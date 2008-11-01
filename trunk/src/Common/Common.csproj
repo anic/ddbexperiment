@@ -36,7 +36,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entity\Common.cs" />
+    <Compile Include="Entity\Field.cs" />
+    <Compile Include="Entity\Table.cs" />
+    <Compile Include="Entity\Tuple.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Entity\TableScheme.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

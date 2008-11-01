@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DistDBMS.ServerSite.RelationalAlgebra.Entity;
 
 namespace TestProject
 {
@@ -8,6 +9,8 @@ namespace TestProject
     {
         static void Main(string[] args)
         {
+            
+
         }
     }
 }

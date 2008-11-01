@@ -1,0 +1,17 @@
+Student (id int key, name char(25), sex char(1), age int, degree int)
+create table Student (id int key, name char(25), sex char(1), age int, degree int)
+
+Teacher (id int key, name char(25), title int)
+Course (id int key, name char(80), location char(6), credit_hour int, teacher_id int)
+Exam (student_id int key, course_id int key, mark int)
+
+fragment Student horizontally into id<105000, id>=105000 and id<110000, id>=110000
+fragment Teacher horizontally into id<201000 and title<>3, id<201000 and title=3,
+id>=201000 and title<>3, id>=201000 and title=3
+fragment Course vertically into (id, name), (id, location, credit_hour, teacher_id)
+fragment Exam horizontally into student_id<107000 and course_id<301200, student_id<107000
+and course_id>=301200, student_id>=107000 and course_id<301200, student_id>=107000
+and course_id>=301200
+
+select Course.name from Course
+select * from Course where credit_hour>2 and location='CB©\6'

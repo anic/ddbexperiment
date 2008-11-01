@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DistDBMS.ServerSite.RelationalAlgebra
+namespace DistDBMS.ServerSite.RelationalAlgebra.Entity
 {
     enum RelationalType
     { 

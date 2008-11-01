@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DistDBMS.ServerSite.SQLSyntax
+namespace DistDBMS.ServerSite.Common
 {
     enum RelationOperator
     {
@@ -20,14 +20,8 @@ namespace DistDBMS.ServerSite.SQLSyntax
         NotEqual
     }
 
-    enum AttributeType
-    { 
-        Unkown,
-        Undefined,
-        Int,
-        Boolean,
-        Double,
-        String
-    }
+
+
+    
 
 }

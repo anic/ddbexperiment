@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.ServerSite.SQLSyntax;
 
-namespace DistDBMS.ServerSite.RelationalAlgebra
+using DistDBMS.Common.Entity;
+using DistDBMS.ServerSite.Common;
+
+namespace DistDBMS.ServerSite.RelationalAlgebra.Entity
 {
     class Relation
     {
@@ -25,12 +28,12 @@ namespace DistDBMS.ServerSite.RelationalAlgebra
         /// <summary>
         /// 是否原子关系，不能再细分
         /// </summary>
-        public bool IsAtomRealtion { get; set; }
+        public bool IsDirectTableScheme { get; set; }
 
         /// <summary>
         /// 如果是原子关系，则获得原子的表
         /// </summary>
-        public Table AtomTable { get; set; }
+        public TableScheme DirectTableScheme { get; set; }
 
         /// <summary>
         /// 谓词，如果有
@@ -38,17 +41,33 @@ namespace DistDBMS.ServerSite.RelationalAlgebra
         public Predication Predication { get; set; }
 
         /// <summary>
+        /// 相关的属性集
+        /// </summary>
+        public TableScheme RelativeAttributes { get; set; }
+
+        public TableScheme ResultScheme
+        {
+            get
+            { 
+                //TODO:未完成
+                TableScheme result = new TableScheme();
+                return result;
+            }
+        }
+
+        /// <summary>
         /// 内容
         /// </summary>
-        public String Content { get; set; }
+        public string Content { get; set; }
 
         public Relation()
         {
             
             LeftRelation = null;
             RightRelation = null;
-            IsAtomRealtion = false;
-            AtomTable = new Table();
+            IsDirectTableScheme = false;
+            DirectTableScheme = new TableScheme();
+            RelativeAttributes = new TableScheme();
             Predication = new Predication();
             Content = "";
         }
