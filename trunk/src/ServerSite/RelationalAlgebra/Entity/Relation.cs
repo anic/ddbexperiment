@@ -26,12 +26,12 @@ namespace DistDBMS.ServerSite.RelationalAlgebra.Entity
         public Relation RightRelation { get; set; }
 
         /// <summary>
-        /// 是否原子关系，不能再细分
+        /// 是否关系直接的表
         /// </summary>
         public bool IsDirectTableScheme { get; set; }
 
         /// <summary>
-        /// 如果是原子关系，则获得原子的表
+        /// 如果关系直接的表，则获得原子的表
         /// </summary>
         public TableScheme DirectTableScheme { get; set; }
 

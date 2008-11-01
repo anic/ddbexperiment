@@ -43,9 +43,18 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
             LeftCondition = null;
             RightCondition = null;
             IsAtomCondition = false;
-            AtomCondition = new AtomCondition();
+            AtomCondition = null;
             Content = "";
         }
 
+        public new string ToString()
+        {
+            if (IsAtomCondition && AtomCondition != null)
+                return AtomCondition.ToString();
+            else if (LeftCondition != null && RightCondition != null)
+                return LeftCondition.ToString() + " " + Operator.ToString() + " " + RightCondition.ToString() ;
+            else
+                return "Undone Condition ";
+        }
     }
 }

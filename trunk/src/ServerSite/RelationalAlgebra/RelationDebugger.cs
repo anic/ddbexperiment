@@ -18,13 +18,13 @@ namespace DistDBMS.ServerSite.RelationalAlgebra
         {
             string result = node.Type.ToString() + ": ";
             if (node.IsDirectTableScheme)
-                result += node.DirectTableScheme.ToString() + " ";
+                result += " " + node.DirectTableScheme.ToString();
 
             if (node.Predication.Content != "")
-                result += "Predication: " + node.Predication.Content + " ";
+                result += " Predication: " + node.Predication.Content;
 
             if (node.RelativeAttributes.Fields.Count > 0 || node.RelativeAttributes.TableName != "")
-                result += "Attributes: " + node.RelativeAttributes.ToString();
+                result += " Attributes: " + node.RelativeAttributes.ToString();
             
             return result;
 

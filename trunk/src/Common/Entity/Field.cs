@@ -27,11 +27,7 @@ namespace DistDBMS.Common.Entity
         /// <summary>
         /// 属性对应的表
         /// </summary>
-        public Table Table
-        {
-            get;
-            set;
-        }
+        public Table Table { get; set; }
 
         /// <summary>
         /// 内容字符串
@@ -40,8 +36,10 @@ namespace DistDBMS.Common.Entity
 
         public Field()
         {
-            AttributeName = "UnSet";
-            AttributeType = AttributeType.Unkown;
+            AttributeName = "";
+            TableName = "";
+            Table = null;
+            AttributeType = AttributeType.Unknown;
         }
     }
 }

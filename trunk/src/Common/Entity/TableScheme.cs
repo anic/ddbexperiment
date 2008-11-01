@@ -38,13 +38,15 @@ namespace DistDBMS.Common.Entity
 
         public TableScheme()
         {
+            TableName = "";
+            NickName = "";
+            IsDbTable = false;
             Fields = new List<Field>();
-
+            IsAllFields = false;
         }
 
         public new string ToString()
         {
-            
             if (IsAllFields)
                 return TableName + "(*)";
             else
@@ -54,11 +56,11 @@ namespace DistDBMS.Common.Entity
                 for (int i = 0; i < Fields.Count; i++)
                 {
                     if (i != 0)
-                        result += ",";
+                        result += ", ";
 
-                    result += Fields[i].Content + " ";
+                    result += Fields[i].Content;
                 }
-                result += ") ";
+                result += ")";
                 return result;
             }
         }

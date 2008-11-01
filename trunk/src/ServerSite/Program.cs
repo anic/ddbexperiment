@@ -19,6 +19,8 @@ namespace DistDBMS.ServerSite
             
         }
 
+        Selection s1, s2; //作为测试使用
+
         private void TestRelationAlgebra()
         {
             //Sample1
@@ -36,7 +38,7 @@ namespace DistDBMS.ServerSite
             r.Predication.Content = "credit_hour>2 and location=\'CB‐6\'";
 
             string output = (new RelationDebugger()).GetDebugString(r);
-            System.Console.WriteLine("Sample1:");
+            System.Console.WriteLine("\nSample1 Relation:");
             System.Console.WriteLine(output);
 
             //Sample2
@@ -117,7 +119,7 @@ namespace DistDBMS.ServerSite
             select2.DirectTableScheme.IsAllFields = true;
 
             output = (new RelationDebugger()).GetDebugString(r);
-            System.Console.WriteLine("Sample2:");
+            System.Console.WriteLine("\nSample2 Relation:");
             System.Console.WriteLine(output);
             
         }
@@ -126,54 +128,156 @@ namespace DistDBMS.ServerSite
         {
             //Sample1
             //关系代数树，示范结构：select * from Course where credit_hour>2 and location='CB‐6'
-            Selection s = new Selection();
-            s.Fields.IsAllFields = true;
-            s.Fields.TableName = "Course";
+            s1 = new Selection();
+            s1.Fields.IsAllFields = true;
+            s1.Fields.TableName = "Course";
 
             TableScheme table = new TableScheme();
             table.TableName = "Course";
             table.IsAllFields = true;
-            s.Sources.Add(table);
+            s1.Sources.Add(table);
 
-            Condition c = new Condition();
-            c.IsAtomCondition = false;
-            c.Operator = DistDBMS.ServerSite.Common.RelationOperator.And;
+            s1.Condition.IsAtomCondition = false;
+            s1.Condition.Operator = DistDBMS.ServerSite.Common.RelationOperator.And;
 
-            //左条件 And 右条件
-            c.LeftCondition = new Condition();
-            c.LeftCondition.IsAtomCondition = true;
-            c.LeftCondition.AtomCondition.Content = "credit_hour>2";
-            c.LeftCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Greater;
+            //左条件
+            s1.Condition.LeftCondition = new Condition();
+            s1.Condition.LeftCondition.IsAtomCondition = true;
+            s1.Condition.LeftCondition.AtomCondition = new AtomCondition();
+            s1.Condition.LeftCondition.AtomCondition.Content = "credit_hour>2";
+            s1.Condition.LeftCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Greater;
             //Course.credit_hour
-            c.LeftCondition.AtomCondition.LeftOperand = new Operand();
-            c.LeftCondition.AtomCondition.LeftOperand.IsValue = false;
-            c.LeftCondition.AtomCondition.LeftOperand.Field = new Field();
-            c.LeftCondition.AtomCondition.LeftOperand.Field.TableName = "Course";
-            c.LeftCondition.AtomCondition.LeftOperand.Field.AttributeName = "credit_hour";
+            s1.Condition.LeftCondition.AtomCondition.LeftOperand = new Operand();
+            s1.Condition.LeftCondition.AtomCondition.LeftOperand.IsValue = false;
+            s1.Condition.LeftCondition.AtomCondition.LeftOperand.Field = new Field();
+            s1.Condition.LeftCondition.AtomCondition.LeftOperand.Field.TableName = "Course";
+            s1.Condition.LeftCondition.AtomCondition.LeftOperand.Field.AttributeName = "credit_hour";
             //2
-            c.LeftCondition.AtomCondition.RightOperand = new Operand();
-            c.LeftCondition.AtomCondition.RightOperand.IsValue = true;
-            c.LeftCondition.AtomCondition.RightOperand.ValueType = AttributeType.Int;
-            c.LeftCondition.AtomCondition.RightOperand.Value = 2;
+            s1.Condition.LeftCondition.AtomCondition.RightOperand = new Operand();
+            s1.Condition.LeftCondition.AtomCondition.RightOperand.IsValue = true;
+            s1.Condition.LeftCondition.AtomCondition.RightOperand.ValueType = AttributeType.Int;
+            s1.Condition.LeftCondition.AtomCondition.RightOperand.Value = 2;
 
-            c.RightCondition = new Condition();
-            c.RightCondition.IsAtomCondition = true;
-            c.RightCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Equal;
+            //右条件
+            s1.Condition.RightCondition = new Condition();
+            s1.Condition.RightCondition.IsAtomCondition = true;
+            s1.Condition.RightCondition.AtomCondition = new AtomCondition();
+            s1.Condition.RightCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Equal;
 
-            c.RightCondition.AtomCondition.LeftOperand = new Operand();
-            c.RightCondition.AtomCondition.LeftOperand.IsValue = false;
-            c.RightCondition.AtomCondition.LeftOperand.Field = new Field();
-            c.RightCondition.AtomCondition.LeftOperand.Field.TableName = "Course";
-            c.RightCondition.AtomCondition.LeftOperand.Field.AttributeName = "location";
+            s1.Condition.RightCondition.AtomCondition.LeftOperand = new Operand();
+            s1.Condition.RightCondition.AtomCondition.LeftOperand.IsValue = false;
+            s1.Condition.RightCondition.AtomCondition.LeftOperand.Field = new Field();
+            s1.Condition.RightCondition.AtomCondition.LeftOperand.Field.TableName = "Course";
+            s1.Condition.RightCondition.AtomCondition.LeftOperand.Field.AttributeName = "location";
+
+            s1.Condition.RightCondition.AtomCondition.RightOperand = new Operand();
+            s1.Condition.RightCondition.AtomCondition.RightOperand.IsValue = true;
+            s1.Condition.RightCondition.AtomCondition.RightOperand.ValueType = AttributeType.String;
+            s1.Condition.RightCondition.AtomCondition.RightOperand.Value = "CB‐6";
+
+            System.Console.WriteLine("\nSample1 SQL:");
+            System.Console.WriteLine(s1.ToString());
+
+
+            //Sample2
+            /*
+             * select Course.name, Course.credit_hour, Teacher.name
+             * from Course, Teacher
+             * where Course.teacher_id=Teacher.id and
+             * Course.credit_hour>2 and
+             * Teacher.title=3
+             */
+
+            s2 = new Selection();
+            
+            //Select
+            s2.Fields.IsAllFields = false;
+            s2.Fields.TableName = "";
+            Field f1 = new Field(); 
+            f1.TableName = "Course";
+            f1.AttributeName = "name";
+            s2.Fields.Fields.Add(f1); //Course.name
+
+            f1 = new Field();
+            f1.TableName = "Course";
+            f1.AttributeName = "credit_hour";
+            s2.Fields.Fields.Add(f1); //Course.credit_hour
+
+            f1 = new Field();
+            f1.TableName = "Teacher";
+            f1.AttributeName = "name";
+            s2.Fields.Fields.Add(f1); //Teacher.name
+
+
+            //From Course
+            table = new TableScheme();
+            table.TableName = "Course";
+            table.IsAllFields = true;
+            s2.Sources.Add(table);
+
+            //From Teacher
+            table = new TableScheme();
+            table.TableName = "Teacher";
+            table.IsAllFields = true;
+            s2.Sources.Add(table);
+
+            s2.Condition.IsAtomCondition = false;
+            s2.Condition.Operator = DistDBMS.ServerSite.Common.RelationOperator.And;
+            //左条件 Course.teacher_id=Teacher.id
+            s2.Condition.LeftCondition = new Condition();
+            s2.Condition.LeftCondition.Content = "Course.teacher_id=Teacher.id ";
+            s2.Condition.LeftCondition.IsAtomCondition = true;
+            s2.Condition.LeftCondition.AtomCondition = new AtomCondition();
+            s2.Condition.LeftCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Equal;
+
+            s2.Condition.LeftCondition.AtomCondition.LeftOperand.IsValue = false;
+            s2.Condition.LeftCondition.AtomCondition.LeftOperand.Field.AttributeName = "teacher_id";
+            s2.Condition.LeftCondition.AtomCondition.LeftOperand.Field.TableName = "Course";
+
+            s2.Condition.LeftCondition.AtomCondition.RightOperand.IsValue = false;
+            s2.Condition.LeftCondition.AtomCondition.RightOperand.Field.AttributeName = "id";
+            s2.Condition.LeftCondition.AtomCondition.RightOperand.Field.TableName = "Teacher";
+
+            //右条件 Course.credit_hour>2 and  Teacher.title=3
+            s2.Condition.RightCondition = new Condition();
+            s2.Condition.RightCondition.Content = "Course.credit_hour>2 and  Teacher.title=3";
+            s2.Condition.IsAtomCondition = false;
+            s2.Condition.RightCondition.Operator = DistDBMS.ServerSite.Common.RelationOperator.And;
+
+            //右条件的左条件 Course.credit_hour>2
+            s2.Condition.RightCondition.LeftCondition = new Condition();
+            s2.Condition.RightCondition.LeftCondition.IsAtomCondition = true;
+            s2.Condition.RightCondition.LeftCondition.AtomCondition = new AtomCondition();
+            s2.Condition.RightCondition.LeftCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Greater; //  ">"
+            
+            //Course.credit_hour
+            s2.Condition.RightCondition.LeftCondition.AtomCondition.LeftOperand.IsValue = false;
+            s2.Condition.RightCondition.LeftCondition.AtomCondition.LeftOperand.Field.TableName = "Course";
+            s2.Condition.RightCondition.LeftCondition.AtomCondition.LeftOperand.Field.AttributeName = "credit_hour";
 
             //2
-            c.RightCondition.AtomCondition.RightOperand = new Operand();
-            c.RightCondition.AtomCondition.RightOperand.IsValue = true;
-            c.RightCondition.AtomCondition.RightOperand.ValueType = AttributeType.String;
-            c.RightCondition.AtomCondition.RightOperand.Value = "CB‐6";
+            s2.Condition.RightCondition.LeftCondition.AtomCondition.RightOperand.IsValue = true;
+            s2.Condition.RightCondition.LeftCondition.AtomCondition.RightOperand.ValueType = AttributeType.Int;
+            s2.Condition.RightCondition.LeftCondition.AtomCondition.RightOperand.Value = 2;
 
+            //右条件的右条件 Teacher.title=3
+            s2.Condition.RightCondition.RightCondition = new Condition();
+            s2.Condition.RightCondition.RightCondition.IsAtomCondition = true;
+            s2.Condition.RightCondition.RightCondition.AtomCondition = new AtomCondition();
+            s2.Condition.RightCondition.RightCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Equal; //  "="
 
+            // Teacher.title
+            s2.Condition.RightCondition.RightCondition.AtomCondition.LeftOperand.IsValue = false;
+            s2.Condition.RightCondition.RightCondition.AtomCondition.LeftOperand.Field.TableName = "Teacher";
+            s2.Condition.RightCondition.RightCondition.AtomCondition.LeftOperand.Field.AttributeName = "title";
 
+            //3
+            s2.Condition.RightCondition.RightCondition.AtomCondition.RightOperand.IsValue = true;
+            s2.Condition.RightCondition.RightCondition.AtomCondition.RightOperand.ValueType = AttributeType.Int;
+            s2.Condition.RightCondition.RightCondition.AtomCondition.RightOperand.Value = 3;
+
+            System.Console.WriteLine("\nSample2 SQL:");
+            System.Console.WriteLine(s2.ToString());
 
         }
     }

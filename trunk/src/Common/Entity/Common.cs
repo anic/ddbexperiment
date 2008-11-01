@@ -6,7 +6,7 @@ namespace DistDBMS.Common.Entity
 {
     public enum AttributeType
     {
-        Unkown,
+        Unknown,
         Undefined,
         Int,
         Boolean,

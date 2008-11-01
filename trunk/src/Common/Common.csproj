@@ -40,6 +40,10 @@
     <Compile Include="Entity\Field.cs" />
     <Compile Include="Entity\Table.cs" />
     <Compile Include="Entity\Tuple.cs" />
+    <Compile Include="GDD\ExecutionPlan.cs" />
+    <Compile Include="GDD\ExecutionStep.cs" />
+    <Compile Include="GDD\Site.cs" />
+    <Compile Include="GDD\Status.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entity\TableScheme.cs" />
   </ItemGroup>

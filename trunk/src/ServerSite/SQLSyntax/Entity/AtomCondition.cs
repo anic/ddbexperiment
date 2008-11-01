@@ -30,5 +30,44 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// </summary>
         public string Content { get; set; }
 
+        public AtomCondition()
+        {
+            Operator = LogicOperator.Equal;
+            LeftOperand = new Operand();
+            RightOperand = new Operand();
+            Content = "";
+        }
+
+        public new string ToString()
+        { 
+            string op = "";
+            switch(Operator)
+            {
+                case LogicOperator.Equal:
+                    op = " = ";
+                    break;
+                case LogicOperator.Greater:
+                    op = " > ";
+                    break;
+                case LogicOperator.GreaterOrEqual:
+                    op = " >= ";
+                    break;
+                case LogicOperator.Less:
+                    op = " < ";
+                    break;
+                case LogicOperator.LessOrEqual:
+                    op = " <= ";
+                    break;
+                case LogicOperator.NotEqual:
+                    op = " <> ";
+                    break;
+                default:
+                    op = " error ";
+                    break;
+            }
+
+            return LeftOperand.ToString() + op + RightOperand.ToString();
+        }
+
     }
 }

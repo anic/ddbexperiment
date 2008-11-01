@@ -1,0 +1,146 @@
+1 定义站点
+define site S1 127.0.0.1:2001
+define site S2 127.0.0.1:2002
+define site S3 127.0.0.1:2003
+define site S4 127.0.0.1:2004
+
+2 定义表
+create table Student (id int key, name char(25), sex char(1), age int, degree int)
+create table Teacher (id int key, name char(25), title int)
+create table Course (id int key, name char(80), location char(8), credit_hour int, teacher_id int)
+create table Exam (student_id int, course_id int, mark int)
+
+3 水平划分
+fragment Student horizontally into id<105000, id>=105000 and id<110000, id>=110000
+
+4 水平划分2
+fragment Teacher horizontally into id<201000 and title<>3, id<201000 and title=3, id>=201000
+and title<>3, id>=201000 and title=3
+
+5 垂直划分
+fragment Course vertically into (id, name), (id, location, credit_hour, teacher_id)
+？这里没有说Course分成的名字是什么？好像默认成为Course.1和Course.2
+
+
+6 其他划分
+...
+
+fragment Course.2 horizontally into credit_hour=1, credit_hour>1 and credit_hour<4,
+credit_hour=4
+fragment Exam horizontally into student_id<107000 and course_id<301200, student_id<107000
+and course_id>=301200, student_id>=107000 and course_id<301200, student_id>=107000
+and course_id>=301200
+...
+
+7 分配
+allocate Student.1 to S1
+...
+allocate Student.2 to S2
+allocate Student.3 to S3
+allocate Teacher.1 to S1
+allocate Teacher.2 to S2
+allocate Teacher.3 to S3
+allocate Teacher.4 to S4
+allocate Course.1 to S1
+allocate Course.2.1 to S2
+allocate Course.2.2 to S3
+allocate Course.2.3 to S4
+allocate Exam.1 to S1
+allocate Exam.2 to S2
+allocate Exam.3 to S3
+allocate Exam.4 to S4
+...
+
+//上述1-7，通过SQL解析，生成GDD和执行计划，无需转化关系代数和优化
+
+8 插入
+insert into Student values (190001, 'xiao ming', 'M', 20, 1)
+涉及站点：Site 1
+
+insert into Teacher values (290001, 'Santa Claus', 2)
+涉及站点：Site 3
+
+9 删除
+delete from Teacher where title=1
+涉及站点：Site 1、Site 3
+删除Site 1 上的(200001, 'St. Nicholas', 1)
+
+delete from Teacher where id>=290000 and title=2,
+涉及站点：Site 3
+删除Site 3 上的(290001, 'Santa Claus', 2)
+
+//8和9是需要优化和查找站点，但是应该不需要（不能够）转化成为关系代数
+
+10 导入数据
+格式暂定为
+import from filename
+
+数据文件格式：
+table_name_1 number_of_rows
+表的出现顺序与1.1 节中的顺序一致
+各个属性值之间使用制表符（'\t'）分隔；
+对于字符串，用单引号（'\''）将其引起来，如；'xiao ming'；
+任何字符串中都不会出现制表符、单引号或双引号。
+
+//单独处理
+
+
+11 查询
+1) 查询所有学生的信息
+select * from Student
+
+2) 查询所有课程的名称
+select Course.name from Course
+
+3) 查询所有学分大于 2 且上课地点在六教的课程信息
+select * from Course where credit_hour>2 and location='CB‐6'
+
+4) 查询所有考试的课程号和成绩
+select course_id, mark from Exam
+
+5) 查询由正教授讲授的学分大于 2 的课程的课程名、学分、教师姓名
+select Course.name, Course.credit_hour, Teacher.name
+from Course, Teacher
+where Course.teacher_id=Teacher.id and
+Course.credit_hour>2 and
+Teacher.title=3
+
+6) 查询各个学生的所有考试成绩
+select Student.name, Exam.mark
+from Student, Exam
+where Student.id=Exam.student_id
+
+7) 查询年龄大于 26 且参加了授课地点不在六教的课程的考试的学生的id, 姓名, 考试
+分数，以及相应的课程名称
+select Student.id, Student.name, Exam.mark, Course.name
+from Student, Exam, Course
+where Student.id=Exam.student_id and
+Exam.course_id=Course.id and
+Student.age>26 and
+Course.location<>'CB‐6'
+
+12 混合查询
+1) 查询所有课程的信息
+select * from Course
+
+13 用户界面要求
+可以清晰的显示当前的数据字典。各组必须提供如下信息的显示:
+站点信息，
+全局表的信息，
+统计信息，
+分片信息；
+
+2) 可以方便的导入数据，并且显示导入结果。各组必须提供如下信息的显示：
+成功或失败，
+导入数据总量，
+所用时间；
+
+3) 可以方便的输入 SQL 语句（插入语句、删除语句、查询语句），并且可以对用户的
+不同输入显示相应的结果。各组必须提供如下信息的显示：
+执行 SQL 语句所涉及的站点，
+插入、删除、查询等命令执行是否成功，
+执行时间，
+查询语句的返回结果集，包括行、列计数，
+优化后的查询树、查询执行计划；
+
+4) 对系统运行时出现的错误和用户输入的错误给出相应的提示。
