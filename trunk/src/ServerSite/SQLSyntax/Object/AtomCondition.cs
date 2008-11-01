@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.ServerSite.Common;
 
-namespace DistDBMS.ServerSite.SQLSyntax.Entity
+namespace DistDBMS.ServerSite.SQLSyntax.Object
 {
     /// <summary>
     /// 原子条件，更像谓词
@@ -18,14 +18,14 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// <summary>
         /// 左操作数
         /// </summary>
-        public Operand LeftOperand { get { return left; } }
-        Operand left;
+        public Operand LeftOperand { get; set; }
+        
 
         /// <summary>
         /// 右操作数
         /// </summary>
-        public Operand RightOperand { get { return right; } }
-        Operand right;
+        public Operand RightOperand { get; set; }
+        
 
         /// <summary>
         /// 内容字符串
@@ -35,8 +35,8 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         public AtomCondition()
         {
             Operator = LogicOperator.Equal;
-            left = new Operand();
-            right = new Operand();
+            LeftOperand = new Operand();
+            RightOperand = new Operand();
             Content = "";
         }
 

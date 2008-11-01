@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Entity;
+using DistDBMS.ServerSite.SQLSyntax.Object;
 
-namespace DistDBMS.ServerSite.SQLSyntax.Entity
+namespace DistDBMS.ServerSite.SQLSyntax.Operation
 {
     class HFragmentation
     {
@@ -12,12 +13,10 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// </summary>
         public TableScheme Source
         {
-            get
-            {
-                return source;
-            } 
+            get;
+            set;
         }
-        TableScheme source;
+        
 
         /// <summary>
         /// 分片的条件
@@ -27,7 +26,7 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
 
         public HFragmentation()
         {
-            source = new TableScheme();
+            Source = new TableScheme();
             conditions = new List<Condition>();
         }
 

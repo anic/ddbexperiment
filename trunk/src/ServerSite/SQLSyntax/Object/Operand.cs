@@ -4,7 +4,7 @@ using System.Text;
 
 using DistDBMS.Common.Entity;
 
-namespace DistDBMS.ServerSite.SQLSyntax.Entity
+namespace DistDBMS.ServerSite.SQLSyntax.Object
 {
     class Operand
     {
@@ -26,8 +26,8 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// <summary>
         /// 如果不是值，是某个表的某个属性
         /// </summary>
-        public Field Field { get { return field; } }
-        Field field;
+        public Field Field { get; set; }
+        
 
         /// <summary>
         /// 如果是值，其类型，如Int,Double等
@@ -43,7 +43,7 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         public Operand()
         {
             IsValue = true;
-            field = new Field();
+            Field = new Field();
             ValueType = AttributeType.Unknown;
         }
 

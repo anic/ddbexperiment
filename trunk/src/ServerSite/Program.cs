@@ -4,7 +4,9 @@ using System.Text;
 using DistDBMS.ServerSite.RelationalAlgebra.Entity;
 using DistDBMS.Common.Entity;
 using DistDBMS.ServerSite.RelationalAlgebra;
-using DistDBMS.ServerSite.SQLSyntax.Entity;
+using DistDBMS.ServerSite.SQLSyntax.Object;
+using DistDBMS.ServerSite.SQLSyntax.Operation;
+using DistDBMS.ServerSite.SQLSyntax.Parser;
 
 namespace DistDBMS.ServerSite
 {
@@ -38,7 +40,7 @@ namespace DistDBMS.ServerSite
             r.Predication.Content = "credit_hour>2 and location=\'CB‐6\'";
 
             string output = (new RelationDebugger()).GetDebugString(r);
-            System.Console.WriteLine("\nSample1 Relation:");
+            System.Console.WriteLine("\n\nSample1 Relation:");
             System.Console.WriteLine(output);
 
             //Sample2
@@ -119,7 +121,7 @@ namespace DistDBMS.ServerSite
             select2.DirectTableScheme.IsAllFields = true;
 
             output = (new RelationDebugger()).GetDebugString(r);
-            System.Console.WriteLine("\nSample2 Relation:");
+            System.Console.WriteLine("\n\nSample2 Relation:");
             System.Console.WriteLine(output);
             
         }
@@ -136,7 +138,7 @@ namespace DistDBMS.ServerSite
             table.TableName = "Course";
             table.IsAllFields = true;
             s1.Sources.Add(table);
-
+            s1.Condition = new Condition();
             s1.Condition.IsAtomCondition = false;
             s1.Condition.Operator = DistDBMS.ServerSite.Common.RelationOperator.And;
 
@@ -169,7 +171,7 @@ namespace DistDBMS.ServerSite
             s1.Condition.RightCondition.AtomCondition.RightOperand.ValueType = AttributeType.String;
             s1.Condition.RightCondition.AtomCondition.RightOperand.Value = "CB‐6";
 
-            System.Console.WriteLine("\nSample1 SQL:");
+            System.Console.WriteLine("\n\nSample1 SQL:");
             System.Console.WriteLine(s1.ToString());
 
 
@@ -214,7 +216,7 @@ namespace DistDBMS.ServerSite
             table.TableName = "Teacher";
             table.IsAllFields = true;
             s2.Sources.Add(table);
-
+            s2.Condition = new Condition();
             s2.Condition.IsAtomCondition = false;
             s2.Condition.Operator = DistDBMS.ServerSite.Common.RelationOperator.And;
             //左条件 Course.teacher_id=Teacher.id
@@ -272,6 +274,27 @@ namespace DistDBMS.ServerSite
 
             System.Console.WriteLine("\nSample2 SQL:");
             System.Console.WriteLine(s2.ToString());
+
+            //测试
+            string[] tests = new string[]{
+           "select * from Student",
+            "select Course.name from Course",
+            "select * from Course where credit_hour>2 and location='CB‐6'",
+            "select course_id, mark from Exam",
+            "select Course.name, Course.credit_hour, Teacher.name from Course, Teacher where Course.teacher_id=Teacher.id and Course.credit_hour>2 and Teacher.title=3",
+            "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id",
+            "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'"
+            };
+            
+
+            ParserSwitcher ps = new ParserSwitcher();
+            for (int i = 0; i < tests.Length;i++ )
+            {
+                bool result = ps.Parse(tests[i]);
+                Selection s3 = ps.LastResult as Selection;
+                System.Console.Write("\n\nTEST" + i.ToString() + ":\n" + s3.ToString());
+            }
+            
 
         }
     }

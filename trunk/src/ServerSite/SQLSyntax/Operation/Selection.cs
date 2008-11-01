@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 using DistDBMS.Common.Entity;
+using DistDBMS.ServerSite.SQLSyntax.Object;
 
-namespace DistDBMS.ServerSite.SQLSyntax.Entity
+namespace DistDBMS.ServerSite.SQLSyntax.Operation
 {
     class Selection
     {
@@ -13,10 +14,11 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// </summary>
         public TableScheme Fields
         {
-            get { return fields; }
-            
+            get;
+            set;
+
         } //Select (A.t1,B.t2)
-        TableScheme fields;
+        
 
         /// <summary>
         /// 源表，就是Select...From后面的表
@@ -30,8 +32,8 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// <summary>
         /// 条件，Where后面的内容，可嵌套
         /// </summary>
-        public Condition Condition { get { return condition; } } //Where ...
-        Condition condition;
+        public Condition Condition { get; set; } //Where ...
+        
 
         /// <summary>
         /// 内容字符串
@@ -40,22 +42,23 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
 
         public Selection()
         {
-            fields = new TableScheme();
+            Fields = new TableScheme();
             sources = new List<TableScheme>();
-            condition = new Condition();
+            Condition = null;
             Content = "";
         }
 
         public new string ToString()
         {
-            string result = "SELECT " + Fields.ToString() + "\nFROM ";
+            string result = "SELECT " + Fields.ToString() + " \nFROM ";
             for (int i = 0; i < Sources.Count; i++)
             {
                 if (i != 0)
                     result += ", ";
                 result += Sources[i].ToString();
             }
-            result += "\nWHERE " + Condition.ToString();
+            if (Condition != null)
+                result += " \nWHERE " + Condition.ToString();
             return result;
            
         }

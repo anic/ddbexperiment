@@ -4,21 +4,20 @@ using System.Text;
 
 using DistDBMS.Common.GDD;
 
-namespace DistDBMS.ServerSite.SQLSyntax.Entity
+namespace DistDBMS.ServerSite.SQLSyntax.Operation
 {
     class SiteDefinition
     {
          /// <summary>
         /// 构造一个站点对象
         /// </summary>
-        public Site Site { get { return site; } }
-        Site site;
-
+        public Site Site { get; set; }
+        
         public string Content { get; set; }
 
         public SiteDefinition()
         {
-            site = new Site();
+            Site = new Site();
             Content = "";
         }
 

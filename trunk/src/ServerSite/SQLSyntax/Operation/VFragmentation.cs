@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Entity;
 
-namespace DistDBMS.ServerSite.SQLSyntax.Entity
+namespace DistDBMS.ServerSite.SQLSyntax.Operation
 {
     class VFragmentation
     {
@@ -11,21 +11,21 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// <summary>
         /// 需要分片的表
         /// </summary>
-        public TableScheme Source { get { return source; } }
+        public TableScheme Source { get; set; }
 
         List<TableScheme> schemes;
         List<TableScheme> Schemes { get { return schemes; } }
 
         public VFragmentation()
         {
-            source = new TableScheme();
+            Source = new TableScheme();
             schemes = new List<TableScheme>();
         }
 
         public new string ToString() 
         {
             //fragment Course vertically into (id, name), (id, location, credit_hour, teacher_id)
-            string result = "fragment " + source.ToString() + " vertically into ";
+            string result = "fragment " + Source.ToString() + " vertically into ";
             for (int i = 0; i < schemes.Count; i++)
             {
                 if (i != 0)

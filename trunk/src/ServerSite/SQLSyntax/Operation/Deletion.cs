@@ -2,29 +2,30 @@
 using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Entity;
+using DistDBMS.ServerSite.SQLSyntax.Object;
 
-namespace DistDBMS.ServerSite.SQLSyntax.Entity
+namespace DistDBMS.ServerSite.SQLSyntax.Operation
 {
     class Deletion
     {
         /// <summary>
         /// 删除的源表
         /// </summary>
-        public TableScheme Source { get { return source; } }
-        TableScheme source;
+        public TableScheme Source { get; set; }
+        
 
         /// <summary>
         /// 条件
         /// </summary>
-        public Condition Condition { get { return condition; } }
-        Condition condition;
+        public Condition Condition { get; set; }
+        
 
         public string Content { get; set; }
 
         public Deletion()
         {
-            source = new TableScheme();
-            condition = new Condition();
+            Source = new TableScheme();
+            Condition = new Condition();
 
             Content = "";
         }
@@ -32,7 +33,7 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         public new string ToString()
         {
             //delete from Teacher where title=1
-            return "delete from " + source.TableName + " where " + condition.ToString();
+            return "delete from " + Source.TableName + " where " + Condition.ToString();
         }
     }
 }

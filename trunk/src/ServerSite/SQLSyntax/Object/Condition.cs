@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.ServerSite.Common;
 
-namespace DistDBMS.ServerSite.SQLSyntax.Entity
+namespace DistDBMS.ServerSite.SQLSyntax.Object
 {
     class Condition
     {
