@@ -35,7 +35,7 @@ namespace DistDBMS.ServerSite
 
             r.Predication.Content = "credit_hour>2 and location=\'CB‐6\'";
 
-            string output = (new ConsoleDebugger()).GetDebugString(r);
+            string output = (new RelationDebugger()).GetDebugString(r);
             System.Console.WriteLine("Sample1:");
             System.Console.WriteLine(output);
 
@@ -116,7 +116,7 @@ namespace DistDBMS.ServerSite
             select2.DirectTableScheme.TableName = "Teacher";
             select2.DirectTableScheme.IsAllFields = true;
 
-            output = (new ConsoleDebugger()).GetDebugString(r);
+            output = (new RelationDebugger()).GetDebugString(r);
             System.Console.WriteLine("Sample2:");
             System.Console.WriteLine(output);
             

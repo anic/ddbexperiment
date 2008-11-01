@@ -6,7 +6,7 @@ using DistDBMS.Common.Entity;
 
 namespace DistDBMS.ServerSite.RelationalAlgebra
 {
-    class ConsoleDebugger
+    class RelationDebugger
     {
         public string GetDebugString(Relation root)
         {
