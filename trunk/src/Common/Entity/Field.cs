@@ -25,6 +25,21 @@ namespace DistDBMS.Common.Entity
         public AttributeType AttributeType { get; set; }
 
         /// <summary>
+        /// 如Int32后面的32可以存入，可能没用，暂时做着
+        /// </summary>
+        public object Addition { get; set; }
+
+        /// <summary>
+        /// 表中是否以这个属性作为索引
+        /// </summary>
+        public bool Indexed { get; set; }
+
+        /// <summary>
+        /// 表中是否以这个属性作为主键
+        /// </summary>
+        public bool IsPrimaryKey { get; set; }
+
+        /// <summary>
         /// 属性对应的表
         /// </summary>
         public Table Table { get; set; }
@@ -39,7 +54,15 @@ namespace DistDBMS.Common.Entity
             AttributeName = "";
             TableName = "";
             Table = null;
+            Addition = null;
+            Indexed = false;
+            IsPrimaryKey = false;
             AttributeType = AttributeType.Unknown;
+        }
+
+        public new string ToString()
+        {
+            return TableName + "." + AttributeName;
         }
     }
 }

@@ -20,8 +20,6 @@ namespace DistDBMS.Common.Entity
         /// </summary>
         public List<Tuple> Tuples { get; set; }
 
-
-
         #region ISerializable Members
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)

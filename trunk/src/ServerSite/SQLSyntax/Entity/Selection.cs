@@ -13,23 +13,25 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// </summary>
         public TableScheme Fields
         {
-            get;
-            set;
+            get { return fields; }
+            
         } //Select (A.t1,B.t2)
+        TableScheme fields;
 
         /// <summary>
         /// 源表，就是Select...From后面的表
         /// </summary>
         public List<TableScheme> Sources
         {
-            get;
-            set;
+            get { return sources; }
         } //From A,B
+        List<TableScheme> sources;
 
         /// <summary>
         /// 条件，Where后面的内容，可嵌套
         /// </summary>
-        public Condition Condition { get; set; } //Where ...
+        public Condition Condition { get { return condition; } } //Where ...
+        Condition condition;
 
         /// <summary>
         /// 内容字符串
@@ -38,9 +40,9 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
 
         public Selection()
         {
-            Fields = new TableScheme();
-            Sources = new List<TableScheme>();
-            Condition = new Condition();
+            fields = new TableScheme();
+            sources = new List<TableScheme>();
+            condition = new Condition();
             Content = "";
         }
 

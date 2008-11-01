@@ -18,12 +18,14 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// <summary>
         /// 左操作数
         /// </summary>
-        public Operand LeftOperand { get; set; } //还是说用接口
+        public Operand LeftOperand { get { return left; } }
+        Operand left;
 
         /// <summary>
         /// 右操作数
         /// </summary>
-        public Operand RightOperand { get; set; }
+        public Operand RightOperand { get { return right; } }
+        Operand right;
 
         /// <summary>
         /// 内容字符串
@@ -33,8 +35,8 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         public AtomCondition()
         {
             Operator = LogicOperator.Equal;
-            LeftOperand = new Operand();
-            RightOperand = new Operand();
+            left = new Operand();
+            right = new Operand();
             Content = "";
         }
 

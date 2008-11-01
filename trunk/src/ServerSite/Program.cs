@@ -147,13 +147,10 @@ namespace DistDBMS.ServerSite
             s1.Condition.LeftCondition.AtomCondition.Content = "credit_hour>2";
             s1.Condition.LeftCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Greater;
             //Course.credit_hour
-            s1.Condition.LeftCondition.AtomCondition.LeftOperand = new Operand();
             s1.Condition.LeftCondition.AtomCondition.LeftOperand.IsValue = false;
-            s1.Condition.LeftCondition.AtomCondition.LeftOperand.Field = new Field();
             s1.Condition.LeftCondition.AtomCondition.LeftOperand.Field.TableName = "Course";
             s1.Condition.LeftCondition.AtomCondition.LeftOperand.Field.AttributeName = "credit_hour";
             //2
-            s1.Condition.LeftCondition.AtomCondition.RightOperand = new Operand();
             s1.Condition.LeftCondition.AtomCondition.RightOperand.IsValue = true;
             s1.Condition.LeftCondition.AtomCondition.RightOperand.ValueType = AttributeType.Int;
             s1.Condition.LeftCondition.AtomCondition.RightOperand.Value = 2;
@@ -164,13 +161,10 @@ namespace DistDBMS.ServerSite
             s1.Condition.RightCondition.AtomCondition = new AtomCondition();
             s1.Condition.RightCondition.AtomCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Equal;
 
-            s1.Condition.RightCondition.AtomCondition.LeftOperand = new Operand();
             s1.Condition.RightCondition.AtomCondition.LeftOperand.IsValue = false;
-            s1.Condition.RightCondition.AtomCondition.LeftOperand.Field = new Field();
             s1.Condition.RightCondition.AtomCondition.LeftOperand.Field.TableName = "Course";
             s1.Condition.RightCondition.AtomCondition.LeftOperand.Field.AttributeName = "location";
 
-            s1.Condition.RightCondition.AtomCondition.RightOperand = new Operand();
             s1.Condition.RightCondition.AtomCondition.RightOperand.IsValue = true;
             s1.Condition.RightCondition.AtomCondition.RightOperand.ValueType = AttributeType.String;
             s1.Condition.RightCondition.AtomCondition.RightOperand.Value = "CB‐6";

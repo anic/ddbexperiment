@@ -48,7 +48,12 @@ namespace DistDBMS.Common.Entity
         public new string ToString()
         {
             if (IsAllFields)
-                return TableName + "(*)";
+            {
+                if (TableName != "")
+                    return TableName;
+                else
+                    return "*";
+            }
             else
             {
                 string result = TableName;
@@ -58,7 +63,7 @@ namespace DistDBMS.Common.Entity
                     if (i != 0)
                         result += ", ";
 
-                    result += Fields[i].Content;
+                    result += Fields[i].ToString();
                 }
                 result += ")";
                 return result;

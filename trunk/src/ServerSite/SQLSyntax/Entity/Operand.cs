@@ -26,7 +26,8 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         /// <summary>
         /// 如果不是值，是某个表的某个属性
         /// </summary>
-        public Field Field { get; set; }
+        public Field Field { get { return field; } }
+        Field field;
 
         /// <summary>
         /// 如果是值，其类型，如Int,Double等
@@ -42,7 +43,7 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
         public Operand()
         {
             IsValue = true;
-            Field = new Field();
+            field = new Field();
             ValueType = AttributeType.Unknown;
         }
 
@@ -52,7 +53,7 @@ namespace DistDBMS.ServerSite.SQLSyntax.Entity
                 return Value.ToString();
             else
             {
-                return Field.TableName + "." + Field.AttributeName;
+                return Field.ToString();
             }
         }
 

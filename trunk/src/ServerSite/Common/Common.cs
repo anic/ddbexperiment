@@ -21,7 +21,6 @@ namespace DistDBMS.ServerSite.Common
     }
 
 
-
     
 
 }

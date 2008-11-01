@@ -25,5 +25,13 @@ namespace DistDBMS.Common.GDD
         /// 站点是否活动
         /// </summary>
         public bool IsActive { get; set; }
+
+        public Site()
+        {
+            IP = "";
+            Port = 0;
+            Name = "";
+            IsActive = false;
+        }
     }
 }
