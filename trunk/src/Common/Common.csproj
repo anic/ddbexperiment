@@ -36,16 +36,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entity\Common.cs" />
-    <Compile Include="Entity\Field.cs" />
-    <Compile Include="Entity\Table.cs" />
-    <Compile Include="Entity\Tuple.cs" />
-    <Compile Include="GDD\ExecutionPlan.cs" />
-    <Compile Include="GDD\ExecutionStep.cs" />
-    <Compile Include="GDD\Site.cs" />
-    <Compile Include="GDD\Status.cs" />
+    <Compile Include="Dictionary\FragmentList.cs" />
+    <Compile Include="Enum.cs" />
+    <Compile Include="Table\Field.cs" />
+    <Compile Include="Table\Table.cs" />
+    <Compile Include="Table\Tuple.cs" />
+    <Compile Include="Execution\ExecutionPlan.cs" />
+    <Compile Include="Execution\ExecutionStep.cs" />
+    <Compile Include="Dictionary\Fragment.cs" />
+    <Compile Include="Dictionary\Site.cs" />
+    <Compile Include="Dictionary\SiteList.cs" />
+    <Compile Include="Dictionary\Status.cs" />
+    <Compile Include="Dictionary\GlobalDataDictionary.cs" />
+    <Compile Include="Table\TableSchemeList.cs" />
+    <Compile Include="Syntax\AtomCondition.cs" />
+    <Compile Include="Syntax\Condition.cs" />
+    <Compile Include="Syntax\Operand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Entity\TableScheme.cs" />
+    <Compile Include="Table\TableScheme.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

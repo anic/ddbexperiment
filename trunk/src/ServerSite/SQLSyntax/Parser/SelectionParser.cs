@@ -5,42 +5,34 @@ using DistDBMS.ServerSite.SQLSyntax.Operation;
 using DistDBMS.ServerSite.SQLSyntax.Object;
 using System.Text.RegularExpressions;
 using DistDBMS.Common.Entity;
+using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.ServerSite.SQLSyntax.Parser
 {
-    class SelectionParser:ISqlParser
+    class SelectionParser:AbstractParser
     {
         Selection result;
-
-        SqlSyntaxError error;
+        
         TableMatcher matcher;
         public SelectionParser()
         {
-            error = new SqlSyntaxError();
             matcher = new TableMatcher();
         }
 
 
-        #region ISqlParser Members
-
-        public object LastResult
+        public override object LastResult
         {
             get { return result; }
         }
 
-        public SqlSyntaxError LastError
-        {
-            get { return error; }
-        }
-
-        public bool Parse(string sql)
+        public override bool Parse(string sql)
         {
             //string s1 = "select Course.name, Course.credit_hour, Teacher.name from b where c";
             string condition = "";
             string source ="";
-            Regex reg = new Regex(@"(select)\s*(.*)\s*(from)\s*(.*)", RegexOptions.IgnoreCase);
+            Regex reg = new Regex(@"(select)\s*(.*)\s*(from)\s*(.*)\s*", RegexOptions.IgnoreCase);
             Match match = reg.Match(sql);
-            if (match.Success && match.Groups.Count == 5)
+            if (match.Success)
             {
                 result = new Selection();
 
@@ -98,6 +90,5 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
             return true;
         }
 
-        #endregion
     }
 }

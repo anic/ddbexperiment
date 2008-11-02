@@ -4,6 +4,8 @@ using System.Text;
 using DistDBMS.ServerSite.SQLSyntax.Object;
 using System.Text.RegularExpressions;
 using DistDBMS.Common.Entity;
+using DistDBMS.Common.Syntax;
+using DistDBMS.Common;
 
 namespace DistDBMS.ServerSite.SQLSyntax.Parser
 {
@@ -70,42 +72,74 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
 
         public AtomCondition MatchAtomCondition(string str)
         {
+            string op = "";
+            string left ="";
+            string right = "";
+
             AtomCondition aCondition = new AtomCondition();
-            Regex reg = new Regex(@"(.*)\s*(>|>=|<|<=|=|<>)\s*(.*)");
+            Regex reg = new Regex(@"(.*)\s*(<>|>=|<=)\s*(.*)");
             Match match = reg.Match(str);
+            
+            bool result = false;
+            result |= match.Success;
             if (match.Success)
             {
-                Operand operand1 = MatchOperand(match.Groups[1].ToString().Trim());
+                op = match.Groups[2].ToString();
+                left = match.Groups[1].ToString().Trim();
+                right = match.Groups[3].ToString().Trim();
+            }
+            else
+            {
+                reg = new Regex(@"(.*)\s*(>|<|=)\s*(.*)");
+                match = reg.Match(str);
+                result |= match.Success;
+                if (match.Success)
+                {
+                    op = match.Groups[2].ToString();
+                    left = match.Groups[1].ToString().Trim();
+                    right = match.Groups[3].ToString().Trim();
+                }
+                else
+                {
+                    error.Description = "比较符不匹配";
+                    return null;
+                }
+            }
+
+
+            if (result)
+            {
+                Operand operand1 = MatchOperand(left.Trim());
                 if (operand1 != null)
                     aCondition.LeftOperand = operand1;
                 else
                     return null;
 
-                operand1 = MatchOperand(match.Groups[3].ToString().Trim());
+                operand1 = MatchOperand(right.Trim());
                 if (operand1 != null)
                     aCondition.RightOperand = operand1;
                 else
                     return null;
 
-                switch (match.Groups[2].ToString())
+                switch (op.Trim())
                 { 
                     case ">":
-                        aCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Greater;
+                        aCondition.Operator = LogicOperator.Greater;
                         break;
                     case ">=":
-                        aCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.GreaterOrEqual;
+                        aCondition.Operator = LogicOperator.GreaterOrEqual;
                         break;
                     case "<":
-                        aCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Less;
+                        aCondition.Operator = LogicOperator.Less;
                         break;
                     case "<=":
-                        aCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.LessOrEqual;
+                        aCondition.Operator = LogicOperator.LessOrEqual;
                         break;
                     case "=":
-                        aCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.Equal;
+                        aCondition.Operator = LogicOperator.Equal;
                         break;
                     case "<>":
-                        aCondition.Operator = DistDBMS.ServerSite.Common.LogicOperator.NotEqual;
+                        aCondition.Operator = LogicOperator.NotEqual;
                         break;
                 }
 
@@ -125,18 +159,18 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
             {
                 //数字
                 result.IsValue = true;
-                result.ValueType = DistDBMS.Common.Entity.AttributeType.Int;
+                result.ValueType = AttributeType.Int;
                 result.Value = str;
                 return result;
             }
 
-            reg = new Regex(@"\'(.*)\'");
+            reg = new Regex(@"^\'(.*)\'$");
             match = reg.Match(str);
             if (match.Success)
             { 
                 //字符串
                 result.IsValue = true;
-                result.ValueType = DistDBMS.Common.Entity.AttributeType.String;
+                result.ValueType = AttributeType.String;
                 result.Value = match.Groups[1].ToString();
                 return result;
             }

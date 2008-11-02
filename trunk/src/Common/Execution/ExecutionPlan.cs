@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DistDBMS.Common.GDD
+namespace DistDBMS.Common.Execution
 {
     public class ExecutionPlan
     {

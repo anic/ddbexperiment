@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DistDBMS.Common.GDD;
+using DistDBMS.Common.Dictionary;
 using DistDBMS.Common.Entity;
 
 namespace DistDBMS.ServerSite.SQLSyntax.Operation

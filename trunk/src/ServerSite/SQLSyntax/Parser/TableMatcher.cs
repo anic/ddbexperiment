@@ -65,7 +65,7 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
             return result;
         }
 
-
+        
 
         public TableScheme MatchTableScheme(string str)
         {

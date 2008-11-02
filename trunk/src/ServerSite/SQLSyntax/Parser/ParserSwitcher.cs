@@ -8,6 +8,12 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
 {
     class ParserSwitcher
     {
+        public ParserSwitcher()
+        {
+            error = "";
+            result = null;
+        }
+
         public object LastResult { get { return result; } }
         object result;
 
@@ -17,24 +23,38 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
         public bool Parse(string sql)
         {
             sql = sql.Trim();
-            Regex reg;
-            Match match;
-            ISqlParser parser = null;
-            bool parseResult = false;
-            reg = new Regex("select", RegexOptions.IgnoreCase);
-            match = reg.Match(sql);
-            if (match.Success && match.Index == 0)
-                parser = new SelectionParser();
+            AbstractParser parser = null;
 
+            //获得对应的Parser
+            if (sql.IndexOf("select", StringComparison.CurrentCultureIgnoreCase) == 0)
+                parser = new SelectionParser();
+            else if (sql.IndexOf("allocate", StringComparison.CurrentCultureIgnoreCase) == 0)
+                parser = new AllocationParser();
+            else if (sql.IndexOf("insert", StringComparison.CurrentCultureIgnoreCase) == 0)
+                parser = new InsertionParser();
+            else if (sql.IndexOf("delete", StringComparison.CurrentCultureIgnoreCase) == 0)
+                parser = new DeletionParser();
+
+            //解析
+            bool parseResult = false;
             if (parser != null)
+            {
                 parseResult = parser.Parse(sql);
 
-            if (parseResult && parser!=null)
-                result = parser.LastResult;
-            else
-                error = parser.LastError.Description;
+                if (parseResult && parser != null)
+                    result = parser.LastResult;
+                else
+                    error = parser.LastError.Description;
 
-            return parseResult;
+                return parseResult;
+            }
+            else
+            {
+                error = "不识别的SQL语句";
+                return false;
+            
+            }
+            
 
         }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-using DistDBMS.Common.GDD;
+using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.ServerSite.SQLSyntax.Operation
 {

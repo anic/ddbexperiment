@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DistDBMS.Common.Dictionary;
 
-namespace DistDBMS.Common.GDD
+namespace DistDBMS.Common.Execution
 {
     public class ExecutionStep
     {

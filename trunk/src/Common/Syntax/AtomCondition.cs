@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DistDBMS.Common;
+
 
 namespace DistDBMS.Common.Syntax
 {
     /// <summary>
     /// 原子条件，更像谓词
     /// </summary>
-    class AtomCondition
+    public class AtomCondition
     {
         /// <summary>
         /// 操作符

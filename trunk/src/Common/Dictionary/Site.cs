@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DistDBMS.Common.GDD
+namespace DistDBMS.Common.Dictionary
 {
     public class Site
     {
@@ -34,4 +34,7 @@ namespace DistDBMS.Common.GDD
             IsActive = false;
         }
     }
+
+
+
 }
