@@ -17,8 +17,6 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
         {
         }
 
-        #region ISqlParser Members
-
         public override object LastResult
         {
             get { return result; }
@@ -46,6 +44,5 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
 
         }
 
-        #endregion
     }
 }

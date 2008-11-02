@@ -318,7 +318,34 @@ namespace DistDBMS.ServerSite
                 System.Console.Write("\n\nDelete：" + (ps.LastResult as Deletion).ToString());
             }
 
+            string define = "define site S3 127.0.0.1:2003";
+            r = ps.Parse(define);
+            if (r)
+            {
+                System.Console.Write("\n\nSite Define：" + (ps.LastResult as SiteDefinition).ToString());
+            }
 
+            string create = "create table Student (id int key, name char(25), sex char(1), age int, degree int)";
+            r = ps.Parse(create);
+            if (r)
+            {
+                System.Console.Write("\n\nTable Create：" + (ps.LastResult as TableCreation).ToString());
+            }
+
+            string hfrag = "fragment Teacher horizontally into id<201000 and title<>3, id<201000 and title=3, id>=201000 and title<>3, id>=201000 and title=3";
+            r = ps.Parse(hfrag);
+            if (r)
+            {
+                System.Console.Write("\n\nfragment：" + (ps.LastResult as HFragmentation).ToString());
+            }
+
+            
+            string vfrag = "fragment Course vertically into (id, name), (id, location, credit_hour, teacher_id)";
+            r = ps.Parse(vfrag);
+            if (r)
+            {
+                System.Console.Write("\n\nfragment：" + (ps.LastResult as VFragmentation).ToString());
+            }
 
         }
     }

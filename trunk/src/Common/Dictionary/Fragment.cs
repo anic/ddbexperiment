@@ -67,6 +67,8 @@ namespace DistDBMS.Common.Dictionary
         /// </summary>
         public string Name { get; set; }
 
+        
+        
         public Fragment()
         {
             children = new List<Fragment>();

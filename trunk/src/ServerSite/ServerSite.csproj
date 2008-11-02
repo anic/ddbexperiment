@@ -45,6 +45,10 @@
     <Compile Include="RelationalAlgebra\Entity\Common.cs" />
     <Compile Include="RelationalAlgebra\Entity\Predication.cs" />
     <Compile Include="RelationalAlgebra\Entity\Relation.cs" />
+    <Compile Include="SQLSyntax\Parser\SiteDefinitionParser.cs" />
+    <Compile Include="SQLSyntax\Parser\HFragmentationParser.cs" />
+    <Compile Include="SQLSyntax\Parser\TableCreationParser.cs" />
+    <Compile Include="SQLSyntax\Parser\VFragmentationParser.cs" />
     <Compile Include="SQLSyntax\SqlSyntaxError.cs" />
     <Compile Include="SQLSyntax\Operation\Allocation.cs" />
     <Compile Include="SQLSyntax\Operation\Deletion.cs" />
@@ -62,7 +66,6 @@
     <Compile Include="SQLSyntax\Parser\AbstractParser.cs" />
     <Compile Include="SQLSyntax\Parser\ParserSwitcher.cs" />
     <Compile Include="SQLSyntax\Parser\SelectionParser.cs" />
-    <Compile Include="SQLSyntax\SQLSyntaxDebugger.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

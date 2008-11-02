@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DistDBMS.Common.Dictionary
 {
+    /// <summary>
+    /// 全局数据字典
+    /// </summary>
     public class GlobalDataDictionary
     {
         /// <summary>
@@ -24,6 +27,7 @@ namespace DistDBMS.Common.Dictionary
         public FragmentList Fragments { get { return fragments; } }
         FragmentList fragments;
         
+        //统计信息怎么加？
 
         public GlobalDataDictionary()
         {

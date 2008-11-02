@@ -34,7 +34,17 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
                 parser = new InsertionParser();
             else if (sql.IndexOf("delete", StringComparison.CurrentCultureIgnoreCase) == 0)
                 parser = new DeletionParser();
-
+            else if (sql.IndexOf("define", StringComparison.CurrentCultureIgnoreCase) == 0)
+                parser = new SiteDefinitionParser();
+            else if (sql.IndexOf("create", StringComparison.CurrentCultureIgnoreCase) == 0)
+                parser = new TableCreationParser();
+            else if (sql.IndexOf("fragment", StringComparison.CurrentCultureIgnoreCase) == 0)
+            { 
+                if (sql.IndexOf("horizontally", StringComparison.CurrentCultureIgnoreCase) >= 0)
+                    parser = new HFragmentationParser();
+                else
+                    parser = new VFragmentationParser();
+            }
             //解析
             bool parseResult = false;
             if (parser != null)

@@ -67,8 +67,14 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
 
         
 
+        /// <summary>
+        /// 匹配*或者id,name,...等表样式
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public TableScheme MatchTableScheme(string str)
         {
+            
             Regex reg;
             Match match;
             TableScheme result = new TableScheme();

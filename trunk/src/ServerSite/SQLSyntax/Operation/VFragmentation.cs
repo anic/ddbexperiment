@@ -13,8 +13,13 @@ namespace DistDBMS.ServerSite.SQLSyntax.Operation
         /// </summary>
         public TableScheme Source { get; set; }
 
+        
+        /// <summary>
+        /// 分成的表的样式
+        /// </summary>
+        public List<TableScheme> Schemes { get { return schemes; } }
         List<TableScheme> schemes;
-        List<TableScheme> Schemes { get { return schemes; } }
+
 
         public VFragmentation()
         {

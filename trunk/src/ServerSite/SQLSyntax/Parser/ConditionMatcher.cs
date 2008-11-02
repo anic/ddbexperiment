@@ -70,6 +70,11 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
 
         }
 
+        /// <summary>
+        /// 匹配原子条件
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public AtomCondition MatchAtomCondition(string str)
         {
             string op = "";

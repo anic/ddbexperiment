@@ -24,7 +24,6 @@ fragment Course vertically into (id, name), (id, location, credit_hour, teacher_
 
 6 其他划分
 ...
-
 fragment Course.2 horizontally into credit_hour=1, credit_hour>1 and credit_hour<4,
 credit_hour=4
 fragment Exam horizontally into student_id<107000 and course_id<301200, student_id<107000

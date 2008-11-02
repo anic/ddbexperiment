@@ -13,6 +13,7 @@ namespace DistDBMS.ServerSite.SQLSyntax.Operation
         public TableCreation()
         {
             Target = new TableScheme();
+            
         }
 
         public new string ToString()
