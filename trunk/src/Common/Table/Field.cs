@@ -40,11 +40,6 @@ namespace DistDBMS.Common.Entity
         public bool IsPrimaryKey { get; set; }
 
         /// <summary>
-        /// 属性对应的表
-        /// </summary>
-        public Table Table { get; set; }
-
-        /// <summary>
         /// 内容字符串
         /// </summary>
         public string Content { get; set; }
@@ -53,7 +48,6 @@ namespace DistDBMS.Common.Entity
         {
             AttributeName = "";
             TableName = "";
-            Table = null;
             Addition = null;
             Indexed = false;
             IsPrimaryKey = false;

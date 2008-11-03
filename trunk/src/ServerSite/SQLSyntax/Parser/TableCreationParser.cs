@@ -47,10 +47,10 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
             if (items != null)
             {
                 //匹配关键字ID: id int key
-                if (items.Length == 3 && items[0].IndexOf("id", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (items.Length == 3 && items[2].IndexOf("key", StringComparison.CurrentCultureIgnoreCase)==0)
                 {
                     f.IsPrimaryKey = true;
-                    f.AttributeName = items[2];
+                    f.AttributeName = items[0];
                     if (MatchType(items[1], ref f))
                         return f;
                     else
@@ -101,6 +101,16 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
             }
             error.Description = "未知类型匹配";
             return false;
+        }
+
+        public override bool FillLocalConsistency()
+        {
+            result.Target.IsDbTable = true;
+            result.Target.IsAllFields = true;
+            foreach (Field f in result.Target.Fields)
+                f.TableName = result.Target.TableName;
+
+            return true;
         }
     }
 }

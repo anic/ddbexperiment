@@ -32,6 +32,19 @@ namespace DistDBMS.Common.Entity
         public bool IsAllFields { get; set; }
 
         /// <summary>
+        /// 返回是主键的属性域
+        /// </summary>
+        public Field PrimaryKeyField {
+            get {
+                foreach (Field f in Fields)
+                    if (f.IsPrimaryKey)
+                        return f;
+
+                return null;
+            }
+        }
+
+        /// <summary>
         /// 内容字符串
         /// </summary>
         public string Content { get; set; }
@@ -67,6 +80,18 @@ namespace DistDBMS.Common.Entity
                 }
                 result += ")";
                 return result;
+            }
+        }
+
+        public Field this[string fieldName]
+        {
+            get
+            {
+                foreach (Field f in Fields)
+                    if (f.AttributeName == fieldName)
+                        return f;
+
+                return null;
             }
         }
     }

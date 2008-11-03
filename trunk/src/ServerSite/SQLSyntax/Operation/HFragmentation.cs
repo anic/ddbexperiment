@@ -7,6 +7,9 @@ using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.ServerSite.SQLSyntax.Operation
 {
+    /// <summary>
+    /// 水平分片
+    /// </summary>
     class HFragmentation
     {
         /// <summary>

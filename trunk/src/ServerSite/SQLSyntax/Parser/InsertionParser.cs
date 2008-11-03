@@ -66,5 +66,10 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
         {
             get { return result; }
         }
+
+        public override bool FillLocalConsistency()
+        {
+            return true;
+        }
     }
 }

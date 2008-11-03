@@ -9,6 +9,10 @@ namespace DistDBMS.Common.Dictionary
     public enum FragmentType
     {
         /// <summary>
+        /// 分片，无条件
+        /// </summary>
+        None,
+        /// <summary>
         /// 水平分片
         /// </summary>
         Horizontal, 
@@ -26,20 +30,20 @@ namespace DistDBMS.Common.Dictionary
         public Site Site { get; set; }
 
         /// <summary>
-        /// 数据库中的原始表格
+        /// 原始的逻辑表格
         /// </summary>
-        public TableScheme DbTable { get; set; }
+        public TableScheme LogicTable { get; set; }
 
         /// <summary>
-        /// 水平划分条件,可以为无
+        /// 划分条件,可以为无
         /// </summary>
         public Condition Condition { get; set; }
 
-        /// <summary>
-        /// 如果是垂直分片则记录分片的表样式
-        /// </summary>
-        public TableSchemeList ConditionSchemes { get { return conSchemes; } }
-        TableSchemeList conSchemes;
+        ///// <summary>
+        ///// 如果是垂直分片则记录分片的表样式
+        ///// </summary>
+        //public TableSchemeList ConditionSchemes { get { return conSchemes; } }
+        //TableSchemeList conSchemes;
 
         /// <summary>
         /// 上级的分片
@@ -60,7 +64,23 @@ namespace DistDBMS.Common.Dictionary
         /// <summary>
         /// 分片后最终的样式表
         /// </summary>
-        public TableScheme Scheme { get; set; }
+        public TableScheme Scheme {
+            get
+            {
+                //垂直分片或者顶层分片
+                if (Type == FragmentType.Vertical || Type == FragmentType.None)
+                    return ts;
+                else if (Parent!=null) //水平分片
+                    return Parent.Scheme;
+                else 
+                    return null;
+            }
+            set
+            {
+                ts = value;
+            }
+        }
+        TableScheme ts;
 
         /// <summary>
         /// 名称
@@ -73,13 +93,17 @@ namespace DistDBMS.Common.Dictionary
         {
             children = new List<Fragment>();
             Site = null;
-            DbTable = null;
+            LogicTable = null;
             Condition = null;
             Parent = null;
             Type = FragmentType.Horizontal;
-            conSchemes = new TableSchemeList();
-            Scheme = null;
+            ts = null;
             Name = "";
+        }
+
+        public new string ToString()
+        {
+            return Name;
         }
     }
 }

@@ -21,6 +21,7 @@ namespace DistDBMS.Common.Syntax
         public bool IsField
         {
             get { return !IsValue; }
+            set { IsValue = !value; }
         }
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace DistDBMS.Common.Syntax
         /// 如果是值，其类型，如Int,Double等
         /// </summary>
         public AttributeType ValueType { get; set; }
-
+        
         /// <summary>
         /// 值
         /// </summary>

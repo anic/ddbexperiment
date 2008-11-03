@@ -42,9 +42,12 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
             }
             error.Description = "水平分片格式匹配错误";
             return false;
+            
+        }
 
-
-            return false;
+        public override bool FillLocalConsistency()
+        {
+            return true;
         }
     }
 }

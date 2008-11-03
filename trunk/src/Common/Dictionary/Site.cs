@@ -33,6 +33,11 @@ namespace DistDBMS.Common.Dictionary
             Name = "";
             IsActive = false;
         }
+
+        public new string ToString()
+        {
+            return Name + ": " + IP + ":" + Port.ToString();
+        }
     }
 
 

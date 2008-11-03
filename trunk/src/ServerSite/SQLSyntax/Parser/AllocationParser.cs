@@ -39,9 +39,14 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
                 return true;
             }
 
-            error.Description = "格式不匹配";
+            error.Description = "站点分配格式不匹配";
             return false;
 
+        }
+
+        public override bool FillLocalConsistency()
+        {
+            return true;
         }
 
     }

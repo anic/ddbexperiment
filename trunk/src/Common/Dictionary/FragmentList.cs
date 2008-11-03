@@ -19,6 +19,39 @@ namespace DistDBMS.Common.Dictionary
             return result;
         }
 
+        /// <summary>
+        /// 通过分片名称获得分片
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Fragment GetFragmentByName(string name)
+        {
+            foreach (Fragment f in this)
+            {
+                Fragment result = FindFragmentByName(f, name);
+                if (result != null)
+                    return result;
+            }
+            return null;
+        }
+
+
+        private Fragment FindFragmentByName(Fragment f, string name)
+        { 
+            if (f.Name == name)
+                return f;
+
+            foreach(Fragment child in f.Children)
+            {
+                Fragment fInChild = FindFragmentByName(child, name);
+                if (fInChild != null)
+                    return fInChild;
+
+            }
+
+            return null;
+        }
+
         private void FindFragmentBySiteName(string sitename,Fragment f,ref List<Fragment> result)
         { 
             if (f.Site != null && f.Site.Name == sitename)
@@ -27,7 +60,8 @@ namespace DistDBMS.Common.Dictionary
             foreach (Fragment f1 in f.Children)
                 FindFragmentBySiteName(sitename, f1, ref result);
 
-            
         }
+
+
     }
 }

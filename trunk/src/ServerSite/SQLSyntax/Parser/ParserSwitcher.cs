@@ -52,7 +52,14 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
                 parseResult = parser.Parse(sql);
 
                 if (parseResult && parser != null)
-                    result = parser.LastResult;
+                {
+                    //本地语意检查
+                    parseResult |= parser.FillLocalConsistency();
+                    if (parseResult)
+                        result = parser.LastResult;
+                    else
+                        error = parser.LastError.Description;
+                }
                 else
                     error = parser.LastError.Description;
 

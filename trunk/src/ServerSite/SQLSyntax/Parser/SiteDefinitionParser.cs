@@ -48,5 +48,10 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
             error.Description = "定义格式匹配错误";
             return false;
         }
+
+        public override bool FillLocalConsistency()
+        {
+            return true;
+        }
     }
 }

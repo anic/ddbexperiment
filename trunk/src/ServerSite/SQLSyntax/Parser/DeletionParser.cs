@@ -45,5 +45,10 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
 
             //delete from Teacher where id>=290000 and title=2,
         }
+
+        public override bool FillLocalConsistency()
+        {
+            return true;
+        }
     }
 }

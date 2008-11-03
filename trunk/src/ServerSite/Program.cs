@@ -9,6 +9,7 @@ using DistDBMS.ServerSite.SQLSyntax.Operation;
 using DistDBMS.ServerSite.SQLSyntax.Parser;
 using DistDBMS.Common.Syntax;
 using DistDBMS.Common;
+using System.IO;
 
 namespace DistDBMS.ServerSite
 {
@@ -20,6 +21,7 @@ namespace DistDBMS.ServerSite
 
             a.TestSQLSyntax();
             a.TestRelationAlgebra();
+            a.TestGDD();
             
         }
 
@@ -347,6 +349,28 @@ namespace DistDBMS.ServerSite
                 System.Console.Write("\n\nfragment：" + (ps.LastResult as VFragmentation).ToString());
             }
 
+        }
+
+        /// <summary>
+        /// 测试构造数据字典
+        /// </summary>
+        private void TestGDD()
+        {
+            GDDCreator gddCreator = new GDDCreator();
+            string path = "InitScript.txt";
+            if (File.Exists(path))
+            {
+                StreamReader sr = new StreamReader(path, System.Text.Encoding.Default);
+                
+                while (!sr.EndOfStream)
+                {
+                    gddCreator.InsertCommand(sr.ReadLine());
+                }
+                sr.Close();
+                gddCreator.CreateGDD();
+
+
+            }
         }
     }
 }
