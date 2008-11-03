@@ -6,15 +6,16 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7281B7B1-BC54-4D6D-B745-9C950B1BE110}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DistDBMS.ServerSite</RootNamespace>
+    <RootNamespace>DistDBMS.ControlSite</RootNamespace>
     <AssemblyName>ServerSite</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkSubset>
     </TargetFrameworkSubset>
-    <StartupObject>DistDBMS.ServerSite.Program</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,38 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Finder\FragmentFinder.cs" />
-    <Compile Include="Finder\FragmentMatcher.cs" />
-    <Compile Include="GDDCreator.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RelationalAlgebra\RelationDebugger.cs" />
-    <Compile Include="RelationalAlgebra\Entity\Common.cs" />
-    <Compile Include="RelationalAlgebra\Entity\Predication.cs" />
-    <Compile Include="RelationalAlgebra\Entity\Relation.cs" />
-    <Compile Include="SQLSyntax\GlobalConsitencyFiller.cs" />
-    <Compile Include="SQLSyntax\Parser\ConditionConsistencyFiller.cs" />
-    <Compile Include="SQLSyntax\Parser\SiteDefinitionParser.cs" />
-    <Compile Include="SQLSyntax\Parser\HFragmentationParser.cs" />
-    <Compile Include="SQLSyntax\Parser\TableCreationParser.cs" />
-    <Compile Include="SQLSyntax\Parser\VFragmentationParser.cs" />
-    <Compile Include="SQLSyntax\SqlSyntaxError.cs" />
-    <Compile Include="SQLSyntax\Operation\Allocation.cs" />
-    <Compile Include="SQLSyntax\Operation\Deletion.cs" />
-    <Compile Include="SQLSyntax\Operation\SiteDefinition.cs" />
-    <Compile Include="SQLSyntax\Operation\Insertion.cs" />
-    <Compile Include="SQLSyntax\Operation\Selection.cs" />
-    <Compile Include="SQLSyntax\Operation\TableCreation.cs" />
-    <Compile Include="SQLSyntax\Operation\HFragmentation.cs" />
-    <Compile Include="SQLSyntax\Operation\VFragmentation.cs" />
-    <Compile Include="SQLSyntax\Parser\AllocationParser.cs" />
-    <Compile Include="SQLSyntax\Parser\ConditionMatcher.cs" />
-    <Compile Include="SQLSyntax\Parser\DeletionParser.cs" />
-    <Compile Include="SQLSyntax\Parser\InsertionParser.cs" />
-    <Compile Include="SQLSyntax\Parser\TableMatcher.cs" />
-    <Compile Include="SQLSyntax\Parser\AbstractParser.cs" />
-    <Compile Include="SQLSyntax\Parser\ParserSwitcher.cs" />
-    <Compile Include="SQLSyntax\Parser\SelectionParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
@@ -81,11 +51,6 @@
       <Project>{568C0C83-FDE7-4945-AC3D-F0F2AE312720}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="InitScript.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
