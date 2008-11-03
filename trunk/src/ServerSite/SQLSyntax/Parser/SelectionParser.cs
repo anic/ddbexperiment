@@ -4,7 +4,7 @@ using System.Text;
 using DistDBMS.ServerSite.SQLSyntax.Operation;
 using DistDBMS.ServerSite.SQLSyntax.Object;
 using System.Text.RegularExpressions;
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
 using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.ServerSite.SQLSyntax.Parser

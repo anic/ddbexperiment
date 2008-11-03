@@ -25,7 +25,7 @@ namespace DistDBMS.Common.Syntax
         /// <summary>
         /// 是否原子条件，即是否有连接符
         /// </summary>
-        public bool IsAtomCondition { get; set; }
+        public bool IsAtomCondition { get { return (AtomCondition != null); } }
 
         /// <summary>
         /// 原子条件
@@ -42,14 +42,13 @@ namespace DistDBMS.Common.Syntax
             Operator = RelationOperator.And;
             LeftCondition = null;
             RightCondition = null;
-            IsAtomCondition = false;
             AtomCondition = null;
             Content = "";
         }
 
         public new string ToString()
         {
-            if (IsAtomCondition && AtomCondition != null)
+            if (IsAtomCondition)
                 return AtomCondition.ToString();
             else if (LeftCondition != null && RightCondition != null)
                 return LeftCondition.ToString() + " " + Operator.ToString() + " " + RightCondition.ToString() ;

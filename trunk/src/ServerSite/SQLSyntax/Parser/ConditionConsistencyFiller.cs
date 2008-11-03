@@ -2,36 +2,54 @@
 using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Syntax;
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
+using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.ServerSite.SQLSyntax.Parser
 {
     class ConditionConsistencyFiller
     {
-        public void FillSingleTableCondition(TableScheme table, Condition c)
+        public void FillCondition(TableScheme table, Condition c)
+        {
+
+            TableSchemeList list = new TableSchemeList();
+            list.Add(table);
+
+            FillCondition(list, c);
+        }
+
+
+        public void FillCondition(TableSchemeList tables, Condition c)
         {
             if (c.IsAtomCondition)
             {
-                FillSingleTableOperand(table, c.AtomCondition.LeftOperand);
-                FillSingleTableOperand(table, c.AtomCondition.RightOperand);
+                FillOperand(tables, c.AtomCondition.LeftOperand);
+                FillOperand(tables, c.AtomCondition.RightOperand);
             }
             else
             {
                 if (c.LeftCondition != null)
-                    FillSingleTableCondition(table, c.LeftCondition);
+                    FillCondition(tables, c.LeftCondition);
 
                 if (c.RightCondition != null)
-                    FillSingleTableCondition(table, c.RightCondition);
+                    FillCondition(tables, c.RightCondition);
             }
         }
 
-        public void FillSingleTableOperand(TableScheme table, Operand operand)
+        public void FillOperand(TableSchemeList tables,Operand operand)
         {
             if (operand.IsField)
             {
-                Field f = table[operand.Field.AttributeName];
-                if (f!=null)
-                operand.Field = f;
+                foreach (TableScheme table in tables)
+                {
+                    Field f = table[operand.Field.AttributeName];
+                    if (f != null)
+                    {
+                        operand.Field = f;
+                        return;
+                    }
+
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
 using DistDBMS.ServerSite.SQLSyntax.Object;
 using DistDBMS.Common.Syntax;
 

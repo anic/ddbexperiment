@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DistDBMS.Common.Table;
+using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.Common.Dictionary
 {
@@ -35,6 +37,9 @@ namespace DistDBMS.Common.Dictionary
             schemes = new TableSchemeList();
             fragments = new FragmentList();
         }
+
+        
+
 
         
     }

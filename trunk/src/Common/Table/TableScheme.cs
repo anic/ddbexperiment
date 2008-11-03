@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DistDBMS.Common.Entity
+namespace DistDBMS.Common.Table
 {
     public class TableScheme
     {
@@ -18,6 +18,9 @@ namespace DistDBMS.Common.Entity
 
         /// <summary>
         /// 是不是数据库中的表，如果是临时由几个属性组成的“表”，
+        /// 
+        /// 这里还有问题，暂时不要使用这个属性
+        /// 
         /// </summary>
         public bool IsDbTable { get; set; }
 

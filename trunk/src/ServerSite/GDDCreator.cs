@@ -4,7 +4,7 @@ using System.Text;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.ServerSite.SQLSyntax.Parser;
 using DistDBMS.ServerSite.SQLSyntax.Operation;
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
 using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.ServerSite
@@ -184,7 +184,7 @@ namespace DistDBMS.ServerSite
                 if (f.Condition != null)
                 {
                     ConditionConsistencyFiller filler = new ConditionConsistencyFiller();
-                    filler.FillSingleTableCondition(logicTable, f.Condition);
+                    filler.FillCondition(logicTable, f.Condition);
                 }
 
                 //如果是垂直分片，用逻辑表填充分片中的样式
@@ -198,6 +198,9 @@ namespace DistDBMS.ServerSite
                         if (logicTableField != null)
                             ts.Fields[i] = logicTableField;
                     }
+
+                    if (ts.Fields.Count < logicTable.Fields.Count)
+                        ts.IsAllFields = false;
                 }
 
             }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.ServerSite.SQLSyntax.Object;
 using System.Text.RegularExpressions;
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
 using DistDBMS.Common.Syntax;
 using DistDBMS.Common;
 
@@ -25,7 +25,6 @@ namespace DistDBMS.ServerSite.SQLSyntax.Parser
             if (IsAtomCondition(str))
             {
                 AtomCondition ac = MatchAtomCondition(str);
-                result.IsAtomCondition = true;
                 result.AtomCondition = ac;
                 return result;
             }

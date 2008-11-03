@@ -39,6 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Finder\FragmentFinder.cs" />
+    <Compile Include="Finder\FragmentMatcher.cs" />
     <Compile Include="GDDCreator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -46,6 +48,7 @@
     <Compile Include="RelationalAlgebra\Entity\Common.cs" />
     <Compile Include="RelationalAlgebra\Entity\Predication.cs" />
     <Compile Include="RelationalAlgebra\Entity\Relation.cs" />
+    <Compile Include="SQLSyntax\GlobalConsitencyFiller.cs" />
     <Compile Include="SQLSyntax\Parser\ConditionConsistencyFiller.cs" />
     <Compile Include="SQLSyntax\Parser\SiteDefinitionParser.cs" />
     <Compile Include="SQLSyntax\Parser\HFragmentationParser.cs" />

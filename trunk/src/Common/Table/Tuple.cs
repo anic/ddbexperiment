@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DistDBMS.Common.Entity
+namespace DistDBMS.Common.Table
 {
     public class Tuple
     {

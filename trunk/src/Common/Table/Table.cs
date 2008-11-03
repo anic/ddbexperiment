@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
 
-namespace DistDBMS.Common.Entity
+namespace DistDBMS.Common.Table
 {
     /// <summary>
     /// 一个包含数据的表

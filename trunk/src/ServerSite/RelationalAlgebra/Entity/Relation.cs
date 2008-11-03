@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.ServerSite.SQLSyntax;
 
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
 
 
 namespace DistDBMS.ServerSite.RelationalAlgebra.Entity

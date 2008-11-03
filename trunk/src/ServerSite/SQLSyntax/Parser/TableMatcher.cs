@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using DistDBMS.ServerSite.SQLSyntax.Object;
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
 using System.Text.RegularExpressions;
 
 namespace DistDBMS.ServerSite.SQLSyntax.Parser

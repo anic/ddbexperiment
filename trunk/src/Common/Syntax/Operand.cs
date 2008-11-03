@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
 
 namespace DistDBMS.Common.Syntax
 {
@@ -51,7 +51,12 @@ namespace DistDBMS.Common.Syntax
         public new string ToString()
         {
             if (IsValue)
-                return Value.ToString();
+            {
+                if (ValueType != AttributeType.String)
+                    return Value.ToString();
+                else
+                    return "\'" + Value.ToString() + "\'";
+            }
             else
             {
                 return Field.ToString();

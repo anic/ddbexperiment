@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using DistDBMS.ServerSite.RelationalAlgebra.Entity;
-using DistDBMS.Common.Entity;
+using DistDBMS.Common.Table;
 using DistDBMS.ServerSite.RelationalAlgebra;
 using DistDBMS.ServerSite.SQLSyntax.Object;
 using DistDBMS.ServerSite.SQLSyntax.Operation;
@@ -10,18 +10,24 @@ using DistDBMS.ServerSite.SQLSyntax.Parser;
 using DistDBMS.Common.Syntax;
 using DistDBMS.Common;
 using System.IO;
+using DistDBMS.Common.Dictionary;
+using DistDBMS.ServerSite.Finder;
+using DistDBMS.ServerSite.SQLSyntax;
 
 namespace DistDBMS.ServerSite
 {
     class Program
     {
+        GlobalDataDictionary gdd;
+
         static void Main(string[] args)
         {
             Program a = new Program();
 
+            a.TestGDD();
             a.TestSQLSyntax();
             a.TestRelationAlgebra();
-            a.TestGDD();
+            
             
         }
 
@@ -143,12 +149,10 @@ namespace DistDBMS.ServerSite
             table.IsAllFields = true;
             s1.Sources.Add(table);
             s1.Condition = new Condition();
-            s1.Condition.IsAtomCondition = false;
             s1.Condition.Operator = RelationOperator.And;
 
             //左条件
             s1.Condition.LeftCondition = new Condition();
-            s1.Condition.LeftCondition.IsAtomCondition = true;
             s1.Condition.LeftCondition.AtomCondition = new AtomCondition();
             s1.Condition.LeftCondition.AtomCondition.Content = "credit_hour>2";
             s1.Condition.LeftCondition.AtomCondition.Operator = LogicOperator.Greater;
@@ -163,7 +167,6 @@ namespace DistDBMS.ServerSite
 
             //右条件
             s1.Condition.RightCondition = new Condition();
-            s1.Condition.RightCondition.IsAtomCondition = true;
             s1.Condition.RightCondition.AtomCondition = new AtomCondition();
             s1.Condition.RightCondition.AtomCondition.Operator = LogicOperator.Equal;
 
@@ -221,12 +224,10 @@ namespace DistDBMS.ServerSite
             table.IsAllFields = true;
             s2.Sources.Add(table);
             s2.Condition = new Condition();
-            s2.Condition.IsAtomCondition = false;
             s2.Condition.Operator = RelationOperator.And;
             //左条件 Course.teacher_id=Teacher.id
             s2.Condition.LeftCondition = new Condition();
             s2.Condition.LeftCondition.Content = "Course.teacher_id=Teacher.id ";
-            s2.Condition.LeftCondition.IsAtomCondition = true;
             s2.Condition.LeftCondition.AtomCondition = new AtomCondition();
             s2.Condition.LeftCondition.AtomCondition.Operator = LogicOperator.Equal;
 
@@ -241,12 +242,10 @@ namespace DistDBMS.ServerSite
             //右条件 Course.credit_hour>2 and  Teacher.title=3
             s2.Condition.RightCondition = new Condition();
             s2.Condition.RightCondition.Content = "Course.credit_hour>2 and  Teacher.title=3";
-            s2.Condition.IsAtomCondition = false;
             s2.Condition.RightCondition.Operator = RelationOperator.And;
 
             //右条件的左条件 Course.credit_hour>2
             s2.Condition.RightCondition.LeftCondition = new Condition();
-            s2.Condition.RightCondition.LeftCondition.IsAtomCondition = true;
             s2.Condition.RightCondition.LeftCondition.AtomCondition = new AtomCondition();
             s2.Condition.RightCondition.LeftCondition.AtomCondition.Operator = LogicOperator.Greater; //  ">"
             
@@ -262,7 +261,6 @@ namespace DistDBMS.ServerSite
 
             //右条件的右条件 Teacher.title=3
             s2.Condition.RightCondition.RightCondition = new Condition();
-            s2.Condition.RightCondition.RightCondition.IsAtomCondition = true;
             s2.Condition.RightCondition.RightCondition.AtomCondition = new AtomCondition();
             s2.Condition.RightCondition.RightCondition.AtomCondition.Operator = LogicOperator.Equal; //  "="
 
@@ -296,7 +294,12 @@ namespace DistDBMS.ServerSite
             {
                 bool result = ps.Parse(tests[i]);
                 Selection s3 = ps.LastResult as Selection;
-                System.Console.Write("\n\nTEST" + i.ToString() + ":\n" + s3.ToString());
+                GlobalConsitencyFiller filler = new GlobalConsitencyFiller();
+                filler.FillSelection(gdd, s3);
+
+                System.Console.WriteLine("\n\nTEST" + i.ToString() + ":");
+                System.Console.WriteLine("Raw: "+tests[i]);
+                System.Console.WriteLine("Parse:" + s3.ToString());
             }
 
             string allocate = "allocate Student.2 to S2";
@@ -367,7 +370,22 @@ namespace DistDBMS.ServerSite
                     gddCreator.InsertCommand(sr.ReadLine());
                 }
                 sr.Close();
-                gddCreator.CreateGDD();
+                gdd = gddCreator.CreateGDD();
+
+                FragmentFinder finder = new FragmentFinder(gdd);
+                Condition condition = new Condition();
+                condition.AtomCondition = new AtomCondition();
+                condition.AtomCondition.LeftOperand.Field.TableName = "Course";
+                condition.AtomCondition.LeftOperand.Field.AttributeName = "credit_hour";
+                condition.AtomCondition.LeftOperand.IsField = true;
+
+                condition.AtomCondition.Operator = LogicOperator.Greater;
+                condition.AtomCondition.RightOperand.IsValue = true;
+                condition.AtomCondition.RightOperand.ValueType = AttributeType.Int;
+                condition.AtomCondition.RightOperand.Value = 2;
+
+
+                finder.GetMatchFragments(condition);
 
 
             }
