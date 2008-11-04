@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DistDBMS.ControlSite.SQLSyntax;
+using DistDBMS.Common.Syntax;
 
 using DistDBMS.Common.Table;
 
 
-namespace DistDBMS.ControlSite.RelationalAlgebra.Entity
+namespace DistDBMS.Common.RelationalAlgebra.Entity
 {
-    class Relation
+    public class Relation
     {
         /// <summary>
         /// 关系代数的关系类型，如Selection,Projection

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DistDBMS.ControlSite.RelationalAlgebra.Entity;
+using DistDBMS.Common.RelationalAlgebra.Entity;
 
 namespace TestProject
 {

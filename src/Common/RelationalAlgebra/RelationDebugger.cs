@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DistDBMS.ControlSite.RelationalAlgebra.Entity;
+using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Table;
 
-namespace DistDBMS.ControlSite.RelationalAlgebra
+namespace DistDBMS.Common.RelationalAlgebra
 {
-    class RelationDebugger
+    public class RelationDebugger
     {
         public string GetDebugString(Relation root)
         {
