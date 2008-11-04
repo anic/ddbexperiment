@@ -8,7 +8,7 @@ namespace DistDBMS.Common.Table
     /// <summary>
     /// 一个包含数据的表
     /// </summary>
-    public class Table:ISerializable
+    public class Table
     {
         /// <summary>
         /// 表头，记录了表名、属性名、属性的类型（int）
@@ -20,13 +20,6 @@ namespace DistDBMS.Common.Table
         /// </summary>
         public List<Tuple> Tuples { get; set; }
 
-        #region ISerializable Members
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+     
     }
 }

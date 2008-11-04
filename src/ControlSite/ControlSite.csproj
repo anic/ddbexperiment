@@ -35,12 +35,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Finder\FragmentFinder.cs" />
-    <Compile Include="Finder\FragmentMatcher.cs" />
     <Compile Include="GDDCreator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -49,6 +49,7 @@
     <Compile Include="RelationalAlgebra\Entity\Relation.cs" />
     <Compile Include="RelationalAlgebra\RelationDebugger.cs" />
     <Compile Include="SQLSyntax\GlobalConsitencyFiller.cs" />
+    <Compile Include="SQLSyntax\InsertionManager.cs" />
     <Compile Include="SQLSyntax\Operation\Allocation.cs" />
     <Compile Include="SQLSyntax\Operation\Deletion.cs" />
     <Compile Include="SQLSyntax\Operation\HFragmentation.cs" />
