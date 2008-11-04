@@ -297,6 +297,8 @@ namespace DistDBMS.ControlSite
                 GlobalConsitencyFiller filler = new GlobalConsitencyFiller();
                 filler.FillSelection(gdd, s3);
 
+
+
                 System.Console.WriteLine("\n\nTEST" + i.ToString() + ":");
                 System.Console.WriteLine("Raw: "+tests[i]);
                 System.Console.WriteLine("Parse:" + s3.ToString());

@@ -6,6 +6,7 @@ using DistDBMS.ControlSite.SQLSyntax.Parser;
 using DistDBMS.ControlSite.SQLSyntax.Operation;
 using DistDBMS.Common.Table;
 using DistDBMS.Common.Syntax;
+using DistDBMS.Common.Execution;
 
 namespace DistDBMS.ControlSite
 {
@@ -24,6 +25,7 @@ namespace DistDBMS.ControlSite
 
         public void InitCreatioin()
         {
+            
             gdd = null;
 
             siteDefList.Clear();
