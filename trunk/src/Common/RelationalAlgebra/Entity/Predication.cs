@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DistDBMS.ControlSite.RelationalAlgebra.Entity
+namespace DistDBMS.Common.RelationalAlgebra.Entity
 {
-    class Predication
+    public class Predication
     {
         /// <summary>
         /// 内容字符串

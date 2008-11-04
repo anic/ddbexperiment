@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DistDBMS.ControlSite.RelationalAlgebra.Entity
+namespace DistDBMS.Common.RelationalAlgebra.Entity
 {
-    enum RelationalType
+    public enum RelationalType
     { 
         Projection,
         Selection,

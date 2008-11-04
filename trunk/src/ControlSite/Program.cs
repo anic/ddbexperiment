@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DistDBMS.ControlSite.RelationalAlgebra.Entity;
+using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Table;
-using DistDBMS.ControlSite.RelationalAlgebra;
+using DistDBMS.Common.RelationalAlgebra;
 using DistDBMS.ControlSite.SQLSyntax.Object;
 using DistDBMS.ControlSite.SQLSyntax.Operation;
 using DistDBMS.ControlSite.SQLSyntax.Parser;

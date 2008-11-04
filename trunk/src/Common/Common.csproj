@@ -38,6 +38,10 @@
   <ItemGroup>
     <Compile Include="Dictionary\FragmentList.cs" />
     <Compile Include="Enum.cs" />
+    <Compile Include="RelationalAlgebra\Entity\Common.cs" />
+    <Compile Include="RelationalAlgebra\Entity\Predication.cs" />
+    <Compile Include="RelationalAlgebra\Entity\Relation.cs" />
+    <Compile Include="RelationalAlgebra\RelationDebugger.cs" />
     <Compile Include="Table\Field.cs" />
     <Compile Include="Table\Table.cs" />
     <Compile Include="Table\Tuple.cs" />
