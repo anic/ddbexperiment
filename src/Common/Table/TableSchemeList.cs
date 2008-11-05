@@ -5,13 +5,13 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.Common.Dictionary
 {
-    public class TableSchemeList:List<TableScheme>
+    public class TableSchemaList:List<TableSchema>
     {
-        public TableScheme this[string key]
+        public TableSchema this[string key]
         {
             get
             {
-                foreach (TableScheme t in this)
+                foreach (TableSchema t in this)
                     if (t.TableName == key || t.NickName == key)
                         return t;
 

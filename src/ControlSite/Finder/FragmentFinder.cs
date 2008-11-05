@@ -18,7 +18,7 @@ namespace DistDBMS.ControlSite.Finder
         public FragmentList GetMatchFragments(Condition condition)
         {
             FragmentList result = new FragmentList();
-            TableSchemeList tables = new TableSchemeList();
+            TableSchemaList tables = new TableSchemaList();
             //TODO:未完成
             FindTableByCondition(condition, tables);
 
@@ -27,7 +27,7 @@ namespace DistDBMS.ControlSite.Finder
             return result;
         }
 
-        public FragmentList GetMatchFragments(TableScheme table)
+        public FragmentList GetMatchFragments(TableSchema table)
         {
             return null;
         }
@@ -37,20 +37,20 @@ namespace DistDBMS.ControlSite.Finder
             return false;
         }
 
-        public TableSchemeList GetRelatedTable(Condition condition)
+        public TableSchemaList GetRelatedTable(Condition condition)
         {
-            TableSchemeList result = new TableSchemeList();
+            TableSchemaList result = new TableSchemaList();
             FindTableByCondition(condition, result);
             return result;
         }
 
-        private void FindTableByCondition(Condition condition, TableSchemeList list)
+        private void FindTableByCondition(Condition condition, TableSchemaList list)
         {
             if (condition.IsAtomCondition)
             {
                 
-                TableScheme t;
-                TableScheme t2;
+                TableSchema t;
+                TableSchema t2;
 
                 t = FindTableByOperand(condition.AtomCondition.LeftOperand);
                 if (t != null)
@@ -90,7 +90,7 @@ namespace DistDBMS.ControlSite.Finder
         /// <param name="t2">表格2</param>
         ///<returns></returns>
         ///<remarks>结果将会在表格1中返回</remarks>
-        private bool MerageTable(TableScheme t1,TableScheme t2)
+        private bool MerageTable(TableSchema t1,TableSchema t2)
         { 
             foreach(Field f2 in t2.Fields)
             {
@@ -101,7 +101,7 @@ namespace DistDBMS.ControlSite.Finder
             return true;
         }
 
-        public TableScheme FindTableByOperand(Operand operand)
+        public TableSchema FindTableByOperand(Operand operand)
         {
             if (operand.IsField)
                 return FindTableByField(operand.Field);
@@ -109,12 +109,12 @@ namespace DistDBMS.ControlSite.Finder
                 return null;
         }
 
-        public TableScheme FindTableByField(Field f)
+        public TableSchema FindTableByField(Field f)
         {
-            TableScheme logicTable = gdd.Schemes[f.TableName];
+            TableSchema logicTable = gdd.Schemas[f.TableName];
             if (logicTable != null)
             {
-                TableScheme tempTable = new TableScheme();
+                TableSchema tempTable = new TableSchema();
                 tempTable.TableName = f.TableName;
                 Field field = logicTable[f.AttributeName];
                 if (field != null)

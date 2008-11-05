@@ -11,7 +11,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         /// <summary>
         /// 需要插入的表格
         /// </summary>
-        public TableScheme Target { get; set; }
+        public TableSchema Target { get; set; }
 
         
         /// <summary>
@@ -22,7 +22,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
 
         public Insertion()
         {
-            Target = new TableScheme();
+            Target = new TableSchema();
             Data = new Tuple();
         }
 

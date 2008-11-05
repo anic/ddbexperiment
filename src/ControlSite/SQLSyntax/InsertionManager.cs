@@ -9,7 +9,7 @@ namespace DistDBMS.ControlSite.SQLSyntax
     class InsertionManager
     {
         GlobalDataDictionary gdd;
-        TableScheme currentScheme;
+        TableSchema currentSchema;
         public InsertionManager(GlobalDataDictionary gdd)
         {
             this.gdd = gdd;
@@ -17,7 +17,7 @@ namespace DistDBMS.ControlSite.SQLSyntax
 
         private void SetTable(string tablename)
         { 
-            currentScheme = gdd.Schemes[tablename];
+            currentSchema = gdd.Schemas[tablename];
         }
 
         public void Init()
@@ -34,7 +34,7 @@ namespace DistDBMS.ControlSite.SQLSyntax
         { 
             List<Fragment> result = new List<Fragment>();
             Queue<Fragment> queue = new Queue<Fragment>();
-            queue.Enqueue(gdd.Fragments.GetFragmentByName(currentScheme.TableName));
+            queue.Enqueue(gdd.Fragments.GetFragmentByName(currentSchema.TableName));
 
             while(queue.Count>0)
             {

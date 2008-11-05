@@ -8,11 +8,11 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
     class TableCreation
     {
 
-        public TableScheme Target { get; set; }
+        public TableSchema Target { get; set; }
 
         public TableCreation()
         {
-            Target = new TableScheme();
+            Target = new TableSchema();
             
         }
 

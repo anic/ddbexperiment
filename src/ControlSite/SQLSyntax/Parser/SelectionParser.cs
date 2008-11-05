@@ -37,7 +37,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
                 result = new Selection();
 
                 //匹配目标的表样式
-                TableScheme t = matcher.MatchTableScheme(match.Groups[2].ToString().Trim());
+                TableSchema t = matcher.MatchTableSchema(match.Groups[2].ToString().Trim());
                 if (t != null)
                     result.Fields = t;
                 else
@@ -75,7 +75,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
 
 
                 //匹配源表格
-                List<TableScheme> sources = matcher.MatchMoreTableScheme(source.Trim());
+                List<TableSchema> sources = matcher.MatchMoreTableSchema(source.Trim());
                 if (source != null)
                     result.Sources.AddRange(sources);
                 else

@@ -17,11 +17,11 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
         SqlSyntaxError error;
         public SqlSyntaxError LastError { get { return error; } }
 
-        public TableScheme MatchOneTable(string str)
+        public TableSchema MatchOneTable(string str)
         {
             //Student S
 
-            TableScheme result = new TableScheme();
+            TableSchema result = new TableSchema();
             result.IsAllFields = true;
 
             string[] items = str.Split(' ');
@@ -46,14 +46,14 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
 
         }
 
-        public List<TableScheme> MatchMoreTableScheme(string str)
+        public List<TableSchema> MatchMoreTableSchema(string str)
         {
-            List<TableScheme> result = new List<TableScheme>();
+            List<TableSchema> result = new List<TableSchema>();
             // Student, Course ,...
             string[] sources = str.Split(',');
             foreach (string s in sources)
             {
-                TableScheme t = MatchOneTable(s.Trim());
+                TableSchema t = MatchOneTable(s.Trim());
                 if (t != null)
                     result.Add(t);
                 else
@@ -72,12 +72,12 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public TableScheme MatchTableScheme(string str)
+        public TableSchema MatchTableSchema(string str)
         {
             
             Regex reg;
             Match match;
-            TableScheme result = new TableScheme();
+            TableSchema result = new TableSchema();
             reg = new Regex(@"\*", RegexOptions.IgnoreCase);
             match = reg.Match(str);
             if (match.Success)

@@ -20,8 +20,8 @@ namespace DistDBMS.Common.Dictionary
         /// <summary>
         /// 表列表
         /// </summary>
-        public TableSchemeList Schemes { get {return schemes; } }
-        TableSchemeList schemes;
+        public TableSchemaList Schemas { get {return schemas; } }
+        TableSchemaList schemas;
 
         /// <summary>
         /// 分片列表
@@ -34,7 +34,7 @@ namespace DistDBMS.Common.Dictionary
         public GlobalDataDictionary()
         {
             sites = new SiteList();
-            schemes = new TableSchemeList();
+            schemas = new TableSchemaList();
             fragments = new FragmentList();
         }
 

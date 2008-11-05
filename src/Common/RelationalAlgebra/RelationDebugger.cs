@@ -17,8 +17,8 @@ namespace DistDBMS.Common.RelationalAlgebra
         private string GetSingleString(Relation node)
         {
             string result = node.Type.ToString() + ": ";
-            if (node.IsDirectTableScheme)
-                result += " " + node.DirectTableScheme.ToString();
+            if (node.IsDirectTableSchema)
+                result += " " + node.DirectTableSchema.ToString();
 
             if (node.Predication.Content != "")
                 result += " Predication: " + node.Predication.Content;

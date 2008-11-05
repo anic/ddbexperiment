@@ -74,10 +74,10 @@ namespace DistDBMS.ControlSite
             
             //然后创建表格
             foreach(TableCreation tc in tableCreationList)
-                gdd.Schemes.Add(tc.Target);
+                gdd.Schemas.Add(tc.Target);
             
             //为每个表格创建一个默认的分片，无条件
-            foreach (TableScheme ts in gdd.Schemes)
+            foreach (TableSchema ts in gdd.Schemas)
             {
                 Fragment fragment = new Fragment();
                 fragment.LogicTable = ts;
@@ -85,7 +85,7 @@ namespace DistDBMS.ControlSite
                 //分片名为表名
                 fragment.Name = ts.TableName;
                 fragment.Type = FragmentType.None;
-                fragment.Scheme = ts;
+                fragment.Schema = ts;
 
                 gdd.Fragments.Add(fragment);
             }
@@ -152,14 +152,14 @@ namespace DistDBMS.ControlSite
                     f = FindParentFragment((frag as VFragmentation).Source.TableName);
                     if (f != null) //找到上层分片
                     {
-                        foreach (TableScheme ts in (frag as VFragmentation).Schemes)
+                        foreach (TableSchema ts in (frag as VFragmentation).Schemas)
                         {
                             Fragment newVFragment = new Fragment();
                             newVFragment.Parent = f;
                             newVFragment.Name = (frag as VFragmentation).Source.TableName + "." + i.ToString();
                             i++;
                             newVFragment.Type = FragmentType.Vertical;
-                            newVFragment.Scheme = ts;
+                            newVFragment.Schema = ts;
                             f.Children.Add(newVFragment);
                         }
                     }
@@ -178,7 +178,7 @@ namespace DistDBMS.ControlSite
         /// </summary>
         /// <param name="logicTable"></param>
         /// <param name="f"></param>
-        private void FillFragments(TableScheme logicTable,Fragment f)
+        private void FillFragments(TableSchema logicTable,Fragment f)
         {
             if (f.Type != FragmentType.None)
             {
@@ -192,7 +192,7 @@ namespace DistDBMS.ControlSite
                 //如果是垂直分片，用逻辑表填充分片中的样式
                 if (f.Type == FragmentType.Vertical)
                 {
-                    TableScheme ts = f.Scheme;
+                    TableSchema ts = f.Schema;
                     for (int i = 0; i < ts.Fields.Count;i++ )
                     {
                         //从逻辑表中找到那个字段，然后用其覆盖，因为其信息是最全的

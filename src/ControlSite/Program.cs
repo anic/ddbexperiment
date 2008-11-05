@@ -42,13 +42,13 @@ namespace DistDBMS.ControlSite
             //关系代数树，示范结构：select * from Course where credit_hour>2 and location='CB‐6'
             Relation r = new Relation();
             r.Type = RelationalType.Selection;
-            r.IsDirectTableScheme = true;
+            r.IsDirectTableSchema = true;
 
 
-            r.DirectTableScheme.Content = "Course";
-            r.DirectTableScheme.TableName = "Course";
-            r.DirectTableScheme.IsAllFields = true; //因为*
-            r.DirectTableScheme.IsDbTable = true;
+            r.DirectTableSchema.Content = "Course";
+            r.DirectTableSchema.TableName = "Course";
+            r.DirectTableSchema.IsAllFields = true; //因为*
+            r.DirectTableSchema.IsDbTable = true;
 
             r.Predication.Content = "credit_hour>2 and location=\'CB‐6\'";
 
@@ -66,7 +66,7 @@ namespace DistDBMS.ControlSite
              */
             r = new Relation();
             r.Type = RelationalType.Projection;
-            r.IsDirectTableScheme = true; 
+            r.IsDirectTableSchema = true; 
             
             Field f1 = new Field();
             f1.AttributeName = "name";
@@ -95,7 +95,7 @@ namespace DistDBMS.ControlSite
             //Join :Course.teacher_id=Teacher.id and
             Relation joinRelation = r.LeftRelation;
             joinRelation.Type = RelationalType.Join;
-            joinRelation.IsDirectTableScheme = false;
+            joinRelation.IsDirectTableSchema = false;
 
             Field f4 = new Field();
             f4.TableName = "Course";
@@ -118,9 +118,9 @@ namespace DistDBMS.ControlSite
             //谓词
             select1.Predication.Content = "Course.credit_hour>2";
             //关系一个表
-            select1.IsDirectTableScheme = true;
-            select1.DirectTableScheme.TableName = "Course";
-            select1.DirectTableScheme.IsAllFields = true;
+            select1.IsDirectTableSchema = true;
+            select1.DirectTableSchema.TableName = "Course";
+            select1.DirectTableSchema.IsAllFields = true;
 
             //右边关联Teacher表，Teacher表做了Selection:Teacher.title=3
             joinRelation.RightRelation = new Relation();
@@ -129,9 +129,9 @@ namespace DistDBMS.ControlSite
             //谓词
             select2.Predication.Content = "Teacher.title=3";
             //关系一个表
-            select2.IsDirectTableScheme = true;
-            select2.DirectTableScheme.TableName = "Teacher";
-            select2.DirectTableScheme.IsAllFields = true;
+            select2.IsDirectTableSchema = true;
+            select2.DirectTableSchema.TableName = "Teacher";
+            select2.DirectTableSchema.IsAllFields = true;
 
             output = (new RelationDebugger()).GetDebugString(r);
             System.Console.WriteLine("\n\nSample2 Relation:");
@@ -174,7 +174,7 @@ namespace DistDBMS.ControlSite
                 System.Console.WriteLine("Raw: "+tests[i]);
                 System.Console.WriteLine("Parse:" + s3.ToString());
             }
-
+            
 
         }
 
