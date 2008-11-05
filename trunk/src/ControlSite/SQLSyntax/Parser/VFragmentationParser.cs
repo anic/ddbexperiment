@@ -25,10 +25,10 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
             if (match.Success)
             {
                 result.Source.TableName = match.Groups[1].ToString();
-                string schemes = match.Groups[2].ToString().Trim();
+                string schemas = match.Groups[2].ToString().Trim();
                 int left, right;
-                left = schemes.IndexOf('(');
-                right = schemes.IndexOf(')');
+                left = schemas.IndexOf('(');
+                right = schemas.IndexOf(')');
                 if ((left >= 0 && right < 0) || (left < 0 && right >= 0))
                 {
                     error.Description = "括号不匹配";
@@ -37,19 +37,19 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
                 TableMatcher tm = new TableMatcher();
                 while (left >= 0 && right >= 0)
                 {
-                    string scheme = schemes.Substring(left + 1, right - left - 1);
-                    TableScheme t = tm.MatchTableScheme(scheme);
+                    string schema = schemas.Substring(left + 1, right - left - 1);
+                    TableSchema t = tm.MatchTableSchema(schema);
                     if (t != null)
-                        result.Schemes.Add(t);
+                        result.Schemas.Add(t);
                     else
                     {
                         error.Description = tm.LastError.Description;
                         return false;
                     }
 
-                    schemes = schemes.Substring(right + 1);
-                    left = schemes.IndexOf('(');
-                    right = schemes.IndexOf(')');
+                    schemas = schemas.Substring(right + 1);
+                    left = schemas.IndexOf('(');
+                    right = schemas.IndexOf(')');
                     if ((left>=0 && right <0)||(left< 0 && right >=0))
                     {
                         error.Description = "括号不匹配";

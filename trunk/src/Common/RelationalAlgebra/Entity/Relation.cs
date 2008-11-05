@@ -28,12 +28,12 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// <summary>
         /// 是否关系直接的表
         /// </summary>
-        public bool IsDirectTableScheme { get; set; }
+        public bool IsDirectTableSchema { get; set; }
 
         /// <summary>
         /// 如果关系直接的表，则获得原子的表
         /// </summary>
-        public TableScheme DirectTableScheme { get; set; }
+        public TableSchema DirectTableSchema { get; set; }
 
         /// <summary>
         /// 谓词，如果有
@@ -43,14 +43,14 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// <summary>
         /// 相关的属性集
         /// </summary>
-        public TableScheme RelativeAttributes { get; set; }
+        public TableSchema RelativeAttributes { get; set; }
 
-        public TableScheme ResultScheme
+        public TableSchema ResultSchema
         {
             get
             { 
                 //TODO:未完成
-                TableScheme result = new TableScheme();
+                TableSchema result = new TableSchema();
                 return result;
             }
         }
@@ -65,9 +65,9 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             
             LeftRelation = null;
             RightRelation = null;
-            IsDirectTableScheme = false;
-            DirectTableScheme = new TableScheme();
-            RelativeAttributes = new TableScheme();
+            IsDirectTableSchema = false;
+            DirectTableSchema = new TableSchema();
+            RelativeAttributes = new TableSchema();
             Predication = new Predication();
             Content = "";
         }

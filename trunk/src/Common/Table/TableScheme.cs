@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DistDBMS.Common.Table
 {
-    public class TableScheme
+    public class TableSchema
     {
         /// <summary>
         /// 表名
@@ -52,7 +52,7 @@ namespace DistDBMS.Common.Table
         /// </summary>
         public string Content { get; set; }
 
-        public TableScheme()
+        public TableSchema()
         {
             TableName = "";
             NickName = "";

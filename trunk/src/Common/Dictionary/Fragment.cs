@@ -32,7 +32,7 @@ namespace DistDBMS.Common.Dictionary
         /// <summary>
         /// 原始的逻辑表格
         /// </summary>
-        public TableScheme LogicTable { get; set; }
+        public TableSchema LogicTable { get; set; }
 
         /// <summary>
         /// 划分条件,可以为无
@@ -64,14 +64,14 @@ namespace DistDBMS.Common.Dictionary
         /// <summary>
         /// 分片后最终的样式表
         /// </summary>
-        public TableScheme Scheme {
+        public TableSchema Schema {
             get
             {
                 //垂直分片或者顶层分片
                 if (Type == FragmentType.Vertical || Type == FragmentType.None)
                     return ts;
                 else if (Parent!=null) //水平分片
-                    return Parent.Scheme;
+                    return Parent.Schema;
                 else 
                     return null;
             }
@@ -80,7 +80,7 @@ namespace DistDBMS.Common.Dictionary
                 ts = value;
             }
         }
-        TableScheme ts;
+        TableSchema ts;
 
         /// <summary>
         /// 名称

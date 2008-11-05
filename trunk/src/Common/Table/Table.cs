@@ -13,7 +13,7 @@ namespace DistDBMS.Common.Table
         /// <summary>
         /// 表头，记录了表名、属性名、属性的类型（int）
         /// </summary>
-        public TableScheme Scheme { get; set; }
+        public TableSchema Schema { get; set; }
 
         /// <summary>
         /// 元组列表

@@ -15,12 +15,12 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         
         public string Content { get; set; }
 
-        public TableScheme Table { get; set; }
+        public TableSchema Table { get; set; }
         
         public Allocation()
         {
             Site = new Site();
-            Table = new TableScheme();
+            Table = new TableSchema();
             Content = "";
         }
 

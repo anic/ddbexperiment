@@ -15,7 +15,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         /// <summary>
         /// 需要分片的表
         /// </summary>
-        public TableScheme Source
+        public TableSchema Source
         {
             get;
             set;
@@ -30,7 +30,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
 
         public HFragmentation()
         {
-            Source = new TableScheme();
+            Source = new TableSchema();
             conditions = new List<Condition>();
         }
 

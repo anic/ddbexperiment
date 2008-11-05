@@ -15,7 +15,7 @@ namespace DistDBMS.ControlSite.SQLSyntax
 
             for (int i = 0; i < s.Sources.Count; i++)
             {
-                TableScheme logicTable = gdd.Schemes[s.Sources[i].TableName];
+                TableSchema logicTable = gdd.Schemas[s.Sources[i].TableName];
                 if (logicTable != null)
                     s.Sources[i] = logicTable;
                 else
@@ -26,7 +26,7 @@ namespace DistDBMS.ControlSite.SQLSyntax
             if (s.Sources.Count == 1 && s.Condition != null)
             {
                 ConditionConsistencyFiller filler = new ConditionConsistencyFiller();
-                TableSchemeList list = new TableSchemeList();
+                TableSchemaList list = new TableSchemaList();
                 list.AddRange(s.Sources);
                 filler.FillCondition(list, s.Condition);
             }

@@ -12,7 +12,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         /// <summary>
         /// 删除的源表
         /// </summary>
-        public TableScheme Source { get; set; }
+        public TableSchema Source { get; set; }
         
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
 
         public Deletion()
         {
-            Source = new TableScheme();
+            Source = new TableSchema();
             Condition = new Condition();
 
             Content = "";

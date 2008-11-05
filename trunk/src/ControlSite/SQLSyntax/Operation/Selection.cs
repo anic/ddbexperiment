@@ -13,7 +13,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         /// <summary>
         /// 目标样式，Select 后面的样式
         /// </summary>
-        public TableScheme Fields
+        public TableSchema Fields
         {
             get;
             set;
@@ -24,11 +24,11 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         /// <summary>
         /// 源表，就是Select...From后面的表
         /// </summary>
-        public List<TableScheme> Sources
+        public List<TableSchema> Sources
         {
             get { return sources; }
         } //From A,B
-        List<TableScheme> sources;
+        List<TableSchema> sources;
 
         /// <summary>
         /// 条件，Where后面的内容，可嵌套
@@ -43,8 +43,8 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
 
         public Selection()
         {
-            Fields = new TableScheme();
-            sources = new List<TableScheme>();
+            Fields = new TableSchema();
+            sources = new List<TableSchema>();
             Condition = null;
             Content = "";
         }

@@ -9,17 +9,17 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
 {
     class ConditionConsistencyFiller
     {
-        public void FillCondition(TableScheme table, Condition c)
+        public void FillCondition(TableSchema table, Condition c)
         {
 
-            TableSchemeList list = new TableSchemeList();
+            TableSchemaList list = new TableSchemaList();
             list.Add(table);
 
             FillCondition(list, c);
         }
 
 
-        public void FillCondition(TableSchemeList tables, Condition c)
+        public void FillCondition(TableSchemaList tables, Condition c)
         {
             if (c.IsAtomCondition)
             {
@@ -36,11 +36,11 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
             }
         }
 
-        public void FillOperand(TableSchemeList tables,Operand operand)
+        public void FillOperand(TableSchemaList tables,Operand operand)
         {
             if (operand.IsField)
             {
-                foreach (TableScheme table in tables)
+                foreach (TableSchema table in tables)
                 {
                     Field f = table[operand.Field.AttributeName];
                     if (f != null)
