@@ -9,8 +9,8 @@ namespace DistDBMS.ControlSite.Finder
 {
     class FragmentFinder
     {
-        GlobalDataDictionary gdd;
-        public FragmentFinder(GlobalDataDictionary gdd)
+        GlobalDirectory gdd;
+        public FragmentFinder(GlobalDirectory gdd)
         {
             this.gdd = gdd;
         }

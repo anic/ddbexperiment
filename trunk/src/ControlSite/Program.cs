@@ -18,7 +18,7 @@ namespace DistDBMS.ControlSite
 {
     class Program
     {
-        GlobalDataDictionary gdd;
+        GlobalDirectory gdd;
 
         static void Main(string[] args)
         {

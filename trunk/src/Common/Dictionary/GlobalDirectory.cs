@@ -9,7 +9,7 @@ namespace DistDBMS.Common.Dictionary
     /// <summary>
     /// 全局数据字典
     /// </summary>
-    public class GlobalDataDictionary
+    public class GlobalDirectory
     {
         /// <summary>
         /// 站点列表
@@ -31,7 +31,7 @@ namespace DistDBMS.Common.Dictionary
         
         //统计信息怎么加？
 
-        public GlobalDataDictionary()
+        public GlobalDirectory()
         {
             sites = new SiteList();
             schemas = new TableSchemaList();

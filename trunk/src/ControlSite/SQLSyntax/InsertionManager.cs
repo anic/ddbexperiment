@@ -8,9 +8,9 @@ namespace DistDBMS.ControlSite.SQLSyntax
 {
     class InsertionManager
     {
-        GlobalDataDictionary gdd;
+        GlobalDirectory gdd;
         TableSchema currentSchema;
-        public InsertionManager(GlobalDataDictionary gdd)
+        public InsertionManager(GlobalDirectory gdd)
         {
             this.gdd = gdd;
         }

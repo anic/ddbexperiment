@@ -51,7 +51,7 @@
     <Compile Include="Dictionary\Site.cs" />
     <Compile Include="Dictionary\SiteList.cs" />
     <Compile Include="Dictionary\Status.cs" />
-    <Compile Include="Dictionary\GlobalDataDictionary.cs" />
+    <Compile Include="Dictionary\GlobalDirectory.cs" />
     <Compile Include="Table\TableSchemeList.cs" />
     <Compile Include="Syntax\AtomCondition.cs" />
     <Compile Include="Syntax\Condition.cs" />

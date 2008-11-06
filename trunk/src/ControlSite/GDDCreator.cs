@@ -20,7 +20,7 @@ namespace DistDBMS.ControlSite
 
         ParserSwitcher ps = new ParserSwitcher();
 
-        GlobalDataDictionary gdd;
+        GlobalDirectory gdd;
         Queue<object> fragmentQueue = new Queue<object>();
 
         public void InitCreatioin()
@@ -65,9 +65,9 @@ namespace DistDBMS.ControlSite
         /// 构造GDD
         /// </summary>
         /// <returns></returns>
-        public GlobalDataDictionary CreateGDD()
+        public GlobalDirectory CreateGDD()
         {
-            gdd = new GlobalDataDictionary();
+            gdd = new GlobalDirectory();
             //先对Site处理
             foreach (SiteDefinition sd in siteDefList)
                 gdd.Sites.Add(sd.Site);
