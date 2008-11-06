@@ -10,7 +10,7 @@ namespace DistDBMS.ControlSite.SQLSyntax
 {
     class GlobalConsitencyFiller
     {
-        public bool FillSelection(GlobalDataDictionary gdd, Selection s)
+        public bool FillSelection(GlobalDirectory gdd, Selection s)
         {
 
             for (int i = 0; i < s.Sources.Count; i++)
