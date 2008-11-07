@@ -50,10 +50,6 @@
       <Project>{1EDEE97A-4E3B-4F00-9A29-A8C246F49FEC}</Project>
       <Name>ControlSite</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ServerSite\ServerSite.csproj">
-      <Project>{7281B7B1-BC54-4D6D-B745-9C950B1BE110}</Project>
-      <Name>ServerSite</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="BriefTODO.txt" />
