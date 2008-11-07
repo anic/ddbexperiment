@@ -13,7 +13,7 @@ namespace DistDBMS.UserInterface.SqlInput
     {
         FrmTip frmTip;
         string[] keywords = new string[] { "select", "from", "where" };
-        string[] symbol = new string[] { ",", ".", ";" };
+        string[] symbol = new string[] { " ", ",", ";" };
         public SqlTextBox()
             : base()
         {
@@ -62,10 +62,10 @@ namespace DistDBMS.UserInterface.SqlInput
             }
         }
 
-
+        Keys lastKey = Keys.None;
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            
+            lastKey = e.KeyData;
             switch (e.KeyData)
             { 
                 case Keys.Up:
@@ -83,38 +83,45 @@ namespace DistDBMS.UserInterface.SqlInput
                     }
                     break;
                 case Keys.Escape:
+                case Keys.Back:
+                case Keys.Right:
+                case Keys.Left:
                     frmTip.Visible = false;
                     break;
                 case Keys.Enter:
-                    if (frmTip.Visible && frmTip.IsTipSelected)
+                    if (frmTip.Visible)
                     {
-                        int lastPosition = this.SelectionStart;
-                        int index = Text.Substring(0, this.SelectionStart).LastIndexOf(' ');
-                        if (index >= 0)
+                        if (frmTip.IsTipSelected)
                         {
-                            int right = this.Text.IndexOf(' ', index + 1);
-                            if (right >= 0)
+                            int lastPosition = this.SelectionStart;
+                            int end = this.SelectionStart > 0 ? this.SelectionStart - 1 : 0;
+                            int index = LastIndexOfSymbol(Text, 0, end);
+                            if (index >= 0)
                             {
-                                int length = frmTip.SelectedTip.Length;
-                                this.Text = this.Text.Substring(0, index + 1) + frmTip.SelectedTip + this.Text.Substring(right);
-                                this.SelectionStart = index + length + 1;
+                                int right = FirstIndexOfSymbol(Text, index + 1, Text.Length - 1);
+                                if (right >= 0)
+                                {
+                                    int length = frmTip.SelectedTip.Length;
+                                    this.Text = this.Text.Substring(0, index + 1) + frmTip.SelectedTip + this.Text.Substring(right);
+                                    this.SelectionStart = index + length + 1;
+                                }
+                                else
+                                {
+                                    this.Text = this.Text.Substring(0, index + 1) + frmTip.SelectedTip;
+                                    this.SelectionStart = this.Text.Length;
+                                }
                             }
                             else
                             {
-                                this.Text = this.Text.Substring(0, index + 1) + frmTip.SelectedTip;
+                                this.Text = frmTip.SelectedTip;
                                 this.SelectionStart = this.Text.Length;
                             }
-                        }
-                        else
-                        {
-                            this.Text = frmTip.SelectedTip;
-                            this.SelectionStart = this.Text.Length;
-                        }
 
-                        frmTip.Visible = false;
-                        
-                        e.Handled = true;
+                            e.Handled = true;
+                        }
                     }
+
+
                     break;
             }
 
@@ -122,26 +129,62 @@ namespace DistDBMS.UserInterface.SqlInput
                 base.OnKeyUp(e);
         }
 
+        private int LastIndexOfSymbol(string str,int startIndex,int endIndex)
+        {
+            int result, left;
+            result = left = -1;
+            string str1 = str.Substring(startIndex, endIndex - startIndex + 1);
+            foreach (string s in symbol)
+            {
+                left = str1.LastIndexOf(s, StringComparison.CurrentCultureIgnoreCase);
+                if (left > result)
+                    result = left;
+            }
+            return (result == -1) ? -1 : (result + startIndex);
+        }
+
+        private int FirstIndexOfSymbol(string str,int startIndex,int endIndex)
+        {
+            int result, right;
+            result = right = -1;
+            string str1 = str.Substring(startIndex, endIndex - startIndex + 1);
+            foreach (string s in symbol)
+            {
+                right = str1.IndexOf(s, StringComparison.CurrentCultureIgnoreCase);
+
+                if (result == -1 && right != -1)
+                    result = right;
+
+                if (right != -1 && right < result)
+                    result = right;
+            }
+            return (result == -1) ? -1 : (result + startIndex);
+        }
+
+
         private string LastWord
         {
             get
             {
-
-                int index = Text.Substring(0, this.SelectionStart).LastIndexOf(' ');
+                int end = this.SelectionStart > 0 ? this.SelectionStart - 1 : 0;
+                int index = LastIndexOfSymbol(Text, 0, end);
                 if (index >= 0)
                 {
-                    int right = this.Text.IndexOf(' ', index + 1);
+                    int right = FirstIndexOfSymbol(Text, index + 1, Text.Length - 1);
                     if (right >= 0)
-                        return Text.Substring(index + 1, right - index - 1);
+                        return Text.Substring(index + 1, right - index - 1).Trim();
                     else
-                        return Text.Substring(index + 1);
+                        return Text.Substring(index + 1).Trim();
                 }
                 else
-                    return Text;
+                    return Text.Trim();
             }
         }
 
-        private void FillColor()
+        /// <summary>
+        /// 填入关键字颜色
+        /// </summary>
+        private void FillKeywordColor()
         {
             int lastSelectionPos = this.SelectionStart;
             int lastLength = this.SelectionLength;
@@ -172,9 +215,6 @@ namespace DistDBMS.UserInterface.SqlInput
             this.SelectionLength = lastLength;
         }
 
-        
-
-
         protected override void OnTextChanged(EventArgs e)
         {
             if (Text.Length == 0)
@@ -189,17 +229,37 @@ namespace DistDBMS.UserInterface.SqlInput
 
             frmTip.Location = this.PointToScreen(p);
 
-            frmTip.MatchTip(LastWord);
+            string lastWord = LastWord;
+
             
-            if (LastWord!="")
+            if (lastKey == Keys.Enter)  //按了回车键
             {
-                if (!frmTip.Visible)
-                    frmTip.Show(this);
+                frmTip.Visible = false;
+            }
+            else
+            {
+                if (frmTip.Visible) //如果是其他键，如果提示框可见，匹配
+                    frmTip.MatchTip(lastWord);
+
+
+                if (frmTip.IsFullyMatch(lastWord)) //如果完全匹配，则隐藏提示框
+                {
+                    frmTip.Visible = false;
+                }
+                else if (lastWord != "") //如果不完全匹配，且不为空“”，显示提示框
+                {
+                    if (!frmTip.Visible)
+                        frmTip.Show(this);
+                }
+                else
+                    frmTip.Visible = false;
             }
             
 
             this.Focus();
-            FillColor();
+
+            //填充关键字颜色
+            FillKeywordColor();
 
             base.OnTextChanged(e);
             

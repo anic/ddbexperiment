@@ -33,10 +33,22 @@ namespace DistDBMS.UserInterface
                 }
                 sr.Close();
                 gdd = gddCreator.CreateGDD();
+                
             }
 
-            uscSqlInput1.GDD = gdd;
+            txtSqlInput.GDD = gdd;
+            txtSqlInput.KeyUp += new KeyEventHandler(txtSqlInput_KeyUp);
+        }
 
+        void txtSqlInput_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.F5)
+                btnExcute_Click(this, EventArgs.Empty);
+        }
+
+        private void btnExcute_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("执行" + txtSqlInput.Text);
         }
     }
 }
