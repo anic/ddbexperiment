@@ -10,7 +10,7 @@ using DistDBMS.Common.Execution;
 
 namespace DistDBMS.ControlSite
 {
-    class GDDCreator
+    public class GDDCreator
     {
         List<SiteDefinition> siteDefList = new List<SiteDefinition>();
         List<TableCreation> tableCreationList = new List<TableCreation>();
