@@ -104,6 +104,17 @@ namespace DistDBMS.UserInterface.SqlInput
             lsbTip.SelectedIndex = -1;
         }
 
+        public bool IsFullyMatch(string text)
+        {
+            if (lsbTip.SelectedIndex >=0 )
+            {
+                string str = (lsbTip.SelectedItem as GListBoxItem).Text;
+                if (str.Equals(text,StringComparison.CurrentCultureIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
         public void NextTip(int delta)
         {
             //没有提示
