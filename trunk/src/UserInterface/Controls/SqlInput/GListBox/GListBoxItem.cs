@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DistDBMS.UserInterface.SqlInput.GListBox
+namespace DistDBMS.UserInterface.Controls.SqlInput.GListBox
 {
     public class GListBoxItem
     {

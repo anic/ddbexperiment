@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace DistDBMS.UserInterface.SqlInput
+namespace DistDBMS.UserInterface.Controls.SqlInput
 {
     public class InputStyle
     {

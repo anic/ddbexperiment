@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DistDBMS.UserInterface.SqlInput.InputStyle inputStyle2 = new DistDBMS.UserInterface.SqlInput.InputStyle();
+            DistDBMS.UserInterface.Controls.SqlInput.InputStyle inputStyle2 = new DistDBMS.UserInterface.Controls.SqlInput.InputStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tbp = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -42,7 +42,7 @@
             this.menuItemShowTip = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemColorKeyword = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemColorTable = new System.Windows.Forms.ToolStripMenuItem();
-            this.sqlTextBox = new DistDBMS.UserInterface.SqlInput.SqlTextBox();
+            this.sqlTextBox = new DistDBMS.UserInterface.Controls.SqlInput.SqlTextBox();
             this.tabControl1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -209,7 +209,7 @@
 
         #endregion
 
-        private DistDBMS.UserInterface.SqlInput.SqlTextBox sqlTextBox;
+        private DistDBMS.UserInterface.Controls.SqlInput.SqlTextBox sqlTextBox;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.TabPage tbp;

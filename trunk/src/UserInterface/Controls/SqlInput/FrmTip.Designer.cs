@@ -1,4 +1,4 @@
-﻿namespace DistDBMS.UserInterface.SqlInput
+﻿namespace DistDBMS.UserInterface.Controls.SqlInput
 {
     partial class FrmTip
     {
@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
-            this.lsbTip = new DistDBMS.UserInterface.SqlInput.GListBox.GListBox();
+            this.lsbTip = new DistDBMS.UserInterface.Controls.SqlInput.GListBox.GListBox();
             this.SuspendLayout();
             // 
             // imageList
@@ -72,7 +72,7 @@
 
         #endregion
 
-        private DistDBMS.UserInterface.SqlInput.GListBox.GListBox lsbTip;
+        private DistDBMS.UserInterface.Controls.SqlInput.GListBox.GListBox lsbTip;
         private System.Windows.Forms.ImageList imageList;
 
 

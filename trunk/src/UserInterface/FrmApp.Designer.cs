@@ -75,13 +75,13 @@
             this.tvwMenu.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode2,
             treeNode6});
-            this.tvwMenu.Size = new System.Drawing.Size(180, 415);
+            this.tvwMenu.Size = new System.Drawing.Size(183, 415);
             this.tvwMenu.TabIndex = 2;
             this.tvwMenu.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvwMenu_AfterSelect);
             // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(200, 25);
+            this.splitter1.Location = new System.Drawing.Point(203, 25);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(3, 435);
             this.splitter1.TabIndex = 4;
@@ -94,7 +94,7 @@
             this.pnlControl.Location = new System.Drawing.Point(0, 25);
             this.pnlControl.Name = "pnlControl";
             this.pnlControl.Padding = new System.Windows.Forms.Padding(10);
-            this.pnlControl.Size = new System.Drawing.Size(200, 435);
+            this.pnlControl.Size = new System.Drawing.Size(203, 435);
             this.pnlControl.TabIndex = 5;
             // 
             // mainMenu
@@ -154,10 +154,10 @@
             // uscExecuteQuery
             // 
             this.uscExecuteQuery.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.uscExecuteQuery.Location = new System.Drawing.Point(203, 25);
+            this.uscExecuteQuery.Location = new System.Drawing.Point(206, 25);
             this.uscExecuteQuery.Name = "uscExecuteQuery";
             this.uscExecuteQuery.Padding = new System.Windows.Forms.Padding(10);
-            this.uscExecuteQuery.Size = new System.Drawing.Size(494, 435);
+            this.uscExecuteQuery.Size = new System.Drawing.Size(491, 435);
             this.uscExecuteQuery.TabIndex = 6;
             // 
             // FrmApp
