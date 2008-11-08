@@ -37,6 +37,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -50,14 +51,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\UscExecuteQuery.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UscExecuteQuery.Designer.cs">
+      <DependentUpon>UscExecuteQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UscTableSchemaViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UscTableSchemaViewer.Designer.cs">
+      <DependentUpon>UscTableSchemaViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmApp.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FrmApp.Designer.cs">
       <DependentUpon>FrmApp.cs</DependentUpon>
     </Compile>
+    <Compile Include="PanelSwitchManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Controls\UscExecuteQuery.resx">
+      <DependentUpon>UscExecuteQuery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\UscTableSchemaViewer.resx">
+      <DependentUpon>UscTableSchemaViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmApp.resx">
       <DependentUpon>FrmApp.cs</DependentUpon>
     </EmbeddedResource>
@@ -110,9 +130,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BriefTODO.txt" />
+    <None Include="Resources\img_colortable.png" />
     <Content Include="Resources\img_column.png" />
+    <None Include="Resources\img_exesql.png" />
     <Content Include="Resources\img_keyword.png" />
     <Content Include="Resources\img_table.png" />
+    <None Include="Resources\img_tool.png" />
     <Content Include="Resources\Triangle.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
