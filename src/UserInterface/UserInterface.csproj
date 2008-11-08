@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -72,6 +72,9 @@
     <Compile Include="PanelSwitchManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Controls\SqlInput\SqlTextBox.resx">
+      <DependentUpon>SqlTextBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\UscExecuteQuery.resx">
       <DependentUpon>UscExecuteQuery.cs</DependentUpon>
     </EmbeddedResource>
@@ -86,7 +89,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SqlInput\FrmTip.resx">
+    <EmbeddedResource Include="Controls\SqlInput\FrmTip.resx">
       <DependentUpon>FrmTip.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
@@ -103,20 +106,20 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SqlInput\FrmTip.cs">
+    <Compile Include="Controls\SqlInput\FrmTip.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SqlInput\FrmTip.Designer.cs">
+    <Compile Include="Controls\SqlInput\FrmTip.Designer.cs">
       <DependentUpon>FrmTip.cs</DependentUpon>
     </Compile>
-    <Compile Include="SqlInput\GListBox\GListBox.cs">
+    <Compile Include="Controls\SqlInput\GListBox\GListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SqlInput\GListBox\GListBoxItem.cs" />
-    <Compile Include="SqlInput\SqlTextBox.cs">
+    <Compile Include="Controls\SqlInput\GListBox\GListBoxItem.cs" />
+    <Compile Include="Controls\SqlInput\SqlTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SqlInput\InputStyle.cs" />
+    <Compile Include="Controls\SqlInput\InputStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

@@ -8,7 +8,7 @@ using System.Drawing;
 using DistDBMS.UserInterface.Properties;
 using DistDBMS.Common.Table;
 
-namespace DistDBMS.UserInterface.SqlInput
+namespace DistDBMS.UserInterface.Controls.SqlInput
 {
     class SqlTextBox:RichTextBox
     {

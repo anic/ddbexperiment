@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using DistDBMS.Common.Dictionary;
-using DistDBMS.UserInterface.SqlInput;
+using DistDBMS.UserInterface.Controls.SqlInput;
 
 namespace DistDBMS.UserInterface.Controls
 {

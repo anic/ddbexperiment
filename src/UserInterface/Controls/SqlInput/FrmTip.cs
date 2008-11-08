@@ -8,11 +8,11 @@ using System.Text;
 using System.Windows.Forms;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.Common.Table;
-using DistDBMS.UserInterface.SqlInput.GListBox;
+using DistDBMS.UserInterface.Controls.SqlInput.GListBox;
 using DistDBMS.UserInterface.Properties;
 using System.Text.RegularExpressions;
 
-namespace DistDBMS.UserInterface.SqlInput
+namespace DistDBMS.UserInterface.Controls.SqlInput
 {
     public partial class FrmTip : Form
     {

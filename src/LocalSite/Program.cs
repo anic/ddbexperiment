@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Data.SQLite;
+using DistDBMS.ControlSite.DataAccess;
+using System.IO;
+using DistDBMS.ControlSite;
+using DistDBMS.Common.Dictionary;
+using DistDBMS.Common.Table;
 
 namespace DistDBMS.LocalSite
 {
@@ -9,21 +14,70 @@ namespace DistDBMS.LocalSite
     {
         static void Main(string[] args)
         {
-            string connectionString = "Data Source = DDBTest";
-            SQLiteConnection conn = new SQLiteConnection(connectionString);
-            conn.Open();
+            
+            //本不应该依赖
+            GDDCreator gddCreator = new GDDCreator();
+            GlobalDirectory gdd = null;
+            string path = "InitScript.txt";
+            if (File.Exists(path))
+            {
+                StreamReader sr = new StreamReader(path, System.Text.Encoding.Default);
 
-            SQLiteCommand cmd = new SQLiteCommand();
-            cmd.Connection = conn;
-            cmd.CommandType = System.Data.CommandType.Text;
-            //cmd.CommandText = "CREATE  TABLE 'main'.'Student' ('key' INTEGER PRIMARY KEY  NOT NULL )";
+                while (!sr.EndOfStream)
+                {
+                    gddCreator.InsertCommand(sr.ReadLine());
+                }
+                sr.Close();
+                gdd = gddCreator.CreateGDD();
 
-            //int result = cmd.ExecuteNonQuery();
-            //System.Console.WriteLine(result.ToString());
+            }
+            try
+            {
+                File.Delete("Default");
+            }
+            catch(Exception ex) { }
 
-            cmd.CommandText = "select * from student";
-            SQLiteDataReader reader = cmd.ExecuteReader();
-            System.Console.WriteLine(reader[1].ToString());
+            using (DataAccessor da = new DataAccessor("Default"))
+            {
+                if (da.CreateTable(gdd.Schemas[0]))
+                {
+                    Table table = new Table();
+                    table.Schema = gdd.Schemas[0];
+                    Tuple t = new Tuple();
+                    t.Data.Add("1");
+                    t.Data.Add("Liu Zhang");
+                    t.Data.Add("M");
+                    t.Data.Add("22");
+                    t.Data.Add("100");
+                    table.Tuples.Add(t);
+
+                    t = new Tuple();
+                    t.Data.Add("2");
+                    t.Data.Add("Cheng Yaoan");
+                    t.Data.Add("M");
+                    t.Data.Add("23");
+                    t.Data.Add("99");
+                    table.Tuples.Add(t);
+
+
+                    t = new Tuple();
+                    t.Data.Add("3");
+                    t.Data.Add("Wang Xiaoguang");
+                    t.Data.Add("M");
+                    t.Data.Add("22");
+                    t.Data.Add("101");
+                    table.Tuples.Add(t);
+
+                    da.InsertValues(table);
+
+                    //da.DropTable(table.Schema.TableName);
+
+                    string sql = "select * from student where degree >= 100";
+                    Table table2 = da.Select(sql, gdd.Schemas[0]);
+                    
+                }
+                //create table Student (id int key, name char(25), sex char(1), age int, degree int)
+            }
         }
     }
 }

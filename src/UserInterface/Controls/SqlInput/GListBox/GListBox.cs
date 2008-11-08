@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
-namespace DistDBMS.UserInterface.SqlInput.GListBox
+namespace DistDBMS.UserInterface.Controls.SqlInput.GListBox
 {
     //GListBox 类 
     public class GListBox : ListBox
