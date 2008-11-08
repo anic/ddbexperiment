@@ -57,6 +57,8 @@ namespace DistDBMS.UserInterface.SqlInput
                     subItem.Level = 1;
                     lsbTip.Items.Add(subItem);
                 }
+
+                
             }
         }
 

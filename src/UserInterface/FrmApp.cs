@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using DistDBMS.ControlSite;
 using System.IO;
 using DistDBMS.Common.Dictionary;
+using DistDBMS.UserInterface.Controls;
 
 namespace DistDBMS.UserInterface
 {
@@ -16,6 +17,7 @@ namespace DistDBMS.UserInterface
     {
 
         GlobalDirectory gdd;
+        
         public FrmApp()
         {
             InitializeComponent();
@@ -36,19 +38,14 @@ namespace DistDBMS.UserInterface
                 
             }
 
-            txtSqlInput.GDD = gdd;
-            txtSqlInput.KeyUp += new KeyEventHandler(txtSqlInput_KeyUp);
+            uscExecuteQuery.SetGlobalDirectory(gdd);
+            //txtSqlInput.GDD = gdd;
         }
 
-        void txtSqlInput_KeyUp(object sender, KeyEventArgs e)
+        private void tvwMenu_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (e.KeyData == Keys.F5)
-                btnExcute_Click(this, EventArgs.Empty);
-        }
 
-        private void btnExcute_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("执行" + txtSqlInput.Text);
         }
+        
     }
 }

@@ -8,6 +8,8 @@ namespace DistDBMS.UserInterface.SqlInput
 {
     public class InputStyle
     {
+        public string Name { get; set; }
+
         /// <summary>
         /// 背景色
         /// </summary>
@@ -35,9 +37,48 @@ namespace DistDBMS.UserInterface.SqlInput
             ForeColor = Color.Black;
             KeywordColor = Color.Blue;
             colors = new List<Color>();
-            colors.Add(Color.Red);
-            colors.Add(Color.Green);
-            colors.Add(Color.Orange);
+            Name = "";
+        }
+
+
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        static InputStyle blackStyle;
+        public static InputStyle BlackStyle
+        {
+            get
+            { 
+                if (blackStyle==null)
+                {
+                    blackStyle = new InputStyle();
+                    blackStyle.BackgroundColor = Color.Black;
+                    blackStyle.ForeColor = Color.White;
+                    blackStyle.HighLightColors.Add(Color.Red);
+                    blackStyle.HighLightColors.Add(Color.Yellow);
+                    blackStyle.HighLightColors.Add(Color.Green);
+                    blackStyle.KeywordColor = Color.Blue;
+                    blackStyle.Name = "黑底白字";
+                }
+                return blackStyle;
+            }
+        }
+
+        static InputStyle whiteStyle;
+        public static InputStyle WhiteStyle
+        {
+            get
+            {
+                if (whiteStyle == null)
+                {
+                    whiteStyle = new InputStyle();
+                    whiteStyle.HighLightColors.AddRange(new Color[] { Color.Red, Color.Orange, Color.Green });
+                    whiteStyle.Name = "白底黑字";
+                }
+                return whiteStyle;
+            }
         }
     }
 }

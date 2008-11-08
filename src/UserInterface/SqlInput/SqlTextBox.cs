@@ -6,6 +6,7 @@ using DistDBMS.Common.Dictionary;
 using System.Windows.Forms;
 using System.Drawing;
 using DistDBMS.UserInterface.Properties;
+using DistDBMS.Common.Table;
 
 namespace DistDBMS.UserInterface.SqlInput
 {
@@ -14,6 +15,9 @@ namespace DistDBMS.UserInterface.SqlInput
         FrmTip frmTip;
         string[] keywords = new string[] { "select", "from", "where" };
         string[] symbol = new string[] { " ", ",", ";" };
+
+        List<string> table = new List<string>();
+
         public SqlTextBox()
             : base()
         {
@@ -24,9 +28,47 @@ namespace DistDBMS.UserInterface.SqlInput
                 frmTip.CreateKeyword(s);
         }
 
+        /// <summary>
+        /// 是否高亮关键字
+        /// </summary>
+        public bool ColorKeyword {
+            get { return bColorKeyword; }
+            set { 
+                bColorKeyword = value;
+                FillTextColor();
+                }
+        }
+        bool bColorKeyword = true;
 
+        /// <summary>
+        /// 是否填充表格颜色
+        /// </summary>
+        public bool ColorTable {
+            get { return bColorTable; }
+            set { 
+                bColorTable = value;
+                FillTextColor();
+            }
+        }
+        bool bColorTable = true;
+
+        /// <summary>
+        /// 是否显示提示
+        /// </summary>
+        public bool ShowTip
+        {
+            get { return bShowTip; }
+            set { 
+                bShowTip = value; 
+                frmTip.Visible = false; 
+            }
+        }
+        bool bShowTip = true;
 
         GlobalDirectory gdd;
+        /// <summary>
+        /// 全局数据字典
+        /// </summary>
         public GlobalDirectory GDD
         {
             get
@@ -37,10 +79,19 @@ namespace DistDBMS.UserInterface.SqlInput
             {
                 gdd = value;
                 frmTip.InitTips(gdd);
+                if (gdd != null)
+                {
+                    table.Clear();
+                    foreach (TableSchema t in gdd.Schemas)
+                        table.Add(t.TableName);
+                }
+
             }
         }
 
-        InputStyle style = new InputStyle();
+        /// <summary>
+        /// 风格
+        /// </summary>
         public InputStyle Style
         {
             get
@@ -50,8 +101,11 @@ namespace DistDBMS.UserInterface.SqlInput
             set
             {
                 style = value;
+                SetStyle();
+                FillTextColor();
             }
         }
+        InputStyle style = new InputStyle();
 
         private void SetStyle()
         {
@@ -129,6 +183,13 @@ namespace DistDBMS.UserInterface.SqlInput
                 base.OnKeyUp(e);
         }
 
+        /// <summary>
+        /// 查找最后的符号
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <returns></returns>
         private int LastIndexOfSymbol(string str,int startIndex,int endIndex)
         {
             int result, left;
@@ -143,6 +204,13 @@ namespace DistDBMS.UserInterface.SqlInput
             return (result == -1) ? -1 : (result + startIndex);
         }
 
+        /// <summary>
+        /// 查找最前的符号
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <returns></returns>
         private int FirstIndexOfSymbol(string str,int startIndex,int endIndex)
         {
             int result, right;
@@ -161,7 +229,9 @@ namespace DistDBMS.UserInterface.SqlInput
             return (result == -1) ? -1 : (result + startIndex);
         }
 
-
+        /// <summary>
+        /// 当前最后一个字
+        /// </summary>
         private string LastWord
         {
             get
@@ -184,7 +254,7 @@ namespace DistDBMS.UserInterface.SqlInput
         /// <summary>
         /// 填入关键字颜色
         /// </summary>
-        private void FillKeywordColor()
+        private void FillTextColor()
         {
             int lastSelectionPos = this.SelectionStart;
             int lastLength = this.SelectionLength;
@@ -193,26 +263,50 @@ namespace DistDBMS.UserInterface.SqlInput
             this.SelectionLength = this.Text.Length;
             this.SelectionColor = this.style.ForeColor;
 
-            
-            foreach (string key in keywords)
+            if (ColorKeyword)
             {
-                string str = this.Text;
-                int left = str.IndexOf(key);
-                int addition = 0;
-                while (left >= 0)
-                {
-                    this.SelectionStart = left + addition;
-                    this.SelectionLength = key.Length;
-                    this.SelectionColor = style.KeywordColor;
+                foreach (string key in keywords)
+                    MatchText(key, style.KeywordColor);
+            }
 
-                    addition = left + key.Length;
-                    str = str.Substring(left + key.Length);
-                    left = str.IndexOf(key);
+            if (ColorTable)
+            {
+                int len = style.HighLightColors.Count;
+                if (len > 0)
+                {
+                    for (int i = 0; i < table.Count; i++)
+                    {
+                        string tablename = table[i];
+                        MatchText(tablename, style.HighLightColors[i % len]);
+                    }
                 }
             }
 
             this.SelectionStart = lastSelectionPos;
             this.SelectionLength = lastLength;
+        }
+
+        /// <summary>
+        /// 匹配字并填充颜色
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="color"></param>
+        private void MatchText(string text, Color color)
+        {
+            string str = this.Text;
+            int left = str.IndexOf(text, StringComparison.CurrentCultureIgnoreCase);
+            int addition = 0;
+            while (left >= 0)
+            {
+                this.SelectionStart = left + addition;
+                this.SelectionLength = text.Length;
+
+                this.SelectionColor = color;
+
+                addition += left + text.Length;
+                str = Text.Substring(addition);
+                left = str.IndexOf(text, StringComparison.CurrentCultureIgnoreCase);
+            }
         }
 
         protected override void OnTextChanged(EventArgs e)
@@ -248,7 +342,7 @@ namespace DistDBMS.UserInterface.SqlInput
                 }
                 else if (lastWord != "") //如果不完全匹配，且不为空“”，显示提示框
                 {
-                    if (!frmTip.Visible)
+                    if (!frmTip.Visible && ShowTip)
                         frmTip.Show(this);
                 }
                 else
@@ -259,7 +353,7 @@ namespace DistDBMS.UserInterface.SqlInput
             this.Focus();
 
             //填充关键字颜色
-            FillKeywordColor();
+            FillTextColor();
 
             base.OnTextChanged(e);
             
