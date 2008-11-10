@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DistDBMS.Common.Table
 {
-    public class TableSchema
+    public class TableSchema:ICloneable
     {
         /// <summary>
         /// 表名
@@ -97,5 +97,16 @@ namespace DistDBMS.Common.Table
                 return null;
             }
         }
+
+        #region ICloneable Members
+
+        public object Clone()
+        {
+            object result = this.MemberwiseClone();
+            
+            return result;
+        }
+
+        #endregion
     }
 }

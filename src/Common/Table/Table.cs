@@ -43,7 +43,7 @@ namespace DistDBMS.Common.Table
         /// </summary>
         /// <param name="index">tuple的索引</param>
         /// <returns></returns>
-        public string ToTupleString(int index)
+        public string GenerateTupleString(int index)
         {
             if (index >= 0 && index < tuples.Count)
             {

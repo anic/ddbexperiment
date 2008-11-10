@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Table;
+using DistDBMS.Common.Execution;
 
 namespace DistDBMS.Common.RelationalAlgebra
 {
@@ -14,21 +15,13 @@ namespace DistDBMS.Common.RelationalAlgebra
 
         }
 
-        private string GetSingleString(Relation node)
+        public string GetDebugString(ExecutionRelation root)
         {
-            string result = node.Type.ToString() + ": ";
-            if (node.IsDirectTableSchema)
-                result += " " + node.DirectTableSchema.ToString();
-
-            if (node.Predication.Content != "")
-                result += " Predication: " + node.Predication.Content;
-
-            if (node.RelativeAttributes.Fields.Count > 0 || node.RelativeAttributes.TableName != "")
-                result += " Attributes: " + node.RelativeAttributes.ToString();
-            
-            return result;
+            return GetNextLevelString(root, 0);
 
         }
+
+        
 
         private string GetNextLevelString(Relation node, int level)
         {
@@ -39,18 +32,14 @@ namespace DistDBMS.Common.RelationalAlgebra
                 result += space;
 
             result += "|_";
-            result += GetSingleString(node);
+            result += node.ToString();
             result += "\n";
 
-            if (node.LeftRelation!=null)
+            foreach(Relation child in node.Children)
             {
-                result += GetNextLevelString(node.LeftRelation, level + 1);
+                result += GetNextLevelString(child, level + 1);
             }
-
-            if (node.RightRelation != null)
-            {
-                result += GetNextLevelString(node.RightRelation, level + 1);
-            }
+            
             return result;
         }
 

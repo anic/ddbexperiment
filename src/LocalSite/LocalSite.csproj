@@ -44,17 +44,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccess\DataAccessor.cs" />
+    <Compile Include="Processor\SelectionProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VirtualInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{6732C2FA-0941-4ED3-9DD1-E8B3783A2869}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ControlSite\ControlSite.csproj">
-      <Project>{1EDEE97A-4E3B-4F00-9A29-A8C246F49FEC}</Project>
-      <Name>ControlSite</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

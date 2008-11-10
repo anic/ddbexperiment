@@ -17,6 +17,14 @@ namespace DistDBMS.Common.Table
             data = new List<string>();
         }
 
+        public string this[int index]
+        {
+            get
+            {
+                return data[index];
+            }
+        }
+
         public new string ToString()
         {
             string result = "(";

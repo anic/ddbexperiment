@@ -44,12 +44,19 @@ namespace DistDBMS.ControlSite.DataAccess
                 return type.ToString();
         }
 
+        public bool CreateTable(TableSchema tableSchema)
+        {
+            return CreateTable(tableSchema, true, false);
+        }
+
         /// <summary>
         /// 创建表格
         /// </summary>
         /// <param name="tableSchema"></param>
+        /// <param name="bPrimaryKey">创建主键</param>
+        /// <param name="index">创建索引</param>
         /// <returns></returns>
-        public bool CreateTable(TableSchema tableSchema)
+        public bool CreateTable(TableSchema tableSchema,bool bPrimaryKey, bool index)
         {
             SQLiteCommand cmd = new SQLiteCommand();
             cmd.Connection = conn;
@@ -63,7 +70,8 @@ namespace DistDBMS.ControlSite.DataAccess
                     cmd.CommandText += ",";
 
                 cmd.CommandText += f.AttributeName + " " + GetLocalDbType(f.AttributeType);
-                if (f.IsPrimaryKey)
+
+                if (f.IsPrimaryKey && bPrimaryKey)
                     cmd.CommandText += " PRIMARY KEY";
                 
             }
@@ -93,7 +101,7 @@ namespace DistDBMS.ControlSite.DataAccess
             {
                 for (int i=0;i<table.Tuples.Count;i++)
                 {
-                    cmd.CommandText = "insert into " + table.Schema.TableName + " values" + table.ToTupleString(i);
+                    cmd.CommandText = "insert into " + table.Schema.TableName + " values" + table.GenerateTupleString(i);
                     cmd.ExecuteNonQuery();
                 }
                 transaction.Commit();
