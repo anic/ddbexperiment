@@ -13,6 +13,7 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         Difference,
         Intersection,
         Join,
-        Semijoin
+        Semijoin,
+        
     }
 }

@@ -16,14 +16,53 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         public RelationalType Type { get; set; }
 
         /// <summary>
-        /// 左关系
+        /// 子关系
         /// </summary>
-        public Relation LeftRelation { get; set; }
+        public List<Relation> Children { get { return children; } } //修改过
+        List<Relation> children;
 
         /// <summary>
-        /// 右关系
+        /// 获得左关系
         /// </summary>
-        public Relation RightRelation { get; set; }
+        public Relation LeftRelation
+        {
+            get
+            {
+                if (children.Count == 0)
+                    return null;
+                else
+                    return children[0];
+            }
+            set
+            {
+                if (children.Count == 0)
+                    children.Add(value);
+                else
+                    children[0] = value;
+            }
+        }
+
+
+        /// <summary>
+        /// 获得右关系
+        /// </summary>
+        public Relation RightRelation
+        {
+            get
+            {
+                if (children.Count == 0 || children.Count == 1)
+                    return null;
+                else
+                    return children[children.Count - 1];
+            }
+            set
+            {
+                if (children.Count == 0 || children.Count == 1)
+                    children.Add(value);
+                else //关系多于2
+                    children[children.Count - 1] = value;
+            }
+        }
 
         /// <summary>
         /// 是否关系直接的表
@@ -45,15 +84,15 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// </summary>
         public TableSchema RelativeAttributes { get; set; }
 
-        public TableSchema ResultSchema
-        {
-            get
-            { 
-                //TODO:未完成
-                TableSchema result = new TableSchema();
-                return result;
-            }
-        }
+        //public TableSchema ResultSchema
+        //{
+        //    get
+        //    { 
+        //        //TODO:未完成
+        //        TableSchema result = new TableSchema();
+        //        return result;
+        //    }
+        //}
 
         /// <summary>
         /// 内容
@@ -62,14 +101,14 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
 
         public Relation()
         {
-            
-            LeftRelation = null;
-            RightRelation = null;
+
+            children = new List<Relation>();
             IsDirectTableSchema = false;
             DirectTableSchema = new TableSchema();
             RelativeAttributes = new TableSchema();
             Predication = new Predication();
             Content = "";
+            Type = RelationalType.Selection;
         }
 
         public static Relation EmptyRelation
@@ -77,7 +116,20 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             get { return null; }
         }
 
-        
+        public override string ToString()
+        {
+            string result = Type.ToString() + ": ";
+            if (IsDirectTableSchema)
+                result += " " + DirectTableSchema.ToString();
+
+            if (Predication.Content != "")
+                result += " Predication: " + Predication.Content;
+
+            if (RelativeAttributes.Fields.Count > 0 || RelativeAttributes.TableName != "")
+                result += " Attributes: " + RelativeAttributes.ToString();
+
+            return result;
+        }
 
     }
 }

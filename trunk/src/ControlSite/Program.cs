@@ -13,6 +13,8 @@ using System.IO;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.ControlSite.Finder;
 using DistDBMS.ControlSite.SQLSyntax;
+using DistDBMS.Common.Execution;
+using DistDBMS.ControlSite.Plan;
 
 namespace DistDBMS.ControlSite
 {
@@ -27,12 +29,12 @@ namespace DistDBMS.ControlSite
             a.TestGDD();
             a.TestSQLSyntax();
             a.TestRelationAlgebra();
-            
-            
+            a.TestExecutionPlan();
+
         }
 
         Selection s1, s2; //作为测试使用
-
+        Relation r;
         /// <summary>
         /// 关系代数的填写方法
         /// </summary>
@@ -40,7 +42,7 @@ namespace DistDBMS.ControlSite
         {
             //Sample1
             //关系代数树，示范结构：select * from Course where credit_hour>2 and location='CB‐6'
-            Relation r = new Relation();
+            r = new Relation();
             r.Type = RelationalType.Selection;
             r.IsDirectTableSchema = true;
 
@@ -66,8 +68,8 @@ namespace DistDBMS.ControlSite
              */
             r = new Relation();
             r.Type = RelationalType.Projection;
-            r.IsDirectTableSchema = true; 
-            
+            r.IsDirectTableSchema = true;
+
             Field f1 = new Field();
             f1.AttributeName = "name";
             f1.Content = "Course.name";
@@ -118,9 +120,36 @@ namespace DistDBMS.ControlSite
             //谓词
             select1.Predication.Content = "Course.credit_hour>2";
             //关系一个表
-            select1.IsDirectTableSchema = true;
-            select1.DirectTableSchema.TableName = "Course";
-            select1.DirectTableSchema.IsAllFields = true;
+            Relation join = new Relation();
+            join.Type = RelationalType.Join;
+            select1.Children.Add(join);
+
+            Field f6 = new Field();
+            f6.AttributeName = "id";
+            f6.TableName = "Course.1";
+            join.RelativeAttributes.Fields.Add(f6);
+
+            f6 = new Field();
+            f6.AttributeName = "id";
+            f6.TableName = "Course.2.2";
+            join.RelativeAttributes.Fields.Add(f6);
+
+
+
+            Relation select3 = new Relation();
+            select3.Type = RelationalType.Selection;
+            select3.IsDirectTableSchema = true;
+            select3.DirectTableSchema = new TableSchema();
+            select3.DirectTableSchema.TableName = "Course.1";
+            join.Children.Add(select3);
+
+            select3 = new Relation();
+            select3.Type = RelationalType.Selection;
+            select3.IsDirectTableSchema = true;
+            select3.DirectTableSchema = new TableSchema();
+            select3.DirectTableSchema.TableName = "Course.2.2";
+            join.Children.Add(select3);
+
 
             //右边关联Teacher表，Teacher表做了Selection:Teacher.title=3
             joinRelation.RightRelation = new Relation();
@@ -129,15 +158,118 @@ namespace DistDBMS.ControlSite
             //谓词
             select2.Predication.Content = "Teacher.title=3";
             //关系一个表
-            select2.IsDirectTableSchema = true;
-            select2.DirectTableSchema.TableName = "Teacher";
-            select2.DirectTableSchema.IsAllFields = true;
+            //select2.IsDirectTableSchema = true;
+            //select2.DirectTableSchema.TableName = "Teacher";
+            //select2.DirectTableSchema.IsAllFields = true;
+            Relation union = new Relation();
+            select2.Children.Add(union);
+            union.Type = RelationalType.Union;
+
+            Relation union1 = new Relation();
+            union1.Type = RelationalType.Selection;
+            union1.IsDirectTableSchema = true;
+            union1.DirectTableSchema = new TableSchema();
+            union1.DirectTableSchema.TableName = "Teacher.2";
+            union1.DirectTableSchema.IsAllFields = true;
+            union.Children.Add(union1);
+            union1 = new Relation();
+            union1.Type = RelationalType.Selection;
+            union1.IsDirectTableSchema = true;
+            union1.DirectTableSchema = new TableSchema();
+            union1.DirectTableSchema.TableName = "Teacher.4";
+            union1.DirectTableSchema.IsAllFields = true;
+            union.Children.Add(union1);
+
 
             output = (new RelationDebugger()).GetDebugString(r);
             System.Console.WriteLine("\n\nSample2 Relation:");
             System.Console.WriteLine(output);
-            
+
         }
+
+
+        private void TestExecutionPlan()
+        {
+            ExecutionRelation exR = new ExecutionRelation(r, "PLAN", -1);
+            string output = (new RelationDebugger()).GetDebugString(exR);
+            System.Console.WriteLine("\n\nSample2 Relation:");
+            System.Console.WriteLine(output);
+
+            ////////////////生成执行计划//////////////////////////
+            PlanCreator creator = new PlanCreator();
+
+            ExecutionPlan plan = creator.CreateGlobalPlan(r, "PLAN");
+            
+            System.Console.WriteLine("\n\nPlan:\n");
+            System.Console.WriteLine(plan.ToString());
+
+            /*
+             * Plan:
+                Step 0:
+                PLAN    Projection:  () Attributes: (Course.name, Course.credit_hour, Teacher.na
+                me)
+                PLAN.0  Join:  Attributes: (Course.teacher_id, Teacher.id)
+                PLAN.0.0        Selection:  Predication: Course.credit_hour>2
+                PLAN.0.1        Selection:  Predication: Teacher.title=3
+
+                Step 1:
+                PLAN.0.0        Selection:  Predication: Course.credit_hour>2
+                PLAN.0.0.0      Join:  Attributes: (Course.1.id, Course.2.2.id)
+                PLAN.0.0.0.0    Selection:  Course.1()
+                PLAN.0.0.0.1    Selection:  Course.2.2()
+
+                Step 2:
+                PLAN.0.1        Selection:  Predication: Teacher.title=3
+                PLAN.0.1.0      Union:
+                PLAN.0.1.0.0    Selection:  Teacher.2
+                PLAN.0.1.0.1    Selection:  Teacher.4
+
+                Step 3:
+                PLAN.0.0.0.1    Selection:  Course.2.2()
+
+                Step 4:
+                PLAN.0.1.0.1    Selection:  Teacher.4
+             */
+
+            List<ExecutionPlan> plans;
+            plans = creator.SplitPlan(plan, gdd);
+
+            foreach (ExecutionPlan p in plans)
+            {
+                System.Console.WriteLine("\n\n" + p.ToString() + "\n\n");
+            }
+
+            ExecutionPlan insertPlan = new ExecutionPlan();
+            ExecutionStep insertStep = new ExecutionStep();
+            insertPlan.Steps.Add(insertStep);
+            insertStep.Index = 0;
+            insertStep.Type = ExecutionStep.ExecuteType.Insert;
+            insertStep.Table = new Table();
+            Fragment frag = gdd.Fragments.GetFragmentByName("Course.2.2");
+            insertStep.Table.Schema = frag.Schema.Clone() as TableSchema;
+            insertStep.Table.Schema.TableName = frag.LogicTable.TableName;
+            Tuple tuple = new Tuple();
+            tuple.Data.Add("1");
+            tuple.Data.Add("CB - 6");
+            tuple.Data.Add("12");
+            tuple.Data.Add("4");
+            insertStep.Table.Tuples.Add(tuple);
+
+
+            System.Console.WriteLine("\n\n" + insertPlan.ToString() + "\n\n");
+            ExecutionPlan testPlan = plans[2];
+            ExecutionPackage package = new ExecutionPackage();
+            package.ID = "1";
+            package.Object = testPlan;
+            package.Type = ExecutionPackage.PackageType.Plan;
+
+            VirtualInterface vLocalSite = new VirtualInterface(testPlan.ExecutionSite.Name);
+            vLocalSite.ReceiveGdd(gdd);
+            vLocalSite.ReceiveExecutionPackage(package);
+
+        }
+
+        
 
         /// <summary>
         /// 测试SQL转换
@@ -154,10 +286,10 @@ namespace DistDBMS.ControlSite
             "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id",
             "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'"
             };
-            
+
 
             ParserSwitcher ps = new ParserSwitcher();
-            for (int i = 0; i < tests.Length;i++ )
+            for (int i = 0; i < tests.Length; i++)
             {
                 bool result = ps.Parse(tests[i]);
                 Selection s3 = ps.LastResult as Selection;
@@ -171,10 +303,10 @@ namespace DistDBMS.ControlSite
 
 
                 System.Console.WriteLine("\n\nTEST" + i.ToString() + ":");
-                System.Console.WriteLine("Raw: "+tests[i]);
+                System.Console.WriteLine("Raw: " + tests[i]);
                 System.Console.WriteLine("Parse:" + s3.ToString());
             }
-            
+
 
         }
 
@@ -188,7 +320,7 @@ namespace DistDBMS.ControlSite
             if (File.Exists(path))
             {
                 StreamReader sr = new StreamReader(path, System.Text.Encoding.Default);
-                
+
                 while (!sr.EndOfStream)
                 {
                     gddCreator.InsertCommand(sr.ReadLine());
