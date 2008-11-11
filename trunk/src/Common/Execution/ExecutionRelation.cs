@@ -16,6 +16,9 @@ namespace DistDBMS.Common.Execution
         public ExecutionRelation Parent { get { return parent; } }
         ExecutionRelation parent = null;
 
+        /// <summary>
+        /// 先留着，待扩展
+        /// </summary>
         public Site ExecutionSite { get; set; }
 
         /// <summary>
@@ -33,21 +36,38 @@ namespace DistDBMS.Common.Execution
                     case RelationalType.Join:
                         {
                             TableSchema result = new TableSchema();
-                            result.Fields.AddRange(RelativeAttributes.Fields);
+                            //TODO:这里要考虑是否是同一个表，如果是同一个逻辑表，则join属性合成一个，否则不合成一个
+                            for (int i = 0; i < RelativeAttributes.Fields.Count; i++)
+                            {
+                                if (i % 2 == 0)
+                                    result.Fields.Add(RelativeAttributes.Fields[i]);
+                            }
                             
                             foreach (ExecutionRelation r in Children)
                             {
+                                
                                 TableSchema childResult = r.ResultSchema;
                                 if (childResult != null)
-                                { 
+                                {
+                                    if (result.TableName == "")
+                                        result.TableName = childResult.TableName;
+                                    else
+                                    {
+                                        //两个表有同样的表名字,表名是同一个表
+
+                                        if (childResult.TableName != result.TableName) //否则A_B_C
+                                            result.TableName += "_" + childResult.TableName;
+                                    }
+
                                     foreach(Field f in childResult.Fields)
                                     {
                                         Field searchF = RelativeAttributes[f.AttributeName];
                                         if (searchF == null) //不在相关属性之中
-                                            result.Fields.Add(searchF);
+                                            result.Fields.Add(f);
                                     }
                                 }
                             }
+                            
                             return result;
                         }
                     case RelationalType.Union:
@@ -60,7 +80,9 @@ namespace DistDBMS.Common.Execution
                         {
                             if (IsDirectTableSchema)
                                 return DirectTableSchema;
-
+                            else if (Children.Count > 0)
+                                return (Children[0] as ExecutionRelation).ResultSchema;
+                               
                             break;
                         }
                         
@@ -153,6 +175,8 @@ namespace DistDBMS.Common.Execution
             }
             return null;
         }
+
+        
 
     }
 }
