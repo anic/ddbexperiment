@@ -44,6 +44,11 @@ namespace DistDBMS.ControlSite.DataAccess
                 return type.ToString();
         }
 
+        /// <summary>
+        /// 创建表格
+        /// </summary>
+        /// <param name="tableSchema"></param>
+        /// <returns></returns>
         public bool CreateTable(TableSchema tableSchema)
         {
             return CreateTable(tableSchema, true, false);
@@ -142,7 +147,7 @@ namespace DistDBMS.ControlSite.DataAccess
         /// <param name="cmd">sql语句</param>
         /// <param name="schema">目标表样式</param>
         /// <returns>带数据的表格</returns>
-        public Table Select(string cmd, TableSchema schema)
+        public Table Query(string cmd, TableSchema schema)
         {
             SQLiteCommand sqlCmd = new SQLiteCommand(conn);
             sqlCmd.CommandText = cmd;

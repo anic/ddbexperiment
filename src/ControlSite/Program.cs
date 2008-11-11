@@ -15,6 +15,7 @@ using DistDBMS.ControlSite.Finder;
 using DistDBMS.ControlSite.SQLSyntax;
 using DistDBMS.Common.Execution;
 using DistDBMS.ControlSite.Plan;
+using System.Collections;
 
 namespace DistDBMS.ControlSite
 {
@@ -200,9 +201,7 @@ namespace DistDBMS.ControlSite
 
             ExecutionPlan plan = creator.CreateGlobalPlan(r, "PLAN");
             
-            System.Console.WriteLine("\n\nPlan:\n");
-            System.Console.WriteLine(plan.ToString());
-
+           
             /*
              * Plan:
                 Step 0:
@@ -233,39 +232,46 @@ namespace DistDBMS.ControlSite
 
             List<ExecutionPlan> plans;
             plans = creator.SplitPlan(plan, gdd);
+            Hashtable virInterfaces = new Hashtable();
 
             foreach (ExecutionPlan p in plans)
             {
                 System.Console.WriteLine("\n\n" + p.ToString() + "\n\n");
+
+                //设置不同的站点
+                virInterfaces[p.ExecutionSite.Name] = new VirtualInterface(p.ExecutionSite.Name);
+                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveGdd(gdd);
             }
 
-            ExecutionPlan insertPlan = new ExecutionPlan();
-            ExecutionStep insertStep = new ExecutionStep();
-            insertPlan.Steps.Add(insertStep);
-            insertStep.Index = 0;
-            insertStep.Type = ExecutionStep.ExecuteType.Insert;
-            insertStep.Table = new Table();
-            Fragment frag = gdd.Fragments.GetFragmentByName("Course.2.2");
-            insertStep.Table.Schema = frag.Schema.Clone() as TableSchema;
-            insertStep.Table.Schema.TableName = frag.LogicTable.TableName;
-            Tuple tuple = new Tuple();
-            tuple.Data.Add("1");
-            tuple.Data.Add("CB - 6");
-            tuple.Data.Add("12");
-            tuple.Data.Add("4");
-            insertStep.Table.Tuples.Add(tuple);
+            //ExecutionPlan insertPlan = new ExecutionPlan();
+            //ExecutionStep insertStep = new ExecutionStep();
+            //insertPlan.Steps.Add(insertStep);
+            //insertStep.Index = 0;
+            //insertStep.Type = ExecutionStep.ExecuteType.Insert;
+            //insertStep.Table = new Table();
+            //Fragment frag = gdd.Fragments.GetFragmentByName("Course.2.2");
+            //insertStep.Table.Schema = frag.Schema.Clone() as TableSchema;
+            //insertStep.Table.Schema.TableName = frag.LogicTable.TableName;
+            //Tuple tuple = new Tuple();
+            //tuple.Data.Add("1");
+            //tuple.Data.Add("CB - 6");
+            //tuple.Data.Add("12");
+            //tuple.Data.Add("4");
+            //insertStep.Table.Tuples.Add(tuple);
 
 
-            System.Console.WriteLine("\n\n" + insertPlan.ToString() + "\n\n");
-            ExecutionPlan testPlan = plans[2];
-            ExecutionPackage package = new ExecutionPackage();
-            package.ID = "1";
-            package.Object = testPlan;
-            package.Type = ExecutionPackage.PackageType.Plan;
+            //System.Console.WriteLine("\n\n" + insertPlan.ToString() + "\n\n");
+            //ExecutionPlan testPlan = plans[3];
 
-            VirtualInterface vLocalSite = new VirtualInterface(testPlan.ExecutionSite.Name);
-            vLocalSite.ReceiveGdd(gdd);
-            vLocalSite.ReceiveExecutionPackage(package);
+            foreach (ExecutionPlan p in plans)
+            {
+                ExecutionPackage package = new ExecutionPackage();
+                package.ID = "1";
+                package.Object = p;
+                package.Type = ExecutionPackage.PackageType.Plan;
+                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
+            }
+            
 
         }
 

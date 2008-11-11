@@ -11,6 +11,12 @@ namespace DistDBMS.ControlSite.Plan
 {
     class PlanCreator
     {
+        /// <summary>
+        /// 生成全局的Plan
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ExecutionPlan CreateGlobalPlan(Relation root,string id)
         {
             ExecutionRelation exR = new ExecutionRelation(root, id, -1);
@@ -28,20 +34,20 @@ namespace DistDBMS.ControlSite.Plan
                 Relation re = queue.Dequeue();
                 step = new ExecutionStep();
                 step.Index = plan.Steps.Count;
-                ExecutionRelation joinOrUnion = (re as ExecutionRelation).FindFirstJoinOrUnion(out index);
-                if (joinOrUnion != null)
+                
+                //TODO:这里应该修改为找到分枝节点，且其孩子节点包含在两个站点中
+                //其实就只有Join和Union可以有子孩子
+                //ExecutionRelation splitRelation = (re as ExecutionRelation).FindFirstJoinOrUnion(out index);
+                ExecutionRelation splitRelation = FindSplitRelation(re as ExecutionRelation, out index);
+                
+                if (splitRelation != null)
                 {
                     step.Operation = new ExecutionRelation(re as ExecutionRelation, index + 1);
-
-                    if (joinOrUnion.Children[0].Children.Count > 0)
-                        queue.Enqueue(joinOrUnion.Children[0] as ExecutionRelation);//选择最左边的
-
-                    for (int i = 1; i < joinOrUnion.Children.Count; i++)
-                    {
-                        queue.Enqueue(joinOrUnion.Children[i] as ExecutionRelation);
-                    }
+                    
+                    for (int i = 0; i < splitRelation.Children.Count; i++)
+                        queue.Enqueue(splitRelation.Children[i] as ExecutionRelation);
                 }
-                else
+                else //如果没有分裂点，表明从这个开始到底层都是一个step
                 {
                     step.Operation = new ExecutionRelation(re as ExecutionRelation, -1);
                 }
@@ -49,6 +55,11 @@ namespace DistDBMS.ControlSite.Plan
             }
             return plan;
         }
+
+
+        Hashtable site2PlanTable = new Hashtable();
+        Hashtable id2PlanTable = new Hashtable();
+        List<ExecutionPlan> resultPlans = new List<ExecutionPlan>();
 
         /// <summary>
         /// 将总表分成站点的表
@@ -58,8 +69,9 @@ namespace DistDBMS.ControlSite.Plan
         /// <returns></returns>
         public List<ExecutionPlan> SplitPlan(ExecutionPlan gPlan,GlobalDirectory gdd)
         {
-            Hashtable site2PlanTable = new Hashtable();
-            Hashtable id2PlanTable = new Hashtable();
+            resultPlans.Clear();
+            site2PlanTable.Clear();
+            id2PlanTable.Clear();
 
             //将一个总计划分成多个站点计划
             for (int i = gPlan.Steps.Count - 1; i >= 0; i--)
@@ -70,6 +82,7 @@ namespace DistDBMS.ControlSite.Plan
                 //如果关系本地数据库表
                 if (leftBottom.IsDirectTableSchema) 
                 {
+                    //在这里设置是否本地站点
                     leftBottom.InLocalSite = true;//设置关系本地站点
 
                     //找到分片，默认的执行站点
@@ -80,23 +93,10 @@ namespace DistDBMS.ControlSite.Plan
                         leftBottom.DirectTableSchema.TableName = fragment.LogicTable.TableName;
                         leftBottom.DirectTableSchema.NickName = fragment.Name;
 
-                        currentPlan = (ExecutionPlan)site2PlanTable[fragment.Site.Name];
-
-                        if (currentPlan != null)
-                        {
-                            currentPlan.Steps.Add(gPlan.Steps[i]);
-                            //记录Id与Plan的对应关系
-                            id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;
-                        }
-                        else
-                        {
-                            currentPlan = new ExecutionPlan();
-                            currentPlan.ExecutionSite = fragment.Site;
-                            currentPlan.Steps.Add(gPlan.Steps[i]);
-                            site2PlanTable[fragment.Site.Name] = currentPlan;
-                            //记录Id与Plan的对应关系
-                            id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;
-                        }
+                        currentPlan = GetPlanBySite(fragment.Site);
+                        currentPlan.Steps.Add(gPlan.Steps[i]);
+                        //记录Id与Plan的对应关系
+                        id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;
                     }
                 }
                 else 
@@ -111,48 +111,55 @@ namespace DistDBMS.ControlSite.Plan
                         //记录Id与Plan的对应关系
                         id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;
                     }
-                    else //理论上不应该执行到这里，为了保险，先保留
-                    {
-                        //否则在站点1中做吧，测试
-                        currentPlan = (ExecutionPlan)site2PlanTable[gdd.Sites[0].Name];
-                        if (currentPlan != null)
-                        {
-                            currentPlan.Steps.Add(gPlan.Steps[i]);
-                            //记录Id与Plan的对应关系
-                            id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;
-                        }
-                        else
-                        {
-                            currentPlan = new ExecutionPlan();
-                            currentPlan.ExecutionSite = gdd.Sites[0];
-                            currentPlan.Steps.Add(gPlan.Steps[i]);
-                            site2PlanTable[gdd.Sites[0].Name] = currentPlan;
-                            //记录Id与Plan的对应关系
-                            id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;
-                        }
-                    }
                 }
 
-                SetWaitingId(gPlan.Steps[i], leftBottom);
-
-
+                SetBottomInfo(gPlan.Steps[i], leftBottom);
             }
 
-            List<ExecutionPlan> result = new List<ExecutionPlan>();
-            foreach (DictionaryEntry entry in site2PlanTable)
-                result.Add(entry.Value as ExecutionPlan);
+            foreach (ExecutionPlan plan in resultPlans)
+                foreach (ExecutionStep step in plan.Steps)
+                    SetTransferSite(step, resultPlans);
+            
 
-            foreach (ExecutionPlan plan in result)
+            return resultPlans;
+        }
+
+
+        private ExecutionStep GetStepById(string id)
+        {
+            ExecutionPlan plan = (ExecutionPlan)id2PlanTable[id];
+            if (plan != null)
             {
                 foreach (ExecutionStep step in plan.Steps)
-                {
-                    SetTransferSite(step, result);
-                }
+                    if (step.Operation != null && step.Operation.ResultID == id)
+                        return step;
             }
-
+            return null;
+        }
+        
+        /// <summary>
+        /// 通过站点获得Plan
+        /// </summary>
+        /// <param name="site"></param>
+        /// <returns></returns>
+        private ExecutionPlan GetPlanBySite(Site site)
+        {
+            ExecutionPlan result = (ExecutionPlan)site2PlanTable[site.Name];
+            if (result == null)
+            {
+                result = new ExecutionPlan();
+                result.ExecutionSite = site;
+                site2PlanTable[site.Name] = result;
+                resultPlans.Add(result);
+            }
             return result;
         }
 
+        /// <summary>
+        /// 找到最左的底层节点
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
         private ExecutionRelation FindLeftBottomNode(ExecutionRelation r)
         {
             if (r.Children.Count == 0)
@@ -161,16 +168,52 @@ namespace DistDBMS.ControlSite.Plan
                 return FindLeftBottomNode(r.Children[0] as ExecutionRelation);
         }
 
-        private void SetWaitingId(ExecutionStep step, ExecutionRelation leftBottom)
+        /// <summary>
+        /// 设置底层节点的信息，包括等待ID
+        /// </summary>
+        /// <param name="step"></param>
+        /// <param name="leftBottom"></param>
+        private void SetBottomInfo(ExecutionStep step, ExecutionRelation leftBottom)
         {
             if (leftBottom.Parent != null)
             {
                 ExecutionRelation parent = leftBottom.Parent;
-                for (int i = 1; i < parent.Children.Count; i++)
-                    step.WaitingId.Add((parent.Children[i] as ExecutionRelation).ResultID);
+                for (int i = 0; i < parent.Children.Count; i++)
+                {
+                    ExecutionRelation currentRelation = (parent.Children[i] as ExecutionRelation);
+                    //应该在这里判断是否本地操作
+                    if (currentRelation.InLocalSite)                    //i==0 是默认本地操作
+                        step.WaitingId.Add(currentRelation.ResultID);
+
+                    //在这里把非本地的数据的结构记录
+                    //需要填写fragment中的信息
+                    string nickName = "";
+                    
+                    if (parent.Children[i].IsDirectTableSchema)
+                        nickName = parent.Children[i].DirectTableSchema.TableName;
+
+                    ExecutionStep tmpStep = GetStepById(currentRelation.ResultID);
+                    if (tmpStep != null)
+                    {
+                        //修改那些非直接表格
+                        currentRelation.IsDirectTableSchema = true;
+                        currentRelation.DirectTableSchema = tmpStep.Operation.ResultSchema; 
+                        currentRelation.DirectTableSchema.NickName = nickName;
+
+                        if (currentRelation.DirectTableSchema.TableName == "") //如果表名没有，则设置为nickname
+                            currentRelation.DirectTableSchema.TableName = nickName;
+                    }
+                    
+                }
             }
         }
 
+
+        /// <summary>
+        /// 设置传送站点
+        /// </summary>
+        /// <param name="step"></param>
+        /// <param name="plans"></param>
         private void SetTransferSite(ExecutionStep step,List<ExecutionPlan> plans)
         {
             foreach (ExecutionPlan plan in plans)
@@ -187,6 +230,31 @@ namespace DistDBMS.ControlSite.Plan
                 }
             }
         }
+
+        /// <summary>
+        /// 查找分裂的节点
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        protected ExecutionRelation FindSplitRelation(ExecutionRelation r,out int level)
+        {
+            //这里用到的策略是，碰到分成2枝的就作为分裂的点
+            level = 1;
+            if (r.Children.Count > 1)
+                return r;
+            else if (r.Children.Count == 1)
+            {
+                int tempLevel;
+                ExecutionRelation result = FindSplitRelation(r.Children[0] as ExecutionRelation, out tempLevel);
+                level = tempLevel + 1;
+                return result;
+            }
+            else
+                return null;
+        }
+
+        
 
     }
 }
