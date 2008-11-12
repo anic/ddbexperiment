@@ -30,34 +30,47 @@
         {
             this.lvwTable = new System.Windows.Forms.ListView();
             this.lblTableName = new System.Windows.Forms.Label();
+            this.lblCondition = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lvwTable
             // 
-            this.lvwTable.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lvwTable.Location = new System.Drawing.Point(10, 37);
+            this.lvwTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvwTable.Location = new System.Drawing.Point(10, 43);
             this.lvwTable.Name = "lvwTable";
-            this.lvwTable.Size = new System.Drawing.Size(475, 270);
+            this.lvwTable.Size = new System.Drawing.Size(475, 264);
             this.lvwTable.TabIndex = 0;
             this.lvwTable.UseCompatibleStateImageBehavior = false;
             this.lvwTable.View = System.Windows.Forms.View.Details;
             // 
-            // label1
+            // lblTableName
             // 
             this.lblTableName.AutoSize = true;
+            this.lblTableName.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblTableName.Font = new System.Drawing.Font("SimSun", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblTableName.Location = new System.Drawing.Point(6, 13);
-            this.lblTableName.Name = "label1";
+            this.lblTableName.Location = new System.Drawing.Point(10, 10);
+            this.lblTableName.Name = "lblTableName";
             this.lblTableName.Size = new System.Drawing.Size(82, 21);
             this.lblTableName.TabIndex = 1;
             this.lblTableName.Text = "label1";
+            // 
+            // lblCondition
+            // 
+            this.lblCondition.AutoSize = true;
+            this.lblCondition.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblCondition.Location = new System.Drawing.Point(10, 31);
+            this.lblCondition.Name = "lblCondition";
+            this.lblCondition.Size = new System.Drawing.Size(41, 12);
+            this.lblCondition.TabIndex = 2;
+            this.lblCondition.Text = "label1";
             // 
             // UscTableSchemaViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.lblTableName);
             this.Controls.Add(this.lvwTable);
+            this.Controls.Add(this.lblCondition);
+            this.Controls.Add(this.lblTableName);
             this.Name = "UscTableSchemaViewer";
             this.Padding = new System.Windows.Forms.Padding(10);
             this.Size = new System.Drawing.Size(495, 317);
@@ -70,6 +83,7 @@
 
         private System.Windows.Forms.ListView lvwTable;
         private System.Windows.Forms.Label lblTableName;
+        private System.Windows.Forms.Label lblCondition;
 
     }
 }

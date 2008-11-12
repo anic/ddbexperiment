@@ -25,47 +25,81 @@ namespace DistDBMS.ControlSite.Processor
 
         string condition = "";
 
-        public void SetPackage(ExecutionPackage package)
-        { 
+        
+        private Table HandleUnion(ExecutionStep step, string dbname, VirtualBuffer buffer)
+        {
+            using (DataAccess.DataAccessor accessor = new DistDBMS.ControlSite.DataAccess.DataAccessor(dbname))
+            {
 
+                string sql = GenerateQueryString(true);
+                System.Console.WriteLine(sql);
+
+                Table result = accessor.Query(sql, target);
+                
+                //然后将外部的表和这个表在内存中合起来
+                System.Console.WriteLine("Union " + localSources[0].TableName + " ," + tempSources[0].TableName);
+
+                return result;
+            }
         }
 
-        private void HandleUnion(ExecutionStep step, string dbname)
-        { 
-
-        }
-
-        private void HandleQuery(ExecutionStep step, string dbname)
+        private Table HandleQuery(ExecutionStep step, string dbname, VirtualBuffer buffer)
         {
             using (DataAccess.DataAccessor accessor = new DistDBMS.ControlSite.DataAccess.DataAccessor(dbname))
             {
                 //生成临时表格
                 foreach (TableSchema t in tempSources)
-                    accessor.CreateTable(t);
+                {
+                    System.Console.WriteLine("create table " + t.ToString());
+                    bool r = accessor.CreateTable(t);
+                    if (r)
+                    {
+                        //填入临时数据
+                        
+                    }
+                }
 
-                string sql = GenerateQueryString();
-                Table result = accessor.Query(sql, target);
+                
+                
+                string sql = GenerateQueryString(false);
                 System.Console.WriteLine(sql);
+
+                Table result = accessor.Query(sql, target);
+                
 
                 //删除临时表格
                 foreach (TableSchema t in tempSources)
+                {
                     accessor.DropTable(t.TableName);
+                    System.Console.WriteLine("drop table " + t.ToString());
+                }
+
+                return result;
             }
         }
 
-        public void Handle(ExecutionStep step,string dbname)
+        public Table Handle(ExecutionStep step,string dbname,VirtualBuffer buffer)
         {
+            //重置信息
             tempSources.Clear();
             localSources.Clear();
             condition = "";
+            tableIndex = 0;
     
+            //遍历关系代数树
             VisitRelation(step.Operation);
+
+            //设置目标
             target = step.Operation.ResultSchema;
 
-            if (step.Operation.Type == RelationalType.Union)
-                HandleUnion(step, dbname);
+            Table result;
+            if (step.Operation.Type == RelationalType.Union) //如果是Union ，在内存中做
+                result = HandleUnion(step, dbname, buffer);
             else
-                HandleQuery(step, dbname);
+                result = HandleQuery(step, dbname, buffer); //否则做
+
+            return result;
+
         }
 
         private string GetSourceName(string nickname)
@@ -81,7 +115,12 @@ namespace DistDBMS.ControlSite.Processor
             return nickname;
         }
 
-        private string GenerateQueryString()
+        /// <summary>
+        /// 生成查询语句
+        /// </summary>
+        /// <param name="bUnion"></param>
+        /// <returns></returns>
+        private string GenerateQueryString(bool bUnion)
         {
             string result = "select ";
             bool multiSource = (localSources.Count + tempSources.Count > 1);
@@ -104,12 +143,16 @@ namespace DistDBMS.ControlSite.Processor
                 result += t.TableName;
                 index++;
             }
-            foreach (TableSchema t in tempSources)
+
+            if (!bUnion) //如果不是Union，才执行这个操作
             {
-                if (index != 0)
-                    result += ",";
-                result += t.TableName;
-                index++;
+                foreach (TableSchema t in tempSources)
+                {
+                    if (index != 0)
+                        result += ",";
+                    result += t.TableName;
+                    index++;
+                }
             }
 
             if (condition != "")

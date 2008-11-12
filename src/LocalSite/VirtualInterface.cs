@@ -6,6 +6,7 @@ using DistDBMS.Common.Dictionary;
 using DistDBMS.ControlSite.Processor;
 using System.IO;
 using DistDBMS.Common.Table;
+using System.Threading;
 
 namespace DistDBMS.ControlSite
 {
@@ -13,17 +14,28 @@ namespace DistDBMS.ControlSite
     {
         FragmentList ldd; //用于保存local的数据字典
         string name;
-        public VirtualInterface(string siteName)
+
+        VirtualBuffer buffer;
+
+        /// <summary>
+        /// 用于调试的平台，虚拟接口
+        /// </summary>
+        /// <param name="siteName"></param>
+        /// <param name="buffer"></param>
+        public VirtualInterface(string siteName,VirtualBuffer buffer)
         {
             try
             {
                 File.Delete(siteName);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) {
+                System.Console.WriteLine(ex);
+            }
 
 
             ldd = new FragmentList();
             name = siteName;
+            this.buffer = buffer;
         }
 
         public void ReceiveExecutionPackage(ExecutionPackage package)
@@ -33,7 +45,32 @@ namespace DistDBMS.ControlSite
                 ExecutionPlan plan = package.Object as ExecutionPlan;
                 QueryProcessor processor = new QueryProcessor();
                 foreach (ExecutionStep step in plan.Steps)
-                    processor.Handle(step, name);
+                {
+                    while (true)
+                    {
+                        bool allReady = true;
+                        foreach (string id in step.WaitingId)
+                            allReady &= (buffer[id] != null);
+
+                        if (allReady)
+                            break;
+
+                        Thread.Sleep(1000); //现在是停等，以后应该是异步等，或者唤醒机制
+                    }
+
+                    Table table = processor.Handle(step, name, buffer);
+
+                    //相当于发数据
+                    ExecutionPackage newPackage = new ExecutionPackage();
+                    package.ID = step.Operation.ResultID;
+                    package.Type = ExecutionPackage.PackageType.Data;
+                    package.Object = table;
+
+                    lock (buffer)
+                    {
+                        buffer.Add(package);//相当于异步发送
+                    }
+                }
             }
         }
 

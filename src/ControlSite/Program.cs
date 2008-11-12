@@ -16,6 +16,7 @@ using DistDBMS.ControlSite.SQLSyntax;
 using DistDBMS.Common.Execution;
 using DistDBMS.ControlSite.Plan;
 using System.Collections;
+using System.Threading;
 
 namespace DistDBMS.ControlSite
 {
@@ -200,7 +201,7 @@ namespace DistDBMS.ControlSite
 
             ExecutionPlan plan = creator.CreateGlobalPlan(r, "PLAN");
             System.Console.WriteLine(plan.ToString());
-
+#region output
             /*
              *  Step 0:
                 PLAN    Projection:  () Attributes: (Course.name, Course.credit_hour, Teacher.na
@@ -252,18 +253,22 @@ namespace DistDBMS.ControlSite
                 Waiting:
                 Transfer:
              */
-
-            List<ExecutionPlan> plans;
+#endregion
+            
             plans = creator.SplitPlan(plan, gdd);
             Hashtable virInterfaces = new Hashtable();
 
+            VirtualBuffer buffer = new VirtualBuffer();
             foreach (ExecutionPlan p in plans)
             {
                 //System.Console.WriteLine("\n\n" + p.ToString() + "\n\n");
 
                 //设置不同的站点
-                virInterfaces[p.ExecutionSite.Name] = new VirtualInterface(p.ExecutionSite.Name);
+                virInterfaces[p.ExecutionSite.Name] = new VirtualInterface(p.ExecutionSite.Name, buffer);
                 (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveGdd(gdd);
+
+                
+                
             }
 
             //ExecutionPlan insertPlan = new ExecutionPlan();
@@ -292,13 +297,31 @@ namespace DistDBMS.ControlSite
                 package.ID = "1";
                 package.Object = p;
                 package.Type = ExecutionPackage.PackageType.Plan;
-                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
+                //(virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
+                Thread t = new Thread(new ThreadStart(new ThreadExample(virInterfaces[p.ExecutionSite.Name] as VirtualInterface, package).ThreadProc));
+                t.Start();
             }
 
 
         }
+        internal class ThreadExample
+        {
+            VirtualInterface vInterface;
+            ExecutionPackage package;
+            public ThreadExample(VirtualInterface vInterface,ExecutionPackage package)
+            {
+                this.vInterface = vInterface;
+                this.package = package ;
+            }
 
+            public void ThreadProc()
+            {
+                vInterface.ReceiveExecutionPackage(package);
+            }
+        }
 
+        List<ExecutionPlan> plans;
+        
 
         /// <summary>
         /// 测试SQL转换
