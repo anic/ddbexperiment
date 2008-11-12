@@ -69,6 +69,7 @@
     <Compile Include="FrmApp.Designer.cs">
       <DependentUpon>FrmApp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Handler\MenuTreeSwitcher.cs" />
     <Compile Include="PanelSwitchManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -137,6 +138,7 @@
     <Content Include="Resources\img_column.png" />
     <None Include="Resources\img_exesql.png" />
     <Content Include="Resources\img_keyword.png" />
+    <Content Include="Resources\img_magnifier.png" />
     <Content Include="Resources\img_table.png" />
     <None Include="Resources\img_tool.png" />
     <Content Include="Resources\Triangle.ico" />

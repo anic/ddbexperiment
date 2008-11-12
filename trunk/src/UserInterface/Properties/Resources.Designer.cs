@@ -88,6 +88,13 @@ namespace DistDBMS.UserInterface.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap img_magnifier {
+            get {
+                object obj = ResourceManager.GetObject("img_magnifier", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap img_table {
             get {
                 object obj = ResourceManager.GetObject("img_table", resourceCulture);

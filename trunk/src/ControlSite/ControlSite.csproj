@@ -69,6 +69,7 @@
     <Compile Include="SQLSyntax\Parser\TableMatcher.cs" />
     <Compile Include="SQLSyntax\Parser\VFragmentationParser.cs" />
     <Compile Include="SQLSyntax\SqlSyntaxError.cs" />
+    <Compile Include="VirtualInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

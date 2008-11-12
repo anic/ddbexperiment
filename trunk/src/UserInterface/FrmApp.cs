@@ -10,6 +10,9 @@ using DistDBMS.ControlSite;
 using System.IO;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.UserInterface.Controls;
+using DistDBMS.UserInterface.Properties;
+using DistDBMS.Common.Table;
+using DistDBMS.UserInterface.Handler;
 
 namespace DistDBMS.UserInterface
 {
@@ -17,10 +20,17 @@ namespace DistDBMS.UserInterface
     {
 
         GlobalDirectory gdd;
-        
+        MenuTreeSwitcher switcher;
         public FrmApp()
         {
             InitializeComponent();
+
+            imageList.Images.Add(Resources.img_magnifier);
+
+            switcher = new MenuTreeSwitcher(tvwMenu);
+            switcher.SetControl(uscExecuteQuery);
+            switcher.SetControl(uscTableSchemaViewer);
+
 
             //初始化GDD
             GDDCreator gddCreator = new GDDCreator();
@@ -39,13 +49,11 @@ namespace DistDBMS.UserInterface
             }
 
             uscExecuteQuery.SetGlobalDirectory(gdd);
-            //txtSqlInput.GDD = gdd;
+            switcher.SetGlobalDirectory(gdd);
         }
 
-        private void tvwMenu_AfterSelect(object sender, TreeViewEventArgs e)
-        {
 
-        }
+        
         
     }
 }

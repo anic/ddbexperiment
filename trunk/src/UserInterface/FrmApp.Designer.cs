@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("优化树");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("查询", new System.Windows.Forms.TreeNode[] {
             treeNode1});
@@ -40,16 +41,22 @@
             treeNode5});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmApp));
             this.tvwMenu = new System.Windows.Forms.TreeView();
+            this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.pnlControl = new System.Windows.Forms.Panel();
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemImportScript = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemImportData = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOption = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.uscTableSchemaViewer = new DistDBMS.UserInterface.Controls.UscTableSchemaViewer();
             this.uscExecuteQuery = new DistDBMS.UserInterface.Controls.UscExecuteQuery();
+            this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlControl.SuspendLayout();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
@@ -57,11 +64,12 @@
             // tvwMenu
             // 
             this.tvwMenu.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tvwMenu.ItemHeight = 30;
+            this.tvwMenu.ItemHeight = 23;
             this.tvwMenu.Location = new System.Drawing.Point(10, 10);
             this.tvwMenu.Name = "tvwMenu";
             treeNode1.Name = "Node2";
             treeNode1.Text = "优化树";
+            treeNode2.ImageIndex = -2;
             treeNode2.Name = "Node0";
             treeNode2.Text = "查询";
             treeNode3.Name = "Node3";
@@ -77,7 +85,12 @@
             treeNode6});
             this.tvwMenu.Size = new System.Drawing.Size(183, 415);
             this.tvwMenu.TabIndex = 2;
-            this.tvwMenu.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvwMenu_AfterSelect);
+            // 
+            // imageList
+            // 
+            this.imageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imageList.ImageSize = new System.Drawing.Size(30, 30);
+            this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // splitter1
             // 
@@ -100,9 +113,7 @@
             // mainMenu
             // 
             this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuFile,
-            this.menuSetting,
-            this.menuHelp});
+            this.文件ToolStripMenuItem});
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.Name = "mainMenu";
             this.mainMenu.Size = new System.Drawing.Size(697, 25);
@@ -112,15 +123,29 @@
             // menuFile
             // 
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemImportScript,
+            this.menuItemImportData,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
             this.menuFile.Size = new System.Drawing.Size(44, 21);
             this.menuFile.Text = "文件";
             // 
+            // menuItemImportScript
+            // 
+            this.menuItemImportScript.Name = "menuItemImportScript";
+            this.menuItemImportScript.Size = new System.Drawing.Size(124, 22);
+            this.menuItemImportScript.Text = "导入脚本";
+            // 
+            // menuItemImportData
+            // 
+            this.menuItemImportData.Name = "menuItemImportData";
+            this.menuItemImportData.Size = new System.Drawing.Size(124, 22);
+            this.menuItemImportData.Text = "导入数据";
+            // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
-            this.menuItemExit.Size = new System.Drawing.Size(152, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(124, 22);
             this.menuItemExit.Text = "退出";
             // 
             // menuSetting
@@ -134,7 +159,7 @@
             // menuItemOption
             // 
             this.menuItemOption.Name = "menuItemOption";
-            this.menuItemOption.Size = new System.Drawing.Size(152, 22);
+            this.menuItemOption.Size = new System.Drawing.Size(100, 22);
             this.menuItemOption.Text = "选项";
             // 
             // menuHelp
@@ -148,23 +173,45 @@
             // menuItemAbout
             // 
             this.menuItemAbout.Name = "menuItemAbout";
-            this.menuItemAbout.Size = new System.Drawing.Size(152, 22);
+            this.menuItemAbout.Size = new System.Drawing.Size(100, 22);
             this.menuItemAbout.Text = "关于";
+            // 
+            // uscTableSchemaViewer
+            // 
+            this.uscTableSchemaViewer.Location = new System.Drawing.Point(281, 109);
+            this.uscTableSchemaViewer.Name = "uscTableSchemaViewer";
+            this.uscTableSchemaViewer.Padding = new System.Windows.Forms.Padding(10);
+            this.uscTableSchemaViewer.Size = new System.Drawing.Size(495, 317);
+            this.uscTableSchemaViewer.TabIndex = 8;
             // 
             // uscExecuteQuery
             // 
-            this.uscExecuteQuery.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.uscExecuteQuery.Location = new System.Drawing.Point(206, 25);
+            this.uscExecuteQuery.Location = new System.Drawing.Point(203, 64);
             this.uscExecuteQuery.Name = "uscExecuteQuery";
             this.uscExecuteQuery.Padding = new System.Windows.Forms.Padding(10);
-            this.uscExecuteQuery.Size = new System.Drawing.Size(491, 435);
+            this.uscExecuteQuery.Size = new System.Drawing.Size(422, 315);
             this.uscExecuteQuery.TabIndex = 6;
+            // 
+            // 文件ToolStripMenuItem
+            // 
+            this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.退出ToolStripMenuItem});
+            this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
+            this.文件ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.文件ToolStripMenuItem.Text = "文件";
+            // 
+            // 退出ToolStripMenuItem
+            // 
+            this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
+            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.退出ToolStripMenuItem.Text = "退出";
             // 
             // FrmApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(697, 460);
+            this.Controls.Add(this.uscTableSchemaViewer);
             this.Controls.Add(this.uscExecuteQuery);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.pnlControl);
@@ -195,6 +242,12 @@
         private System.Windows.Forms.ToolStripMenuItem menuItemOption;
         private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem menuItemAbout;
+        private System.Windows.Forms.ToolStripMenuItem menuItemImportScript;
+        private System.Windows.Forms.ToolStripMenuItem menuItemImportData;
+        private System.Windows.Forms.ImageList imageList;
+        private DistDBMS.UserInterface.Controls.UscTableSchemaViewer uscTableSchemaViewer;
+        private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
         
     }
 }
