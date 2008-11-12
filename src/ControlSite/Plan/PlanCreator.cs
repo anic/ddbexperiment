@@ -43,13 +43,20 @@ namespace DistDBMS.ControlSite.Plan
                 if (splitRelation != null)
                 {
                     step.Operation = new ExecutionRelation(re as ExecutionRelation, index + 1);
-                    
+
                     for (int i = 0; i < splitRelation.Children.Count; i++)
-                        queue.Enqueue(splitRelation.Children[i] as ExecutionRelation);
+                    {
+                        if (
+                            (splitRelation.Children.Count == 1)                 //只有一个分枝
+                            || (i > 0)      //非第一个分枝
+                            || (i ==0 && !splitRelation.Children[i].IsDirectTableSchema) //第一个分枝且不是直接关系数据库表
+                            )
+                            queue.Enqueue(splitRelation.Children[i] as ExecutionRelation);
+                    }
                 }
                 else //如果没有分裂点，表明从这个开始到底层都是一个step
                 {
-                    step.Operation = new ExecutionRelation(re as ExecutionRelation, -1);
+                    step.Operation = new ExecutionRelation(re as ExecutionRelation, -1);    
                 }
                 plan.Steps.Add(step);
             }
@@ -82,8 +89,7 @@ namespace DistDBMS.ControlSite.Plan
                 //如果关系本地数据库表
                 if (leftBottom.IsDirectTableSchema) 
                 {
-                    //在这里设置是否本地站点
-                    leftBottom.InLocalSite = true;//设置关系本地站点
+                    
 
                     //找到分片，默认的执行站点
                     Fragment fragment = gdd.Fragments.GetFragmentByName(leftBottom.DirectTableSchema.TableName);
@@ -97,6 +103,9 @@ namespace DistDBMS.ControlSite.Plan
                         currentPlan.Steps.Add(gPlan.Steps[i]);
                         //记录Id与Plan的对应关系
                         id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;
+
+                        leftBottom.InLocalSite = true;
+
                     }
                 }
                 else 
@@ -155,6 +164,17 @@ namespace DistDBMS.ControlSite.Plan
             return result;
         }
 
+        private ExecutionPlan GetPlanByStep(ExecutionStep target)
+        {
+            foreach (ExecutionPlan plan in resultPlans)
+            {
+                foreach (ExecutionStep step in plan.Steps)
+                    if (step == target)
+                        return plan;
+            }
+            return null;
+        }
+
         /// <summary>
         /// 找到最左的底层节点
         /// </summary>
@@ -182,7 +202,7 @@ namespace DistDBMS.ControlSite.Plan
                 {
                     ExecutionRelation currentRelation = (parent.Children[i] as ExecutionRelation);
                     //应该在这里判断是否本地操作
-                    if (currentRelation.InLocalSite)                    //i==0 是默认本地操作
+                    if (!currentRelation.InLocalSite)                    //i==0 是默认本地操作
                         step.WaitingId.Add(currentRelation.ResultID);
 
                     //在这里把非本地的数据的结构记录
@@ -197,11 +217,12 @@ namespace DistDBMS.ControlSite.Plan
                     {
                         //修改那些非直接表格
                         currentRelation.IsDirectTableSchema = true;
-                        currentRelation.DirectTableSchema = tmpStep.Operation.ResultSchema; 
+                        currentRelation.DirectTableSchema = tmpStep.Operation.ResultSchema;
                         currentRelation.DirectTableSchema.NickName = nickName;
 
                         if (currentRelation.DirectTableSchema.TableName == "") //如果表名没有，则设置为nickname
                             currentRelation.DirectTableSchema.TableName = nickName;
+                        
                     }
                     
                 }
@@ -241,14 +262,19 @@ namespace DistDBMS.ControlSite.Plan
         {
             //这里用到的策略是，碰到分成2枝的就作为分裂的点
             level = 1;
-            if (r.Children.Count > 1)
+            if (r.Children.Count > 1 )
                 return r;
             else if (r.Children.Count == 1)
             {
-                int tempLevel;
-                ExecutionRelation result = FindSplitRelation(r.Children[0] as ExecutionRelation, out tempLevel);
-                level = tempLevel + 1;
-                return result;
+                if (r.Children[0].Type == RelationalType.Union)
+                    return r;
+                else
+                {
+                    int tempLevel;
+                    ExecutionRelation result = FindSplitRelation(r.Children[0] as ExecutionRelation, out tempLevel);
+                    level = tempLevel + 1;
+                    return result;
+                }
             }
             else
                 return null;

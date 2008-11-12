@@ -27,11 +27,15 @@ namespace DistDBMS.Common.Execution
         public TableSchema ResultSchema {
             get
             {
+                if (IsDirectTableSchema && DirectTableSchema != null
+                    && DirectTableSchema.Fields.Count > 0)
+                    return DirectTableSchema;
+
                 switch(Type)
                 {
                     case RelationalType.Projection:
                         {
-                            return RelativeAttributes;
+                            return RelativeAttributes.Clone() as TableSchema;
                         }
                     case RelationalType.Join:
                         {
@@ -103,7 +107,7 @@ namespace DistDBMS.Common.Execution
             this.Type = r.Type;
 
             int index = 0;
-            if (createLevel>0 || createLevel == -1)
+            if (createLevel -1 >0|| createLevel == -1)
             {
                 foreach (Relation child in r.Children)
                 {

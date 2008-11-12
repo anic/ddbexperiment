@@ -1,7 +1,7 @@
-﻿define site S1 127.0.0.1:2001
-define site S2 127.0.0.1:2002
-define site S3 127.0.0.1:2003
-define site S4 127.0.0.1:2004
+﻿define site S1 127.0.0.1 2001
+define site S2 127.0.0.1 2002
+define site S3 127.0.0.1 2003
+define site S4 127.0.0.1 2004
 create table Student (id int key, name char(25), sex char(1), age int, degree int)
 create table Teacher (id int key, name char(25), title int)
 create table Course (id int key, name char(80), location char(8), credit_hour int, teacher_id int)
@@ -26,3 +26,6 @@ allocate Exam.1 to S1
 allocate Exam.2 to S2
 allocate Exam.3 to S3
 allocate Exam.4 to S4
+createdb ddb //create a database with name “ddb”
+drop table student
+drop the table dropdb ddb

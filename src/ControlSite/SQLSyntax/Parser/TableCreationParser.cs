@@ -20,7 +20,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
         {
             result = new TableCreation();
             //create table Student (id int key, name char(25), sex char(1), age int, degree int)
-            Regex reg = new Regex(@"create table\s+(\S+)\s*\((.*)\)\s*",RegexOptions.IgnoreCase);
+            Regex reg = new Regex(@"create\s*table\s+(\S+)\s*\((.*)\)\s*",RegexOptions.IgnoreCase);
             Match match = reg.Match(sql);
             if (match.Success)
             {
