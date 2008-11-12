@@ -28,7 +28,10 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
                 string[] values = content.Split(',');
                 Tuple result = new Tuple();
                 foreach (string s in values)
+                {
+                    //todo:如果是字符串，是否需要摘除‘’，“”
                     result.Data.Add(s.Trim());
+                }
                 return result;
             }
             return null;

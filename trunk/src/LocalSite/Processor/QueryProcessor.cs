@@ -1,10 +1,11 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Execution;
 using DistDBMS.Common.Table;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Dictionary;
+using System.Collections;
 
 namespace DistDBMS.ControlSite.Processor
 {
@@ -20,6 +21,8 @@ namespace DistDBMS.ControlSite.Processor
 
         TableSchemaList localSources = new TableSchemaList();
 
+        Hashtable name2Schema = new Hashtable();
+
         string condition = "";
 
         public void SetPackage(ExecutionPackage package)
@@ -27,16 +30,13 @@ namespace DistDBMS.ControlSite.Processor
 
         }
 
-        
+        private void HandleUnion(ExecutionStep step, string dbname)
+        { 
 
-        public void Handle(ExecutionStep step,string dbname)
+        }
+
+        private void HandleQuery(ExecutionStep step, string dbname)
         {
-            ExecutionRelation root = step.Operation;
-            VisitRelation(root);
-            target = root.ResultSchema;
-
-
-
             using (DataAccess.DataAccessor accessor = new DistDBMS.ControlSite.DataAccess.DataAccessor(dbname))
             {
                 //生成临时表格
@@ -45,14 +45,40 @@ namespace DistDBMS.ControlSite.Processor
 
                 string sql = GenerateQueryString();
                 Table result = accessor.Query(sql, target);
-
+                System.Console.WriteLine(sql);
 
                 //删除临时表格
                 foreach (TableSchema t in tempSources)
                     accessor.DropTable(t.TableName);
-
-
             }
+        }
+
+        public void Handle(ExecutionStep step,string dbname)
+        {
+            tempSources.Clear();
+            localSources.Clear();
+            condition = "";
+    
+            VisitRelation(step.Operation);
+            target = step.Operation.ResultSchema;
+
+            if (step.Operation.Type == RelationalType.Union)
+                HandleUnion(step, dbname);
+            else
+                HandleQuery(step, dbname);
+        }
+
+        private string GetSourceName(string nickname)
+        {
+            foreach (TableSchema table in localSources)
+                if (table.NickName == nickname || table.TableName == nickname)
+                    return table.TableName;
+
+            foreach (TableSchema table in tempSources)
+                if (table.NickName == nickname || table.TableName == nickname)
+                    return table.TableName;
+
+            return nickname;
         }
 
         private string GenerateQueryString()
@@ -64,7 +90,7 @@ namespace DistDBMS.ControlSite.Processor
                 if (i != 0)
                     result += ", ";
                 if (multiSource)
-                    result += target.Fields[i].ToString();
+                    result += GetSourceName(target.Fields[i].TableName) + "." + target.Fields[i].AttributeName;
                 else
                     result += target.Fields[i].AttributeName;
             }
@@ -115,23 +141,31 @@ namespace DistDBMS.ControlSite.Processor
         /// <param name="r"></param>
         private void VisitRelation(ExecutionRelation r)
         {
+            if (r.IsDirectTableSchema)
+            {
+                if (r.InLocalSite)
+                    localSources.Add(r.DirectTableSchema);
+                else
+                {
+                    if (r.DirectTableSchema.Fields.Count > 0)
+                    {
+                        TableSchema outTable = r.DirectTableSchema.Clone() as TableSchema;
+                        if (outTable.NickName == "") //如果原来有nickname，表名条件中用到
+                            outTable.NickName = outTable.TableName;
+
+                        outTable.TableName = GenerateTempName(outTable.TableName);
+                        tempSources.Add(outTable);
+                    }
+                }
+            }
+
+
             switch (r.Type)
             {
                 case RelationalType.Projection:
                     break;
                 case RelationalType.Selection:
-                    if (r.IsDirectTableSchema)
-                    {
-                        if (r.InLocalSite)
-                            localSources.Add(r.DirectTableSchema);
-                        else
-                        {
-                            TableSchema outTable = r.DirectTableSchema.Clone() as TableSchema;
-                            outTable.TableName = GenerateTempName(outTable.TableName);
-                            tempSources.Add(r.DirectTableSchema);
-                        }
-                    }
-
+                    
                     if (r.Predication.Content != "")
                     {
                         if (condition != "")

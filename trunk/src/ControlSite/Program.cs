@@ -69,8 +69,7 @@ namespace DistDBMS.ControlSite
              */
             r = new Relation();
             r.Type = RelationalType.Projection;
-            r.IsDirectTableSchema = true;
-
+            
             Field f1 = new Field();
             f1.AttributeName = "name";
             f1.Content = "Course.name";
@@ -98,7 +97,7 @@ namespace DistDBMS.ControlSite
             //Join :Course.teacher_id=Teacher.id and
             Relation joinRelation = r.LeftRelation;
             joinRelation.Type = RelationalType.Join;
-            joinRelation.IsDirectTableSchema = false;
+            
 
             Field f4 = new Field();
             f4.TableName = "Course";
@@ -200,34 +199,58 @@ namespace DistDBMS.ControlSite
             PlanCreator creator = new PlanCreator();
 
             ExecutionPlan plan = creator.CreateGlobalPlan(r, "PLAN");
-            
-           
+            System.Console.WriteLine(plan.ToString());
+
             /*
-             * Plan:
-                Step 0:
+             *  Step 0:
                 PLAN    Projection:  () Attributes: (Course.name, Course.credit_hour, Teacher.na
                 me)
                 PLAN.0  Join:  Attributes: (Course.teacher_id, Teacher.id)
                 PLAN.0.0        Selection:  Predication: Course.credit_hour>2
                 PLAN.0.1        Selection:  Predication: Teacher.title=3
+                Waiting:
+                Transfer:
 
                 Step 1:
                 PLAN.0.0        Selection:  Predication: Course.credit_hour>2
                 PLAN.0.0.0      Join:  Attributes: (Course.1.id, Course.2.2.id)
                 PLAN.0.0.0.0    Selection:  Course.1()
                 PLAN.0.0.0.1    Selection:  Course.2.2()
+                Waiting:
+                Transfer:
 
                 Step 2:
                 PLAN.0.1        Selection:  Predication: Teacher.title=3
                 PLAN.0.1.0      Union:
-                PLAN.0.1.0.0    Selection:  Teacher.2
-                PLAN.0.1.0.1    Selection:  Teacher.4
+                Waiting:
+                Transfer:
 
                 Step 3:
-                PLAN.0.0.0.1    Selection:  Course.2.2()
+                PLAN.0.0.0.0    Selection:  Course.1()
+                Waiting:
+                Transfer:
 
                 Step 4:
+                PLAN.0.0.0.1    Selection:  Course.2.2()
+                Waiting:
+                Transfer:
+
+                Step 5:
+                PLAN.0.1.0      Union:
+                PLAN.0.1.0.0    Selection:  Teacher.2
                 PLAN.0.1.0.1    Selection:  Teacher.4
+                Waiting:
+                Transfer:
+
+                Step 6:
+                PLAN.0.1.0.0    Selection:  Teacher.2
+                Waiting:
+                Transfer:
+
+                Step 7:
+                PLAN.0.1.0.1    Selection:  Teacher.4
+                Waiting:
+                Transfer:
              */
 
             List<ExecutionPlan> plans;
@@ -236,7 +259,7 @@ namespace DistDBMS.ControlSite
 
             foreach (ExecutionPlan p in plans)
             {
-                System.Console.WriteLine("\n\n" + p.ToString() + "\n\n");
+                //System.Console.WriteLine("\n\n" + p.ToString() + "\n\n");
 
                 //设置不同的站点
                 virInterfaces[p.ExecutionSite.Name] = new VirtualInterface(p.ExecutionSite.Name);
@@ -271,11 +294,11 @@ namespace DistDBMS.ControlSite
                 package.Type = ExecutionPackage.PackageType.Plan;
                 (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
             }
-            
+
 
         }
 
-        
+
 
         /// <summary>
         /// 测试SQL转换

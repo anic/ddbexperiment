@@ -19,31 +19,24 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
         {
             //define site S1 127.0.0.1:2001
             result = new SiteDefinition();
-            Regex reg = new Regex(@"define site\s+(\S+)\s+(\S+)", RegexOptions.IgnoreCase);
+            Regex reg = new Regex(@"define\s*site\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.IgnoreCase);
             Match match = reg.Match(sql);
             if (match.Success)
             {
                 result.Site.Name = match.Groups[1].ToString();
-                string[] address = match.Groups[2].ToString().Trim().Split(':');
-                if (address != null && address.Length == 2)
+                result.Site.IP = match.Groups[2].ToString();
+                
+                try
                 {
-                    result.Site.IP = address[0];
-                    try
-                    {
-                        result.Site.Port = Convert.ToInt32(address[1]);
-                    }
-                    catch
-                    {
-                        error.Description = "端口匹配错误";
-                        return false;
-                    }
-                    return true;
+                    result.Site.Port = Convert.ToInt32(match.Groups[3].ToString());
                 }
-                else
+                catch
                 {
-                    error.Description = "站点地址匹配错误";
+                    error.Description = "端口匹配错误";
                     return false;
                 }
+                return true;
+            
             }
             error.Description = "定义格式匹配错误";
             return false;

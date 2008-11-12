@@ -32,7 +32,8 @@ namespace DistDBMS.ControlSite
             {
                 ExecutionPlan plan = package.Object as ExecutionPlan;
                 QueryProcessor processor = new QueryProcessor();
-                processor.Handle(plan.Steps[0], name);
+                foreach (ExecutionStep step in plan.Steps)
+                    processor.Handle(step, name);
             }
         }
 
