@@ -7,7 +7,7 @@ namespace DistDBMS.Common.Table
     /// <summary>
     /// 表中的域
     /// </summary>
-    public class Field
+    public class Field:ICloneable
     {
         /// <summary>
         /// 属性名称
@@ -58,5 +58,16 @@ namespace DistDBMS.Common.Table
         {
             return TableName + "." + AttributeName;
         }
+
+
+
+        #region ICloneable Members
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        #endregion
     }
 }

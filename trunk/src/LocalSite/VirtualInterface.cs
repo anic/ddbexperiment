@@ -46,29 +46,39 @@ namespace DistDBMS.ControlSite
                 QueryProcessor processor = new QueryProcessor();
                 foreach (ExecutionStep step in plan.Steps)
                 {
-                    while (true)
+                    if (step.Type == ExecutionStep.ExecuteType.Select)
                     {
-                        bool allReady = true;
-                        foreach (string id in step.WaitingId)
-                            allReady &= (buffer[id] != null);
+                        while (true)
+                        {
+                            bool allReady = true;
+                            foreach (string id in step.WaitingId)
+                                allReady &= (buffer[id] != null);
 
-                        if (allReady)
-                            break;
+                            if (allReady)
+                                break;
 
-                        Thread.Sleep(1000); //现在是停等，以后应该是异步等，或者唤醒机制
+                            Thread.Sleep(1000); //现在是停等，以后应该是异步等，或者唤醒机制
+                        }
+
+                        Table table = processor.Handle(step, name, buffer);
+
+                        //相当于发数据
+                        ExecutionPackage newPackage = new ExecutionPackage();
+                        package.ID = step.Operation.ResultID;
+                        package.Type = ExecutionPackage.PackageType.Data;
+                        package.Object = table;
+
+                        lock (buffer)
+                        {
+                            buffer.Add(package);//相当于异步发送
+                        }
                     }
-
-                    Table table = processor.Handle(step, name, buffer);
-
-                    //相当于发数据
-                    ExecutionPackage newPackage = new ExecutionPackage();
-                    package.ID = step.Operation.ResultID;
-                    package.Type = ExecutionPackage.PackageType.Data;
-                    package.Object = table;
-
-                    lock (buffer)
+                    else if (step.Type == ExecutionStep.ExecuteType.Insert)
                     {
-                        buffer.Add(package);//相当于异步发送
+                        using (DataAccess.DataAccessor da = new DistDBMS.ControlSite.DataAccess.DataAccessor(name))
+                        {
+                            da.InsertValues(step.Table);
+                        }
                     }
                 }
             }

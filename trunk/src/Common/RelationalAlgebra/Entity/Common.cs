@@ -16,4 +16,12 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         Semijoin,
         
     }
+
+
+    public enum NormalFormType
+    {
+        Conjunction,
+        Disjunction
+    }
+
 }

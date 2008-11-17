@@ -41,6 +41,8 @@
     <Compile Include="Execution\ExecutionPackage.cs" />
     <Compile Include="Execution\ExecutionRelation.cs" />
     <Compile Include="RelationalAlgebra\Entity\Common.cs" />
+    <Compile Include="RelationalAlgebra\Entity\ConjunctiveNormalForm.cs" />
+    <Compile Include="RelationalAlgebra\Entity\DisjunctiveNormalForm.cs" />
     <Compile Include="RelationalAlgebra\Entity\Predication.cs" />
     <Compile Include="RelationalAlgebra\Entity\Relation.cs" />
     <Compile Include="RelationalAlgebra\RelationDebugger.cs" />

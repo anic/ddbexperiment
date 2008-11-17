@@ -70,5 +70,10 @@ namespace DistDBMS.Common.Table
             else
                 throw new IndexOutOfRangeException();
         }
+
+        public new string ToString()
+        {
+            return Name;
+        }
     }
 }
