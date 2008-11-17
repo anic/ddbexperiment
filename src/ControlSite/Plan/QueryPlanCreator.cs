@@ -9,8 +9,14 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.ControlSite.Plan
 {
-    class PlanCreator
+    class QueryPlanCreator
     {
+        GlobalDirectory gdd;
+        public QueryPlanCreator(GlobalDirectory gdd)
+        {
+            this.gdd = gdd;
+        }
+
         /// <summary>
         /// 生成全局的Plan
         /// </summary>
@@ -74,7 +80,7 @@ namespace DistDBMS.ControlSite.Plan
         /// <param name="gPlan"></param>
         /// <param name="gdd"></param>
         /// <returns></returns>
-        public List<ExecutionPlan> SplitPlan(ExecutionPlan gPlan,GlobalDirectory gdd)
+        public List<ExecutionPlan> SplitPlan(ExecutionPlan gPlan)
         {
             resultPlans.Clear();
             site2PlanTable.Clear();

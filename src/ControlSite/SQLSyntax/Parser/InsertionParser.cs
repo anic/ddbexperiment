@@ -41,6 +41,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
         {
             result = new Insertion();
             //insert into Student values (190001, 'xiao ming', 'M', 20, 1)
+            //TODO:新的格式有变化
             Regex reg = new Regex(@"(insert)\s+(into)\s+(\S+)\s+(values)\s+(.*)",RegexOptions.IgnoreCase);
             Match match = reg.Match(sql);
             if (match.Success)

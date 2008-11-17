@@ -77,7 +77,7 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// <summary>
         /// 谓词，如果有
         /// </summary>
-        public Predication Predication { get; set; }
+        public Condition Predication { get; set; }
 
         /// <summary>
         /// 相关的属性集
@@ -106,7 +106,7 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             IsDirectTableSchema = false;
             DirectTableSchema = new TableSchema();
             RelativeAttributes = new TableSchema();
-            Predication = new Predication();
+            Predication = new Condition();
             Content = "";
             Type = RelationalType.Selection;
         }

@@ -17,6 +17,7 @@ using DistDBMS.Common.Execution;
 using DistDBMS.ControlSite.Plan;
 using System.Collections;
 using System.Threading;
+using DistDBMS.ControlSite.RelationalAlgebraUtility;
 
 namespace DistDBMS.ControlSite
 {
@@ -31,7 +32,7 @@ namespace DistDBMS.ControlSite
             a.TestGDD();
             a.TestSQLSyntax();
             a.TestRelationAlgebra();
-            a.TestExecutionPlan();
+            //a.TestExecutionPlan();
 
         }
 
@@ -188,7 +189,6 @@ namespace DistDBMS.ControlSite
 
         }
 
-
         private void TestExecutionPlan()
         {
             ExecutionRelation exR = new ExecutionRelation(r, "PLAN", -1);
@@ -197,11 +197,36 @@ namespace DistDBMS.ControlSite
             System.Console.WriteLine(output);
 
             ////////////////生成执行计划//////////////////////////
-            PlanCreator creator = new PlanCreator();
 
+            //插入数据
+            DataImporter importer = new DataImporter(gdd);
+            importer.ImportFromFile("Data.txt");
+
+            ImportPlanCreator importPlanCreator = new ImportPlanCreator(gdd);
+            plans = importPlanCreator.CreatePlans(importer);
+
+            Hashtable virInterfaces = new Hashtable();
+            VirtualBuffer buffer = new VirtualBuffer();
+            
+            foreach (ExecutionPlan p in plans)
+            {
+                //设置不同的站点
+                ExecutionPackage package = new ExecutionPackage();
+                package.Type = ExecutionPackage.PackageType.Plan;
+                package.Object = p;
+
+                virInterfaces[p.ExecutionSite.Name] = new VirtualInterface(p.ExecutionSite.Name, buffer);
+                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveGdd(gdd);
+                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
+            }
+            
+            
+            QueryPlanCreator creator = new QueryPlanCreator(gdd);
             ExecutionPlan plan = creator.CreateGlobalPlan(r, "PLAN");
             System.Console.WriteLine(plan.ToString());
-#region output
+            plans = creator.SplitPlan(plan);
+
+            #region output
             /*
              *  Step 0:
                 PLAN    Projection:  () Attributes: (Course.name, Course.credit_hour, Teacher.na
@@ -254,23 +279,8 @@ namespace DistDBMS.ControlSite
                 Transfer:
              */
 #endregion
-            
-            plans = creator.SplitPlan(plan, gdd);
-            Hashtable virInterfaces = new Hashtable();
 
-            VirtualBuffer buffer = new VirtualBuffer();
-            foreach (ExecutionPlan p in plans)
-            {
-                //System.Console.WriteLine("\n\n" + p.ToString() + "\n\n");
-
-                //设置不同的站点
-                virInterfaces[p.ExecutionSite.Name] = new VirtualInterface(p.ExecutionSite.Name, buffer);
-                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveGdd(gdd);
-
-                
-                
-            }
-
+            #region 测试插入的数据
             //ExecutionPlan insertPlan = new ExecutionPlan();
             //ExecutionStep insertStep = new ExecutionStep();
             //insertPlan.Steps.Add(insertStep);
@@ -290,20 +300,23 @@ namespace DistDBMS.ControlSite
 
             //System.Console.WriteLine("\n\n" + insertPlan.ToString() + "\n\n");
             //ExecutionPlan testPlan = plans[3];
+            #endregion
 
+            
             foreach (ExecutionPlan p in plans)
             {
                 ExecutionPackage package = new ExecutionPackage();
                 package.ID = "1";
                 package.Object = p;
                 package.Type = ExecutionPackage.PackageType.Plan;
-                //(virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
+                
                 Thread t = new Thread(new ThreadStart(new ThreadExample(virInterfaces[p.ExecutionSite.Name] as VirtualInterface, package).ThreadProc));
                 t.Start();
             }
 
 
         }
+
         internal class ThreadExample
         {
             VirtualInterface vInterface;
@@ -351,13 +364,25 @@ namespace DistDBMS.ControlSite
 
                 //TO 刘璋：可以从这里开始测试转换
 
-
-
-
+                SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
+                converter.SetQueryCalculus(s3);
+                Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
+                //System.Console.WriteLine("AAA Parse:" + relationalgebra.ToString());
+                /*
                 System.Console.WriteLine("\n\nTEST" + i.ToString() + ":");
                 System.Console.WriteLine("Raw: " + tests[i]);
-                System.Console.WriteLine("Parse:" + s3.ToString());
+                System.Console.WriteLine("Parse:" + s3.ToString());*/
+
+                //QueryPlanCreator creator = new QueryPlanCreator(gdd);
+                //ExecutionPlan plan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
+                
+                //System.Console.WriteLine("***PLAN***\n" + plan.ToString());
+                //System.Console.WriteLine("***PLAN**************************");
+                //plans = creator.SplitPlan(plan);
+                //foreach (ExecutionPlan p in plans)
+                //    System.Console.WriteLine(p.ToString());
             }
+
 
 
         }
@@ -379,6 +404,8 @@ namespace DistDBMS.ControlSite
                 }
                 sr.Close();
                 gdd = gddCreator.CreateGDD();
+
+                
 
                 //FragmentFinder finder = new FragmentFinder(gdd);
                 //Condition condition = new Condition();

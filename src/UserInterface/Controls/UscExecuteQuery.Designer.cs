@@ -28,16 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DistDBMS.UserInterface.Controls.SqlInput.InputStyle inputStyle2 = new DistDBMS.UserInterface.Controls.SqlInput.InputStyle();
+            DistDBMS.UserInterface.Controls.SqlInput.InputStyle inputStyle1 = new DistDBMS.UserInterface.Controls.SqlInput.InputStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tbp = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.btnExecuteSQL = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.cmbColorStyle = new System.Windows.Forms.ToolStripComboBox();
-            this.btnExecuteSQL = new System.Windows.Forms.ToolStripButton();
             this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripSplitButton();
             this.menuItemShowTip = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemColorKeyword = new System.Windows.Forms.ToolStripMenuItem();
@@ -102,6 +102,16 @@
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
+            // btnExecuteSQL
+            // 
+            this.btnExecuteSQL.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnExecuteSQL.Image = global::DistDBMS.UserInterface.Properties.Resources.img_exesql;
+            this.btnExecuteSQL.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnExecuteSQL.Name = "btnExecuteSQL";
+            this.btnExecuteSQL.Size = new System.Drawing.Size(23, 22);
+            this.btnExecuteSQL.Text = "执行SQL";
+            this.btnExecuteSQL.Click += new System.EventHandler(this.btnExecuteSQL_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -120,15 +130,6 @@
             this.cmbColorStyle.Size = new System.Drawing.Size(121, 25);
             this.cmbColorStyle.SelectedIndexChanged += new System.EventHandler(this.cmbColorStyle_SelectedIndexChanged);
             // 
-            // btnExecuteSQL
-            // 
-            this.btnExecuteSQL.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnExecuteSQL.Image = global::DistDBMS.UserInterface.Properties.Resources.img_exesql;
-            this.btnExecuteSQL.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnExecuteSQL.Name = "btnExecuteSQL";
-            this.btnExecuteSQL.Size = new System.Drawing.Size(23, 22);
-            this.btnExecuteSQL.Text = "执行SQL";
-            // 
             // toolStripSplitButton1
             // 
             this.toolStripSplitButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -146,7 +147,7 @@
             // 
             this.menuItemShowTip.CheckOnClick = true;
             this.menuItemShowTip.Name = "menuItemShowTip";
-            this.menuItemShowTip.Size = new System.Drawing.Size(152, 22);
+            this.menuItemShowTip.Size = new System.Drawing.Size(136, 22);
             this.menuItemShowTip.Text = "显示提示";
             this.menuItemShowTip.Click += new System.EventHandler(this.menuItemShowTip_Click);
             // 
@@ -155,7 +156,7 @@
             this.menuItemColorKeyword.CheckOnClick = true;
             this.menuItemColorKeyword.Image = global::DistDBMS.UserInterface.Properties.Resources.img_keyword;
             this.menuItemColorKeyword.Name = "menuItemColorKeyword";
-            this.menuItemColorKeyword.Size = new System.Drawing.Size(152, 22);
+            this.menuItemColorKeyword.Size = new System.Drawing.Size(136, 22);
             this.menuItemColorKeyword.Text = "关键字高亮";
             this.menuItemColorKeyword.Click += new System.EventHandler(this.menuItemColorKeyword_Click);
             // 
@@ -164,7 +165,7 @@
             this.menuItemColorTable.CheckOnClick = true;
             this.menuItemColorTable.Image = global::DistDBMS.UserInterface.Properties.Resources.img_colortable;
             this.menuItemColorTable.Name = "menuItemColorTable";
-            this.menuItemColorTable.Size = new System.Drawing.Size(152, 22);
+            this.menuItemColorTable.Size = new System.Drawing.Size(136, 22);
             this.menuItemColorTable.Text = "彩色表格";
             this.menuItemColorTable.Click += new System.EventHandler(this.menuItemColorTable_Click);
             // 
@@ -180,11 +181,11 @@
             this.sqlTextBox.Name = "sqlTextBox";
             this.sqlTextBox.ShowTip = true;
             this.sqlTextBox.Size = new System.Drawing.Size(403, 242);
-            inputStyle2.BackgroundColor = System.Drawing.Color.White;
-            inputStyle2.ForeColor = System.Drawing.Color.Black;
-            inputStyle2.KeywordColor = System.Drawing.Color.Blue;
-            inputStyle2.Name = "";
-            this.sqlTextBox.Style = inputStyle2;
+            inputStyle1.BackgroundColor = System.Drawing.Color.White;
+            inputStyle1.ForeColor = System.Drawing.Color.Black;
+            inputStyle1.KeywordColor = System.Drawing.Color.Blue;
+            inputStyle1.Name = "";
+            this.sqlTextBox.Style = inputStyle1;
             this.sqlTextBox.TabIndex = 0;
             this.sqlTextBox.Text = "";
             // 

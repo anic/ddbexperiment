@@ -50,6 +50,15 @@ namespace DistDBMS.UserInterface
 
             uscExecuteQuery.SetGlobalDirectory(gdd);
             switcher.SetGlobalDirectory(gdd);
+
+            uscExecuteQuery.OnExecuteSQL += new EventHandler(uscExecuteQuery_OnExecuteSQL);
+        }
+
+        void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
+        {
+            ControlSite.VirtualInterface2 vInterface = new DistDBMS.ControlSite.VirtualInterface2();
+            vInterface.ExecuteSQL(uscExecuteQuery.SQLText);
+            
         }
 
 

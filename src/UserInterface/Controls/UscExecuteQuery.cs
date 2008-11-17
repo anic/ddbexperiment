@@ -58,6 +58,21 @@ namespace DistDBMS.UserInterface.Controls
             sqlTextBox.ColorTable = menuItemColorTable.Checked;
         }
 
+        private void btnExecuteSQL_Click(object sender, EventArgs e)
+        {
+            if (OnExecuteSQL != null)
+                OnExecuteSQL(sender, e);
+        }
+
+        public string SQLText
+        {
+            get
+            {
+                return sqlTextBox.Text;
+            }
+        }
+
+        public event EventHandler OnExecuteSQL;
         
 
         

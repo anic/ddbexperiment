@@ -30,6 +30,7 @@ namespace DistDBMS.UserInterface.Controls
             {
                 ColumnHeader header = new ColumnHeader();
                 header.Text = f.AttributeName;
+                header.Width = f.AttributeName.Length * 10 + 10;
                 lvwTable.Columns.Add(header);
             }
 
