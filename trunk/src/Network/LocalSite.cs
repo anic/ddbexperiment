@@ -409,9 +409,29 @@ namespace DistDBMS.Network
                 SessionStepPacket ssPacket = (SessionStepPacket)Packets.WaitAndRead(Timeout.Infinite);
                 if (ssPacket != null)
                 {
-                    if (ssPacket is P2PPacket)
-                        if (ssPacket.SessionId != SessionId)
+                    if (ssPacket.SessionId != SessionId)
+                    {
+                        if (ssPacket is LocalSitePacket)
+                        {
+                            Guid oldSessionId = SessionId;
+                            SessionId = ssPacket.SessionId;
+
+                            stepWaitingPackets.Clear(); stepDonePackets.Clear();
+                            stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null);
+                            stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null);
+                            incompletedPackets.Clear();
+
+                            //新建的会话，或者会话还没建立，但P2P数据已经到达
+                            localSiteServer.UpdateSessionConnectionTable(this, oldSessionId, SessionId);
+
+                            //继续执行
+                        }
+                        else
+                        {
+                            //过期的P2P数据包，忽略
                             continue;
+                        }
+                    }
 
                     //如果有未完成的包在等待后续包，则处理之前的未完成的包
                     if (incompletedPackets.ContainsKey(ssPacket.FromHostName))
@@ -441,38 +461,37 @@ namespace DistDBMS.Network
                         }
                     }
 
-                    lock (stepWaitingPackets)
+                    
+                    
+                    bool modified = false;
+
+                    if (ssPacket is P2PPacket || (ssPacket as LocalSitePacket).StepFromIndex == SessionStepPacket.StepIndexNone)
                     {
-                        bool modified = false;
+                        ProcessSessionStepPacket(ssPacket);
 
-                        if (ssPacket is P2PPacket || (ssPacket as LocalSitePacket).StepFromIndex == SessionStepPacket.StepIndexNone)
+                        if (ssPacket.StepIndex != SessionStepPacket.StepIndexNone)
                         {
-                            ProcessSessionStepPacket(ssPacket);
-
-                            if (ssPacket.StepIndex != SessionStepPacket.StepIndexNone)
-                            {
-                                stepDonePackets[ssPacket.StepIndex] = ssPacket;
-                                modified = true;
-                            }
-                        }
-                        else
-                        {
-                            stepWaitingPackets[ssPacket.StepIndex] = ssPacket;
+                            stepDonePackets[ssPacket.StepIndex] = ssPacket;
                             modified = true;
-                        }    
+                        }
+                    }
+                    else
+                    {
+                        stepWaitingPackets[ssPacket.StepIndex] = ssPacket;
+                        modified = true;
+                    }    
 
-                        while (modified)
+                    while (modified)
+                    {
+                        modified = false;
+                        for (int i = 0; i < stepWaitingPackets.Count; i++)
                         {
-                            modified = false;
-                            for (int i = 0; i < stepWaitingPackets.Count; i++)
+                            if (stepWaitingPackets[i] != null && stepDonePackets[ (stepWaitingPackets[i] as LocalSitePacket).StepFromIndex] != null)
                             {
-                                if (stepWaitingPackets[i] != null && stepDonePackets[ (stepWaitingPackets[i] as LocalSitePacket).StepFromIndex] != null)
-                                {
-                                    ProcessSessionStepPacket(stepWaitingPackets[i]);
-                                    stepDonePackets[stepWaitingPackets[i].StepIndex] = stepWaitingPackets[i];
-                                    stepWaitingPackets[i] = null;
-                                    modified = true;
-                                }
+                                ProcessSessionStepPacket(stepWaitingPackets[i]);
+                                stepDonePackets[stepWaitingPackets[i].StepIndex] = stepWaitingPackets[i];
+                                stepWaitingPackets[i] = null;
+                                modified = true;
                             }
                         }
                     }
@@ -491,30 +510,9 @@ namespace DistDBMS.Network
         {
             LocalSiteServer localSiteServer = (LocalSiteServer)genericServer;
             LocalSitePacket lsPacket = LocalSitePacket.NetworkPacketToLocalSitePacket(networkPacket);
-            Guid oldSessionId = SessionId;
-            SessionId = lsPacket.SessionId;
-
-
-            if (oldSessionId != lsPacket.SessionId)
-            {
-                lock (stepWaitingPackets)
-                {
-                    stepWaitingPackets.Clear(); stepDonePackets.Clear();
-                    stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null);
-                    stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null);
-                    incompletedPackets.Clear();
-                }
-            }
 
             lsPacket.FromHostName = localSiteServer.Name;
-            Packets.Append(lsPacket);
-
-            if (oldSessionId != lsPacket.SessionId)
-            {
-                //新建的会话，或者会话还没建立，但P2P数据已经到达
-                localSiteServer.UpdateSessionConnectionTable(this, oldSessionId, SessionId);
-            }
-            
+            Packets.Append(lsPacket);            
         }
     }
 

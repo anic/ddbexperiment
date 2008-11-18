@@ -153,6 +153,17 @@ namespace DistDBMS.Network
                     GetLocalSiteClient("L1").Packets.WaitAndRead();
                     Debug.WriteLine("recv reply for L1");
 
+
+
+                    lsPacket.StepIndex = 0;
+                    lsPacket.StepFromIndex = LocalSitePacket.StepIndexNone;
+                    lsPacket.Command = "Test:Send:L2";
+                    lsPacket.Encapsulate();
+                    GetLocalSiteClient("L1").SendPacket(lsPacket);
+
+
+                    //Thread.Sleep(1000);
+                    
                     lsPacket.StepIndex = LocalSitePacket.StepIndexNone;
                     lsPacket.StepFromIndex = LocalSitePacket.StepIndexNone;
                     lsPacket.Command = "Test:Set:20";
@@ -168,12 +179,6 @@ namespace DistDBMS.Network
                     lsPacket.Encapsulate();
                     GetLocalSiteClient("L2").SendPacket(lsPacket);
 
-                    lsPacket.StepIndex = 0;
-                    lsPacket.StepFromIndex = LocalSitePacket.StepIndexNone;
-                    lsPacket.Command = "Test:Send:L2";
-                    lsPacket.Encapsulate();
-                    GetLocalSiteClient("L1").SendPacket(lsPacket);
-                    
 
                     lsPacket.StepIndex = 2;
                     lsPacket.StepFromIndex = 1;
