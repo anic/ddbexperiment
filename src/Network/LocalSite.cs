@@ -422,7 +422,7 @@ namespace DistDBMS.Network
                             ssPacket.IsCompleted)
                         {
                             //开始处理已经完成的包
-                            ssPacket = (SessionStepPacket)incompletedPackets[ssPacket.FromHostName];
+                            ssPacket = incompletedPackets[ssPacket.FromHostName];
                             incompletedPackets.Remove(ssPacket.FromHostName);
                         }
                         else
