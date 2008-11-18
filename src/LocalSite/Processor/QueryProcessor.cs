@@ -6,6 +6,7 @@ using DistDBMS.Common.Table;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Dictionary;
 using System.Collections;
+using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.ControlSite.Processor
 {
@@ -23,7 +24,15 @@ namespace DistDBMS.ControlSite.Processor
 
         Hashtable name2Schema = new Hashtable();
 
-        string condition = "";
+        List<Condition> conditions = new List<Condition>();
+
+
+        LocalDirectory ldd;
+
+        public QueryProcessor(LocalDirectory ldd)
+        {
+            this.ldd = ldd;
+        }
 
         
         private Table HandleUnion(ExecutionStep step, string dbname, VirtualBuffer buffer)
@@ -83,7 +92,7 @@ namespace DistDBMS.ControlSite.Processor
             //重置信息
             tempSources.Clear();
             localSources.Clear();
-            condition = "";
+            conditions.Clear();
             tableIndex = 0;
     
             //遍历关系代数树
@@ -102,6 +111,11 @@ namespace DistDBMS.ControlSite.Processor
 
         }
 
+        /// <summary>
+        /// 通过nickname获得对应的表名
+        /// </summary>
+        /// <param name="nickname"></param>
+        /// <returns></returns>
         private string GetSourceName(string nickname)
         {
             foreach (TableSchema table in localSources)
@@ -124,14 +138,30 @@ namespace DistDBMS.ControlSite.Processor
         {
             string result = "select ";
             bool multiSource = (localSources.Count + tempSources.Count > 1);
-            for (int i = 0; i < target.Fields.Count; i++)
+            bool isAllField = false;
+            /*
+            if (!multiSource && localSources.Count == 1 && target.Fields.Count == localSources[0].Fields.Count)
             {
-                if (i != 0)
-                    result += ", ";
-                if (multiSource)
-                    result += GetSourceName(target.Fields[i].TableName) + "." + target.Fields[i].AttributeName;
-                else
-                    result += target.Fields[i].AttributeName;
+                isAllField = true;
+                for (int i = 0; i < target.Fields.Count; i++)
+                    isAllField &= (target.Fields[i].TableName == localSources[0].Fields[i].TableName
+                        && target.Fields[i].AttributeName == localSources[0].Fields[i].AttributeName);
+            }*/
+            
+
+            if (isAllField)
+                result += "*";
+            else
+            {
+                for (int i = 0; i < target.Fields.Count; i++)
+                {
+                    if (i != 0)
+                        result += ", ";
+                    if (multiSource)
+                        result += GetSourceName(target.Fields[i].TableName) + "." + target.Fields[i].AttributeName;
+                    else
+                        result += target.Fields[i].AttributeName;
+                }
             }
             result += " from ";
 
@@ -155,10 +185,59 @@ namespace DistDBMS.ControlSite.Processor
                 }
             }
 
-            if (condition != "")
-                result += " where " + condition;
+            if (conditions.Count > 0)
+            {
+                //替换条件中的表名
+                ReplaceAllConditionField();
+
+                result += " where ";
+                for (int i = 0; i < conditions.Count;i++ )
+                {
+                    if (i != 0)
+                        result += " AND " + conditions[i].ToString();
+                    else
+                        result += conditions[i].ToString();
+                }
+            }
 
             return result;
+        }
+
+        private void ReplaceAllConditionField()
+        {
+            foreach (TableSchema schema in localSources)
+            {
+                foreach (Condition condition in conditions)
+                    ReplaceConditionField(condition, schema.NickName, schema.TableName);
+            }
+
+            foreach (TableSchema schema in tempSources)
+            {
+                foreach (Condition condition in conditions)
+                    ReplaceConditionField(condition, schema.NickName, schema.TableName);
+            }
+        }
+
+        private void ReplaceConditionField(Condition condition,string oldTablename,string newTablename)
+        {
+            if (condition.IsAtomCondition)
+            {
+                if (condition.AtomCondition.LeftOperand.IsField
+                    && condition.AtomCondition.LeftOperand.Field.TableName == oldTablename)
+                    condition.AtomCondition.LeftOperand.Field.TableName = newTablename;
+
+                if (condition.AtomCondition.RightOperand.IsField
+                    && condition.AtomCondition.RightOperand.Field.TableName == oldTablename)
+                    condition.AtomCondition.RightOperand.Field.TableName = newTablename;
+            }
+            else
+            {
+                if (condition.LeftCondition != null)
+                    ReplaceConditionField(condition.LeftCondition, oldTablename, newTablename);
+
+                if (condition.RightCondition != null)
+                    ReplaceConditionField(condition.RightCondition, oldTablename, newTablename);
+            }
         }
         
 
@@ -208,22 +287,22 @@ namespace DistDBMS.ControlSite.Processor
                 case RelationalType.Projection:
                     break;
                 case RelationalType.Selection:
-                    
-                    if (r.Predication.Content != "")
                     {
-                        if (condition != "")
-                            condition += " AND ";
-                        condition += r.Predication.Content;
+                        if (r.Predication.IsAtomCondition || r.Predication.LeftCondition != null)
+                            conditions.Add(r.Predication);
+                        break;
                     }
-
-                    break;
                 case RelationalType.Join:
                     {
-                        if (condition != "")
-                            condition += " AND ";
                         //TODO:找名字
                         //这里只是两个表的join
-                        condition += r.RelativeAttributes.Fields[0].ToString() + " = " + r.RelativeAttributes.Fields[1].ToString();
+                        Condition newCondition = new Condition();
+                        newCondition.AtomCondition = new AtomCondition();
+                        newCondition.AtomCondition.LeftOperand.Field = r.RelativeAttributes.Fields[0].Clone() as Field;
+                        newCondition.AtomCondition.LeftOperand.IsField = true;
+                        newCondition.AtomCondition.RightOperand.Field = r.RelativeAttributes.Fields[1].Clone() as Field;
+                        newCondition.AtomCondition.RightOperand.IsField = true;
+                        conditions.Add(newCondition);
                     }
                     break;
             }

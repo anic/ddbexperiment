@@ -70,6 +70,17 @@ namespace DistDBMS.UserInterface.Controls
             {
                 return sqlTextBox.Text;
             }
+            set { sqlTextBox.Text = value; }
+        }
+
+        public string CommandResultText {
+            get { return txtResult.Text; }
+            set { txtResult.Text = value; }
+        }
+
+        public void AddCommandResult(string result)
+        {
+            txtResult.Text += result + "\r\n";
         }
 
         public event EventHandler OnExecuteSQL;

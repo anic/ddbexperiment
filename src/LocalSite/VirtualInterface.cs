@@ -12,7 +12,7 @@ namespace DistDBMS.ControlSite
 {
     public class VirtualInterface
     {
-        FragmentList ldd; //用于保存local的数据字典
+        LocalDirectory ldd; //用于保存local的数据字典
         string name;
 
         VirtualBuffer buffer;
@@ -33,7 +33,7 @@ namespace DistDBMS.ControlSite
             }
 
 
-            ldd = new FragmentList();
+            
             name = siteName;
             this.buffer = buffer;
         }
@@ -43,33 +43,44 @@ namespace DistDBMS.ControlSite
             if (package.Type == ExecutionPackage.PackageType.Plan)
             {
                 ExecutionPlan plan = package.Object as ExecutionPlan;
-                QueryProcessor processor = new QueryProcessor();
+                QueryProcessor processor = new QueryProcessor(ldd);
                 foreach (ExecutionStep step in plan.Steps)
                 {
                     if (step.Type == ExecutionStep.ExecuteType.Select)
                     {
-                        while (true)
-                        {
-                            bool allReady = true;
-                            foreach (string id in step.WaitingId)
-                                allReady &= (buffer[id] != null);
+                        //while (true)
+                        //{
+                        //    bool allReady = true;
+                        //    lock (buffer)
+                        //    {
+                        //        for (int i = 0; i < step.WaitingId.Count; i++)
+                        //            allReady &= (buffer[step.WaitingId[i]] != null);
 
-                            if (allReady)
-                                break;
+                        //        if (allReady)
+                        //            break;
+                        //    }
 
-                            Thread.Sleep(1000); //现在是停等，以后应该是异步等，或者唤醒机制
-                        }
+                        //    Thread.Sleep(new Random().Next(1000)); //现在是停等，以后应该是异步等，或者唤醒机制
+                        //}
 
-                        Table table = processor.Handle(step, name, buffer);
+                        
+                        
 
                         //相当于发数据
-                        ExecutionPackage newPackage = new ExecutionPackage();
-                        package.ID = step.Operation.ResultID;
-                        package.Type = ExecutionPackage.PackageType.Data;
-                        package.Object = table;
-
+                        
+                        
                         lock (buffer)
                         {
+                            Table table = processor.Handle(step, name, buffer);
+                            if (step.Operation.ResultID == "PLAN.0.0.0.0.0.0.1.0.2")
+                            {
+                                int a = 0;
+                            }
+                            ExecutionPackage newPackage = new ExecutionPackage();
+                            package.ID = step.Operation.ResultID;
+                            package.Type = ExecutionPackage.PackageType.Data;
+                            package.Object = table;
+
                             buffer.Add(package);//相当于异步发送
                         }
                     }
@@ -86,11 +97,11 @@ namespace DistDBMS.ControlSite
 
         public void ReceiveGdd(GlobalDirectory gdd)
         {
-            ldd.AddRange(gdd.Fragments.GetFragmentsBySiteName(name));
+            ldd = new LocalDirectory(gdd, name);
 
             using (DataAccess.DataAccessor da = new DistDBMS.ControlSite.DataAccess.DataAccessor(name))
             { 
-                foreach(Fragment f in ldd)
+                foreach(Fragment f in ldd.Fragments)
                 {
                     TableSchema localTable = f.Schema.Clone() as TableSchema;
                     localTable.TableName = f.LogicTable.TableName;

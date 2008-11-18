@@ -18,7 +18,7 @@ namespace DistDBMS.UserInterface
 {
     public partial class FrmApp : Form
     {
-
+        ControlSite.VirtualInterface2 vInterface;
         GlobalDirectory gdd;
         MenuTreeSwitcher switcher;
         public FrmApp()
@@ -32,33 +32,35 @@ namespace DistDBMS.UserInterface
             switcher.SetControl(uscTableSchemaViewer);
 
 
-            //初始化GDD
-            GDDCreator gddCreator = new GDDCreator();
-            string path = "InitScript.txt";
-            if (File.Exists(path))
-            {
-                StreamReader sr = new StreamReader(path, System.Text.Encoding.Default);
+            vInterface = new DistDBMS.ControlSite.VirtualInterface2();
+            
+            //初始化脚本
+            string result;
+            vInterface.ImportScript("InitScript.txt",out gdd,out result);
+            uscExecuteQuery.AddCommandResult(result);
 
-                while (!sr.EndOfStream)
-                {
-                    gddCreator.InsertCommand(sr.ReadLine());
-                }
-                sr.Close();
-                gdd = gddCreator.CreateGDD();
-                
-            }
-
+            //本地设置gdd
             uscExecuteQuery.SetGlobalDirectory(gdd);
             switcher.SetGlobalDirectory(gdd);
 
-            uscExecuteQuery.OnExecuteSQL += new EventHandler(uscExecuteQuery_OnExecuteSQL);
+
+            //导入数据
+            vInterface.ImportData("Data.txt", out result);
+            uscExecuteQuery.AddCommandResult(result);
+
+            
+            //uscExecuteQuery.SQLText = "select Course.name, Course.credit_hour, Teacher.name from Course, Teacher where Course.teacher_id=Teacher.id and Course.credit_hour>2 and Teacher.title=3 ";
+            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+            
         }
 
         void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
         {
-            ControlSite.VirtualInterface2 vInterface = new DistDBMS.ControlSite.VirtualInterface2();
-            vInterface.ExecuteSQL(uscExecuteQuery.SQLText);
             
+            Table data;
+            string result;
+            vInterface.ExecuteSQL(uscExecuteQuery.SQLText, out data, out result);
+            uscExecuteQuery.AddCommandResult(result);
         }
 
 

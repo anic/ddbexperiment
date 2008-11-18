@@ -77,7 +77,16 @@ namespace DistDBMS.Common.Execution
                     case RelationalType.Union:
                         {
                             if (Children.Count > 0)
-                                return (Children[0] as ExecutionRelation).ResultSchema;
+                            {
+                                TableSchema result = (Children[0] as ExecutionRelation).ResultSchema.Clone() as TableSchema;
+                                if (result!=null)
+                                {
+                                    int index  = result.TableName.LastIndexOf(".");
+                                    if (index!=-1)
+                                        result.TableName = result.TableName.Substring(0,index);
+                                    return result;
+                                }
+                            }
                             break;
                         }
                     case RelationalType.Selection:
@@ -88,6 +97,29 @@ namespace DistDBMS.Common.Execution
                                 return (Children[0] as ExecutionRelation).ResultSchema;
                                
                             break;
+                        }
+                    case RelationalType.CartesianProduct:
+                        {
+                            TableSchema result = null;
+                            foreach (ExecutionRelation r in Children)
+                            {
+                                if (result == null)
+                                {
+                                    result = r.ResultSchema;
+                                    if (result!=null)
+                                        result = result.Clone() as TableSchema;
+                                }
+                                else
+                                {
+                                    TableSchema tmp = r.ResultSchema;
+                                    if (tmp != null)
+                                    {
+                                        result.Fields.AddRange(tmp.Fields);
+                                        result.TableName += "_" + tmp.TableName;
+                                    }
+                                }
+                            }
+                            return result;
                         }
                         
                 }

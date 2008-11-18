@@ -84,16 +84,6 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// </summary>
         public TableSchema RelativeAttributes { get; set; }
 
-        //public TableSchema ResultSchema
-        //{
-        //    get
-        //    { 
-        //        //TODO:未完成
-        //        TableSchema result = new TableSchema();
-        //        return result;
-        //    }
-        //}
-
         /// <summary>
         /// 内容
         /// </summary>
@@ -122,8 +112,8 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             if (IsDirectTableSchema)
                 result += " " + DirectTableSchema.ToString();
 
-            if (Predication.Content != "")
-                result += " Predication: " + Predication.Content;
+            if (Predication != null)
+                result += " Predication: " + Predication.ToString();
 
             if (RelativeAttributes.Fields.Count > 0 || RelativeAttributes.TableName != "")
                 result += " Attributes: " + RelativeAttributes.ToString();
