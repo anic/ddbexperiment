@@ -31,8 +31,8 @@ namespace DistDBMS.ControlSite
 
             a.TestGDD();
             a.TestSQLSyntax();
-            a.TestRelationAlgebra();
-            //a.TestExecutionPlan();
+            //a.TestRelationAlgebra();
+            a.TestExecutionPlan();
 
         }
 
@@ -207,24 +207,21 @@ namespace DistDBMS.ControlSite
 
             Hashtable virInterfaces = new Hashtable();
             VirtualBuffer buffer = new VirtualBuffer();
-            
-            foreach (ExecutionPlan p in plans)
-            {
-                //设置不同的站点
-                ExecutionPackage package = new ExecutionPackage();
-                package.Type = ExecutionPackage.PackageType.Plan;
-                package.Object = p;
 
-                virInterfaces[p.ExecutionSite.Name] = new VirtualInterface(p.ExecutionSite.Name, buffer);
-                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveGdd(gdd);
-                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
+            //初始化每个二级接口
+            foreach (Site site in gdd.Sites)
+            {
+                virInterfaces[site.Name] = new VirtualInterface(site.Name, buffer);
+                (virInterfaces[site.Name] as VirtualInterface).ReceiveGdd(gdd);
             }
-            
-            
+
             QueryPlanCreator creator = new QueryPlanCreator(gdd);
             ExecutionPlan plan = creator.CreateGlobalPlan(r, "PLAN");
-            System.Console.WriteLine(plan.ToString());
+            //System.Console.WriteLine(plan.ToString());
             plans = creator.SplitPlan(plan);
+
+            foreach (ExecutionPlan p in plans)
+                System.Console.WriteLine(p.ToString());
 
             #region output
             /*
@@ -367,20 +364,29 @@ namespace DistDBMS.ControlSite
                 SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
                 converter.SetQueryCalculus(s3);
                 Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
-                //System.Console.WriteLine("AAA Parse:" + relationalgebra.ToString());
+                
                 /*
                 System.Console.WriteLine("\n\nTEST" + i.ToString() + ":");
                 System.Console.WriteLine("Raw: " + tests[i]);
                 System.Console.WriteLine("Parse:" + s3.ToString());*/
 
-                //QueryPlanCreator creator = new QueryPlanCreator(gdd);
-                //ExecutionPlan plan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
+                QueryPlanCreator creator = new QueryPlanCreator(gdd);
+                ExecutionPlan plan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
+                if (i == 4)
+                {
+                    //string output = (new RelationDebugger()).GetDebugString(relationalgebra);
+                    
+                    //System.Console.WriteLine("relationalgebra Parse:\n" + output);
+                    //System.Console.WriteLine("***PLAN**************************\n" + plan.ToString());
+                    //System.Console.WriteLine("***PLAN**************************");
+                    //plans = creator.SplitPlan(plan);
+                    //foreach (ExecutionPlan p in plans)
+                    //    System.Console.WriteLine(p.ToString());
+
+                    r = relationalgebra;
+                }
                 
-                //System.Console.WriteLine("***PLAN***\n" + plan.ToString());
-                //System.Console.WriteLine("***PLAN**************************");
-                //plans = creator.SplitPlan(plan);
-                //foreach (ExecutionPlan p in plans)
-                //    System.Console.WriteLine(p.ToString());
+             
             }
 
 

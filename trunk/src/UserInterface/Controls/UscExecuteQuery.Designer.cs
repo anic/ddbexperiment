@@ -43,7 +43,9 @@
             this.menuItemColorKeyword = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemColorTable = new System.Windows.Forms.ToolStripMenuItem();
             this.sqlTextBox = new DistDBMS.UserInterface.Controls.SqlInput.SqlTextBox();
+            this.txtResult = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
+            this.tbp.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,6 +62,7 @@
             // 
             // tbp
             // 
+            this.tbp.Controls.Add(this.txtResult);
             this.tbp.Location = new System.Drawing.Point(4, 22);
             this.tbp.Name = "tbp";
             this.tbp.Padding = new System.Windows.Forms.Padding(3);
@@ -189,6 +192,16 @@
             this.sqlTextBox.TabIndex = 0;
             this.sqlTextBox.Text = "";
             // 
+            // txtResult
+            // 
+            this.txtResult.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtResult.Location = new System.Drawing.Point(3, 3);
+            this.txtResult.Multiline = true;
+            this.txtResult.Name = "txtResult";
+            this.txtResult.ReadOnly = true;
+            this.txtResult.Size = new System.Drawing.Size(389, 139);
+            this.txtResult.TabIndex = 0;
+            // 
             // UscExecuteQuery
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -201,6 +214,8 @@
             this.Padding = new System.Windows.Forms.Padding(10);
             this.Size = new System.Drawing.Size(423, 461);
             this.tabControl1.ResumeLayout(false);
+            this.tbp.ResumeLayout(false);
+            this.tbp.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -224,5 +239,6 @@
         private System.Windows.Forms.ToolStripMenuItem menuItemShowTip;
         private System.Windows.Forms.ToolStripMenuItem menuItemColorKeyword;
         private System.Windows.Forms.ToolStripMenuItem menuItemColorTable;
+        private System.Windows.Forms.TextBox txtResult;
     }
 }

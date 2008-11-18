@@ -14,12 +14,20 @@ namespace DistDBMS.ControlSite
         {
             get
             {
-                foreach (ExecutionPackage package in this)
+                for (int i = 0; i < this.Count; i++)
+                {
+                    ExecutionPackage package = this[i];
                     if (package.ID == id)
                         return package;
-
+                }
                 return null;
             }
         }
+
+        public static bool Flag = false;
     }
+
+    
+
+
 }

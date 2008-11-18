@@ -48,6 +48,11 @@ namespace DistDBMS.ControlSite.Plan
                 
                 if (splitRelation != null)
                 {
+                    if (splitRelation.Type == RelationalType.CartesianProduct)
+                    {
+                        int a = 0;
+                    }
+
                     step.Operation = new ExecutionRelation(re as ExecutionRelation, index + 1);
 
                     for (int i = 0; i < splitRelation.Children.Count; i++)

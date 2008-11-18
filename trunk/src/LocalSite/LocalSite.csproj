@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccess\DataAccessor.cs" />
+    <Compile Include="LocalDirectory.cs" />
     <Compile Include="Processor\QueryProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

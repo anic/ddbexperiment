@@ -1,4 +1,5 @@
-﻿namespace DistDBMS.UserInterface
+﻿using System;
+namespace DistDBMS.UserInterface
 {
     partial class FrmApp
     {
@@ -191,6 +192,7 @@
             this.uscExecuteQuery.Padding = new System.Windows.Forms.Padding(10);
             this.uscExecuteQuery.Size = new System.Drawing.Size(422, 315);
             this.uscExecuteQuery.TabIndex = 6;
+            this.uscExecuteQuery.OnExecuteSQL += new EventHandler(uscExecuteQuery_OnExecuteSQL);
             // 
             // 文件ToolStripMenuItem
             // 
