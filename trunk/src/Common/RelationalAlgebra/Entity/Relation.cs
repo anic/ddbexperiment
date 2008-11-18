@@ -67,7 +67,7 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// <summary>
         /// 是否关系直接的表
         /// </summary>
-        public bool IsDirectTableSchema { get; set; }
+        public bool IsDirectTableSchema { get { return DirectTableSchema != null; } }
 
         /// <summary>
         /// 如果关系直接的表，则获得原子的表
@@ -93,8 +93,7 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         {
 
             children = new List<Relation>();
-            IsDirectTableSchema = false;
-            DirectTableSchema = new TableSchema();
+            DirectTableSchema = null;
             RelativeAttributes = new TableSchema();
             Predication = new Condition();
             Content = "";

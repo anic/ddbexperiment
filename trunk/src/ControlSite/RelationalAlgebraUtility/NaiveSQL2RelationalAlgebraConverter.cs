@@ -122,7 +122,6 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 // 在优化后可以与其他条件合并
                 Relation selection = new Relation();
                 selection.Type = RelationalType.Selection;
-                selection.IsDirectTableSchema = true;
                 selection.DirectTableSchema = tableSchema;
 
                 if (!skipFirstElement)
@@ -135,7 +134,6 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 // 从第2个Table开始，与之前结果进行 x 运算
                 Relation cartesianProduct = new Relation();
                 cartesianProduct.Type = RelationalType.CartesianProduct;
-                cartesianProduct.IsDirectTableSchema = false;
                 cartesianProduct.Children.Add(activeRelation);
                 cartesianProduct.Children.Add(selection);
 
@@ -172,7 +170,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 Condition predication = new Condition();                
                 predication.AtomCondition = atomPredication;
 
-                selection.IsDirectTableSchema = false;
+                
                 selection.Predication = predication;
 
                 activeRelation = selection;
@@ -192,7 +190,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         { 
             Relation projection = new Relation();
             projection.Type = RelationalType.Projection;
-            projection.IsDirectTableSchema = false;
+            
             projection.Children.Add(root);
 
             projection.RelativeAttributes = schema;
@@ -257,11 +255,14 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         {
             if (f.Children.Count == 0)
             {
-                parent.IsDirectTableSchema = true;
+                //parent.IsDirectTableSchema = true; 
+                //TO 刘璋：判断一个关系是否是DirectTableSchema，IsDirectTableSchema = (DirectTableSchema !=null);
                 return;
             }
 
-            parent.IsDirectTableSchema = false;
+            //TO 刘璋：同上
+            //parent.IsDirectTableSchema = false;
+            parent.DirectTableSchema = null;
 
             // 水平划分，Union连接
             if (f.Children[0].Type == FragmentType.Horizontal)
