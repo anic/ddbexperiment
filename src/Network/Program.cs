@@ -73,6 +73,11 @@ namespace DistDBMS
                 controlSiteClient.Packets.WaitAndRead();
                 */
                 controlSiteClient.SendCommand("Test");
+                ControlSitePacket csPacket = ControlSitePacket.NetworkPacketToControlSitePacket(controlSiteClient.Packets.WaitAndRead());
+                if(csPacket is ControlSiteObjectPacket)
+                {
+                    Debug.WriteLine((csPacket as ControlSiteObjectPacket).Object.ToString());
+                }
                 //+ "Test:Return:L2\n";
             }
 

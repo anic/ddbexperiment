@@ -28,6 +28,10 @@ namespace DistDBMS.Network
                     {
                         return networkPacket.ToPacket<ControlSiteCommandPacket>();
                     }
+                case ControlSitePacketTags.Object:
+                    {
+                        return networkPacket.ToPacket<ControlSiteObjectPacket>();
+                    }
                 default:
                     System.Diagnostics.Debugger.Break();
                     break;
@@ -188,6 +192,11 @@ namespace DistDBMS.Network
                     GetLocalSiteClient("L2").Packets.WaitAndRead();
                     Debug.WriteLine("recv return for L2");
 
+
+                    ControlSiteObjectPacket clientPacket = new ControlSiteObjectPacket();
+                    clientPacket.Object = "Hello From ControlServer";
+                    clientPacket.Encapsulate();
+                    SendPacket(clientPacket);
                 }
                 else
                 {
