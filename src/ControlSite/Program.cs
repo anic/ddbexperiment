@@ -47,9 +47,7 @@ namespace DistDBMS.ControlSite
             //关系代数树，示范结构：select * from Course where credit_hour>2 and location='CB‐6'
             r = new Relation();
             r.Type = RelationalType.Selection;
-            r.IsDirectTableSchema = true;
-
-
+            
             r.DirectTableSchema.Content = "Course";
             r.DirectTableSchema.TableName = "Course";
             r.DirectTableSchema.IsAllFields = true; //因为*
@@ -140,14 +138,14 @@ namespace DistDBMS.ControlSite
 
             Relation select3 = new Relation();
             select3.Type = RelationalType.Selection;
-            select3.IsDirectTableSchema = true;
+            
             select3.DirectTableSchema = new TableSchema();
             select3.DirectTableSchema.TableName = "Course.1";
             join.Children.Add(select3);
 
             select3 = new Relation();
             select3.Type = RelationalType.Selection;
-            select3.IsDirectTableSchema = true;
+            
             select3.DirectTableSchema = new TableSchema();
             select3.DirectTableSchema.TableName = "Course.2.2";
             join.Children.Add(select3);
@@ -169,14 +167,14 @@ namespace DistDBMS.ControlSite
 
             Relation union1 = new Relation();
             union1.Type = RelationalType.Selection;
-            union1.IsDirectTableSchema = true;
+            
             union1.DirectTableSchema = new TableSchema();
             union1.DirectTableSchema.TableName = "Teacher.2";
             union1.DirectTableSchema.IsAllFields = true;
             union.Children.Add(union1);
             union1 = new Relation();
             union1.Type = RelationalType.Selection;
-            union1.IsDirectTableSchema = true;
+            
             union1.DirectTableSchema = new TableSchema();
             union1.DirectTableSchema.TableName = "Teacher.4";
             union1.DirectTableSchema.IsAllFields = true;
@@ -217,7 +215,7 @@ namespace DistDBMS.ControlSite
 
             QueryPlanCreator creator = new QueryPlanCreator(gdd);
             ExecutionPlan plan = creator.CreateGlobalPlan(r, "PLAN");
-            //System.Console.WriteLine(plan.ToString());
+            System.Console.WriteLine("\n\n\n*****\n" + plan.ToString() + "\n*****\n");
             plans = creator.SplitPlan(plan);
 
             foreach (ExecutionPlan p in plans)
@@ -370,8 +368,8 @@ namespace DistDBMS.ControlSite
                 System.Console.WriteLine("Raw: " + tests[i]);
                 System.Console.WriteLine("Parse:" + s3.ToString());*/
 
-                QueryPlanCreator creator = new QueryPlanCreator(gdd);
-                ExecutionPlan plan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
+                //QueryPlanCreator creator = new QueryPlanCreator(gdd);
+                //ExecutionPlan plan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
                 if (i == 4)
                 {
                     //string output = (new RelationDebugger()).GetDebugString(relationalgebra);

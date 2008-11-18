@@ -81,9 +81,10 @@ namespace DistDBMS.Common.Execution
                                 TableSchema result = (Children[0] as ExecutionRelation).ResultSchema.Clone() as TableSchema;
                                 if (result!=null)
                                 {
-                                    int index  = result.TableName.LastIndexOf(".");
+                                    //某个表中nickname = Course.2.1,tablename = Course，则Union后，应该nickname为Course.2，Tablename为Course
+                                    int index  = result.NickName.LastIndexOf(".");
                                     if (index!=-1)
-                                        result.TableName = result.TableName.Substring(0,index);
+                                        result.NickName = result.NickName.Substring(0, index);
                                     return result;
                                 }
                             }
@@ -91,6 +92,7 @@ namespace DistDBMS.Common.Execution
                         }
                     case RelationalType.Selection:
                         {
+                            
                             if (IsDirectTableSchema)
                                 return DirectTableSchema;
                             else if (Children.Count > 0)
@@ -133,7 +135,6 @@ namespace DistDBMS.Common.Execution
 
             this.Content = r.Content;
             this.DirectTableSchema = r.DirectTableSchema;
-            this.IsDirectTableSchema = r.IsDirectTableSchema;
             this.Predication = r.Predication;
             this.RelativeAttributes = r.RelativeAttributes;
             this.Type = r.Type;

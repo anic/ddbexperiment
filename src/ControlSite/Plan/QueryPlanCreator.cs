@@ -48,11 +48,6 @@ namespace DistDBMS.ControlSite.Plan
                 
                 if (splitRelation != null)
                 {
-                    if (splitRelation.Type == RelationalType.CartesianProduct)
-                    {
-                        int a = 0;
-                    }
-
                     step.Operation = new ExecutionRelation(re as ExecutionRelation, index + 1);
 
                     for (int i = 0; i < splitRelation.Children.Count; i++)
@@ -104,8 +99,9 @@ namespace DistDBMS.ControlSite.Plan
 
                     //找到分片，默认的执行站点
                     Fragment fragment = gdd.Fragments.GetFragmentByName(leftBottom.DirectTableSchema.TableName);
-                    if (fragment != null)
+                    if (fragment != null && fragment.Site!=null)
                     {
+                  
                         leftBottom.DirectTableSchema = fragment.Schema.Clone() as TableSchema;
                         leftBottom.DirectTableSchema.TableName = fragment.LogicTable.TableName;
                         leftBottom.DirectTableSchema.NickName = fragment.Name;
@@ -227,9 +223,10 @@ namespace DistDBMS.ControlSite.Plan
                     if (tmpStep != null)
                     {
                         //修改那些非直接表格
-                        currentRelation.IsDirectTableSchema = true;
+                        
                         currentRelation.DirectTableSchema = tmpStep.Operation.ResultSchema;
-                        currentRelation.DirectTableSchema.NickName = nickName;
+                        if (nickName != "")
+                            currentRelation.DirectTableSchema.NickName = nickName;
 
                         if (currentRelation.DirectTableSchema.TableName == "") //如果表名没有，则设置为nickname
                             currentRelation.DirectTableSchema.TableName = nickName;

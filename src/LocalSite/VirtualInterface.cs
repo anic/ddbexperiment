@@ -72,10 +72,6 @@ namespace DistDBMS.ControlSite
                         lock (buffer)
                         {
                             Table table = processor.Handle(step, name, buffer);
-                            if (step.Operation.ResultID == "PLAN.0.0.0.0.0.0.1.0.2")
-                            {
-                                int a = 0;
-                            }
                             ExecutionPackage newPackage = new ExecutionPackage();
                             package.ID = step.Operation.ResultID;
                             package.Type = ExecutionPackage.PackageType.Data;

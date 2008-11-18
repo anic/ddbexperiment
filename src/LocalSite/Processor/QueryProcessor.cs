@@ -46,7 +46,10 @@ namespace DistDBMS.ControlSite.Processor
                 Table result = accessor.Query(sql, target);
                 
                 //然后将外部的表和这个表在内存中合起来
-                System.Console.WriteLine("Union " + localSources[0].TableName + " ," + tempSources[0].TableName);
+                string union = "Union " + localSources[0].TableName;
+                foreach (TableSchema schema in tempSources)
+                    union += " ," + schema.TableName;
+                System.Console.WriteLine(union);
 
                 return result;
             }
@@ -94,7 +97,7 @@ namespace DistDBMS.ControlSite.Processor
             localSources.Clear();
             conditions.Clear();
             tableIndex = 0;
-    
+
             //遍历关系代数树
             VisitRelation(step.Operation);
 
@@ -183,22 +186,25 @@ namespace DistDBMS.ControlSite.Processor
                     result += t.TableName;
                     index++;
                 }
-            }
 
-            if (conditions.Count > 0)
-            {
-                //替换条件中的表名
-                ReplaceAllConditionField();
-
-                result += " where ";
-                for (int i = 0; i < conditions.Count;i++ )
+                if (conditions.Count > 0)
                 {
-                    if (i != 0)
-                        result += " AND " + conditions[i].ToString();
-                    else
-                        result += conditions[i].ToString();
+                    //替换条件中的表名
+                    ReplaceAllConditionField();
+
+                    result += " where ";
+                    for (int i = 0; i < conditions.Count; i++)
+                    {
+                        if (i != 0)
+                            result += " AND " + conditions[i].ToString();
+                        else
+                            result += conditions[i].ToString();
+                    }
                 }
+
             }
+
+            
 
             return result;
         }
@@ -251,10 +257,10 @@ namespace DistDBMS.ControlSite.Processor
         /// <returns></returns>
         private string GenerateTempName(string tablename)
         {
-            if (tablename!="")
-                return tablename + "_temp";
+            if (tablename != "")
+                return tablename + "_temp" + (tableIndex++).ToString();
             else
-                return "temp"+(tableIndex++).ToString();
+                return "temp" + (tableIndex++).ToString();
         }
 
         /// <summary>
