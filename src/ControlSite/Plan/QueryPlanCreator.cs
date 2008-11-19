@@ -123,6 +123,7 @@ namespace DistDBMS.ControlSite.Plan
                     {
                         currentPlan.Steps.Add(gPlan.Steps[i]);
                         leftBottom.InLocalSite = true;              //关系本地站点
+                        gPlan.Steps[i].WaitingId.Add(leftBottom.ResultID);
 
                         //记录Id与Plan的对应关系
                         id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;

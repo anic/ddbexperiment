@@ -63,6 +63,12 @@
     <Compile Include="Controls\UscTableSchemaViewer.Designer.cs">
       <DependentUpon>UscTableSchemaViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\UscTableViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UscTableViewer.Designer.cs">
+      <DependentUpon>UscTableViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmApp.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,6 +76,7 @@
       <DependentUpon>FrmApp.cs</DependentUpon>
     </Compile>
     <Compile Include="Handler\MenuTreeSwitcher.cs" />
+    <Compile Include="LogWriter.cs" />
     <Compile Include="PanelSwitchManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -81,6 +88,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\UscTableSchemaViewer.resx">
       <DependentUpon>UscTableSchemaViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\UscTableViewer.resx">
+      <DependentUpon>UscTableViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmApp.resx">
       <DependentUpon>FrmApp.cs</DependentUpon>

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.UserInterface.Controls.SqlInput;
+using DistDBMS.Common.Table;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -48,6 +49,12 @@ namespace DistDBMS.UserInterface.Controls
             sqlTextBox.ShowTip = menuItemShowTip.Checked;
         }
 
+        public bool EnableTip
+        {
+            get { return sqlTextBox.ShowTip; }
+            set { sqlTextBox.ShowTip = value; }
+        }
+
         private void menuItemColorKeyword_Click(object sender, EventArgs e)
         {
             sqlTextBox.ColorKeyword = menuItemColorKeyword.Checked;
@@ -70,17 +77,32 @@ namespace DistDBMS.UserInterface.Controls
             {
                 return sqlTextBox.Text;
             }
-            set { sqlTextBox.Text = value; }
+            set { 
+                sqlTextBox.Text = value;
+                
+            }
         }
 
         public string CommandResultText {
             get { return txtResult.Text; }
-            set { txtResult.Text = value; }
+            set { txtResult.Text = value;
+            
+            txtResult.Select(txtResult.Text.Length, 0);
+            txtResult.ScrollToCaret();
+            }
         }
 
         public void AddCommandResult(string result)
         {
             txtResult.Text += result + "\r\n";
+            
+            txtResult.Select(txtResult.Text.Length, 0);
+            txtResult.ScrollToCaret();
+        }
+
+        public void SetResultTable(Table table)
+        {
+            uscTableViewer1.Table = table;
         }
 
         public event EventHandler OnExecuteSQL;

@@ -46,6 +46,8 @@ namespace DistDBMS.UserInterface
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.pnlControl = new System.Windows.Forms.Panel();
             this.mainMenu = new System.Windows.Forms.MenuStrip();
+            this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemImportScript = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemImportData = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,8 +58,6 @@ namespace DistDBMS.UserInterface
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.uscTableSchemaViewer = new DistDBMS.UserInterface.Controls.UscTableSchemaViewer();
             this.uscExecuteQuery = new DistDBMS.UserInterface.Controls.UscExecuteQuery();
-            this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlControl.SuspendLayout();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
@@ -120,6 +120,20 @@ namespace DistDBMS.UserInterface
             this.mainMenu.Size = new System.Drawing.Size(697, 25);
             this.mainMenu.TabIndex = 7;
             this.mainMenu.Text = "menuStrip1";
+            // 
+            // 文件ToolStripMenuItem
+            // 
+            this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.退出ToolStripMenuItem});
+            this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
+            this.文件ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.文件ToolStripMenuItem.Text = "文件";
+            // 
+            // 退出ToolStripMenuItem
+            // 
+            this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
+            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.退出ToolStripMenuItem.Text = "退出";
             // 
             // menuFile
             // 
@@ -187,26 +201,15 @@ namespace DistDBMS.UserInterface
             // 
             // uscExecuteQuery
             // 
+            this.uscExecuteQuery.CommandResultText = "";
+            this.uscExecuteQuery.EnableTip = true;
             this.uscExecuteQuery.Location = new System.Drawing.Point(203, 64);
             this.uscExecuteQuery.Name = "uscExecuteQuery";
             this.uscExecuteQuery.Padding = new System.Windows.Forms.Padding(10);
             this.uscExecuteQuery.Size = new System.Drawing.Size(422, 315);
+            this.uscExecuteQuery.SQLText = "";
             this.uscExecuteQuery.TabIndex = 6;
-            this.uscExecuteQuery.OnExecuteSQL += new EventHandler(uscExecuteQuery_OnExecuteSQL);
-            // 
-            // 文件ToolStripMenuItem
-            // 
-            this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.退出ToolStripMenuItem});
-            this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
-            this.文件ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
-            this.文件ToolStripMenuItem.Text = "文件";
-            // 
-            // 退出ToolStripMenuItem
-            // 
-            this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
-            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.退出ToolStripMenuItem.Text = "退出";
+            this.uscExecuteQuery.OnExecuteSQL += new System.EventHandler(this.uscExecuteQuery_OnExecuteSQL);
             // 
             // FrmApp
             // 
@@ -223,6 +226,7 @@ namespace DistDBMS.UserInterface
             this.Name = "FrmApp";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "分布式数据库实验系统";
+            this.Shown += new System.EventHandler(this.FrmApp_Shown);
             this.pnlControl.ResumeLayout(false);
             this.mainMenu.ResumeLayout(false);
             this.mainMenu.PerformLayout();

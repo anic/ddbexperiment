@@ -48,7 +48,7 @@ namespace DistDBMS.ControlSite
             r = new Relation();
             r.Type = RelationalType.Selection;
             
-            r.DirectTableSchema.Content = "Course";
+            
             r.DirectTableSchema.TableName = "Course";
             r.DirectTableSchema.IsAllFields = true; //因为*
             r.DirectTableSchema.IsDbTable = true;

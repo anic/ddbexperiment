@@ -67,7 +67,12 @@ namespace DistDBMS.Common.Execution
                                     {
                                         Field searchF = RelativeAttributes[f.AttributeName];
                                         if (searchF == null) //不在相关属性之中
-                                            result.Fields.Add(f);
+                                        {
+                                            Field newField = f.Clone() as Field;
+                                            if (childResult.NickName != "")
+                                                newField.TableName = childResult.NickName;
+                                            result.Fields.Add(newField);
+                                        }
                                     }
                                 }
                             }

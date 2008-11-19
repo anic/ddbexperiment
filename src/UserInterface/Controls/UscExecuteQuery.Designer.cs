@@ -31,6 +31,7 @@
             DistDBMS.UserInterface.Controls.SqlInput.InputStyle inputStyle1 = new DistDBMS.UserInterface.Controls.SqlInput.InputStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tbp = new System.Windows.Forms.TabPage();
+            this.txtResult = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -43,9 +44,10 @@
             this.menuItemColorKeyword = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemColorTable = new System.Windows.Forms.ToolStripMenuItem();
             this.sqlTextBox = new DistDBMS.UserInterface.Controls.SqlInput.SqlTextBox();
-            this.txtResult = new System.Windows.Forms.TextBox();
+            this.uscTableViewer1 = new DistDBMS.UserInterface.Controls.UscTableViewer();
             this.tabControl1.SuspendLayout();
             this.tbp.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,8 +73,20 @@
             this.tbp.Text = "控制台显示";
             this.tbp.UseVisualStyleBackColor = true;
             // 
+            // txtResult
+            // 
+            this.txtResult.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtResult.Location = new System.Drawing.Point(3, 3);
+            this.txtResult.Multiline = true;
+            this.txtResult.Name = "txtResult";
+            this.txtResult.ReadOnly = true;
+            this.txtResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtResult.Size = new System.Drawing.Size(389, 139);
+            this.txtResult.TabIndex = 0;
+            // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.uscTableViewer1);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -192,15 +206,14 @@
             this.sqlTextBox.TabIndex = 0;
             this.sqlTextBox.Text = "";
             // 
-            // txtResult
+            // uscTableViewer1
             // 
-            this.txtResult.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtResult.Location = new System.Drawing.Point(3, 3);
-            this.txtResult.Multiline = true;
-            this.txtResult.Name = "txtResult";
-            this.txtResult.ReadOnly = true;
-            this.txtResult.Size = new System.Drawing.Size(389, 139);
-            this.txtResult.TabIndex = 0;
+            this.uscTableViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uscTableViewer1.Location = new System.Drawing.Point(3, 3);
+            this.uscTableViewer1.Name = "uscTableViewer1";
+            this.uscTableViewer1.Size = new System.Drawing.Size(389, 139);
+            this.uscTableViewer1.TabIndex = 0;
+            this.uscTableViewer1.Table = null;
             // 
             // UscExecuteQuery
             // 
@@ -216,6 +229,7 @@
             this.tabControl1.ResumeLayout(false);
             this.tbp.ResumeLayout(false);
             this.tbp.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -240,5 +254,6 @@
         private System.Windows.Forms.ToolStripMenuItem menuItemColorKeyword;
         private System.Windows.Forms.ToolStripMenuItem menuItemColorTable;
         private System.Windows.Forms.TextBox txtResult;
+        private UscTableViewer uscTableViewer1;
     }
 }
