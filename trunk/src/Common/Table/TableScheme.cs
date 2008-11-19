@@ -47,11 +47,6 @@ namespace DistDBMS.Common.Table
             }
         }
 
-        /// <summary>
-        /// 内容字符串
-        /// </summary>
-        public string Content { get; set; }
-
         public TableSchema()
         {
             TableName = "";
@@ -102,8 +97,12 @@ namespace DistDBMS.Common.Table
 
         public object Clone()
         {
-            object result = this.MemberwiseClone();
-            
+            TableSchema result = new TableSchema();
+            result.TableName = TableName;
+            result.NickName = NickName;
+            result.IsDbTable = IsDbTable;
+            result.Fields.AddRange(Fields);
+            result.IsAllFields = IsAllFields;
             return result;
         }
 

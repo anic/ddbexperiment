@@ -24,7 +24,10 @@ namespace DistDBMS.ControlSite
             }
         }
 
-        public static bool Flag = false;
+        public new void Add(ExecutionPackage item)
+        {
+            base.Add(item);
+        }
     }
 
     

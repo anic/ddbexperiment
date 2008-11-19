@@ -28,5 +28,10 @@ namespace DistDBMS.Common.Execution
         /// 如果Type == Plan，则包含了执行计划；否则包含Table
         /// </summary>
         public object Object { get; set; }
+
+        public new string ToString()
+        {
+            return ID;
+        }
     }
 }

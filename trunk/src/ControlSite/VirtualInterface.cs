@@ -13,6 +13,7 @@ using DistDBMS.ControlSite.SQLSyntax.Parser;
 using DistDBMS.ControlSite.SQLSyntax.Operation;
 using DistDBMS.ControlSite.SQLSyntax;
 using DistDBMS.ControlSite.RelationalAlgebraUtility;
+using DistDBMS.Common.RelationalAlgebra;
 
 namespace DistDBMS.ControlSite
 {
@@ -27,27 +28,44 @@ namespace DistDBMS.ControlSite
         {
             //Relation r = CreateTempRelation();
             threads.Clear();
+            buffer.Clear();
 
             ParserSwitcher ps = new ParserSwitcher();
             bool bParse = ps.Parse(sql.Trim());
+
+            if (!bParse)
+            {
+                data = null;
+                result = "Parse sql error.";
+                return false;
+            }
+
             Selection s3 = ps.LastResult as Selection;
             
             GlobalConsitencyFiller filler = new GlobalConsitencyFiller();
             //这一步很重要，通过gdd来填写selection的完整信息
-            filler.FillSelection(gdd, s3);
-
+            bool checkIntergrity = filler.FillSelection(gdd, s3);
+            if (!checkIntergrity)
+            {
+                data = null;
+                result = "Syntax error.";
+                return false;
+            }
             //TO 刘璋：可以从这里开始测试转换
 
             SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
             converter.SetQueryCalculus(s3);
             Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
 
+            string output = (new RelationDebugger()).GetDebugString(relationalgebra);
+            System.Diagnostics.Debug.WriteLine(output);
+
 
             List<ExecutionPlan> plans = new List<ExecutionPlan>();
 
             QueryPlanCreator creator = new QueryPlanCreator(gdd);
-            ExecutionPlan plan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
-            plans = creator.SplitPlan(plan);
+            ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
+            plans = creator.SplitPlan(gPlan);
 
             foreach (ExecutionPlan p in plans)
             {
@@ -62,27 +80,33 @@ namespace DistDBMS.ControlSite
                 t.Start();
             }
 
-            Wait();
+            Wait(gPlan.Steps[0].Operation.ResultID);
 
-            data = null;
+            data = buffer[gPlan.Steps[0].Operation.ResultID].Object as Table;
             result = "Command executed successfully.";
-
+            result += "\r\n"+data.Tuples.Count+ " tuples selected";
+            if (data.Tuples.Count>0)
+            {
+                result+=":\r\n";
+                foreach (Tuple tuple in data.Tuples)
+                    result += tuple.ToString() + "\r\n";
+                
+            }
             return true;
         }
 
-        private void Wait()
+        private void Wait(string id)
         {
             while (true)
             {
                 //wait for something
-                bool executed = true;
-                foreach (ThreadExample t in threads)
-                    executed &= t.finished;
+                lock (buffer)
+                {
+                    if (buffer[id] != null)
+                        break;
+                }
 
-                if (executed)
-                    break;
-                else
-                    Thread.Sleep(1000);
+                Thread.Sleep(1000);
             }
         }
 
@@ -140,14 +164,18 @@ namespace DistDBMS.ControlSite
                 package.Type = ExecutionPackage.PackageType.Plan;
                 package.Object = p;
 
-                ThreadExample ex = new ThreadExample(virInterfaces[p.ExecutionSite.Name] as VirtualInterface, package);
-                Thread t = new Thread(new ThreadStart(ex.ThreadProc));
-                threads.Add(ex);
-                t.Start();
+                //ThreadExample ex = new ThreadExample(virInterfaces[p.ExecutionSite.Name] as VirtualInterface, package);
+                //Thread t = new Thread(new ThreadStart(ex.ThreadProc));
+                //threads.Add(ex);
+                //t.Start();
                 //(virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
+                
+                //同步执行
+                (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
             }
 
-            Wait();
+            //Wait();
+            
 
             result = "Data imported successful";
             return true;

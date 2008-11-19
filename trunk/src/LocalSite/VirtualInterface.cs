@@ -48,36 +48,34 @@ namespace DistDBMS.ControlSite
                 {
                     if (step.Type == ExecutionStep.ExecuteType.Select)
                     {
-                        //while (true)
-                        //{
-                        //    bool allReady = true;
-                        //    lock (buffer)
-                        //    {
-                        //        for (int i = 0; i < step.WaitingId.Count; i++)
-                        //            allReady &= (buffer[step.WaitingId[i]] != null);
+                        while (true)
+                        {
+                            bool allReady = true;
+                            lock (buffer)
+                            {
+                                for (int i = 0; i < step.WaitingId.Count; i++)
+                                    allReady &= (buffer[step.WaitingId[i]] != null);
 
-                        //        if (allReady)
-                        //            break;
-                        //    }
+                                if (allReady)
+                                    break;
+                            }
 
-                        //    Thread.Sleep(new Random().Next(1000)); //现在是停等，以后应该是异步等，或者唤醒机制
-                        //}
+                            Thread.Sleep(new Random().Next(1000)); //现在是停等，以后应该是异步等，或者唤醒机制
+                        }
 
                         
                         
 
                         //相当于发数据
                         
-                        
                         lock (buffer)
                         {
                             Table table = processor.Handle(step, name, buffer);
                             ExecutionPackage newPackage = new ExecutionPackage();
-                            package.ID = step.Operation.ResultID;
-                            package.Type = ExecutionPackage.PackageType.Data;
-                            package.Object = table;
-
-                            buffer.Add(package);//相当于异步发送
+                            newPackage.ID = step.Operation.ResultID;
+                            newPackage.Type = ExecutionPackage.PackageType.Data;
+                            newPackage.Object = table;
+                            buffer.Add(newPackage);//相当于异步发送
                         }
                     }
                     else if (step.Type == ExecutionStep.ExecuteType.Insert)

@@ -37,6 +37,14 @@ namespace DistDBMS.Common.Syntax
         /// </summary>
         public string Content { get; set; }
 
+        //判断条件是否为空的条件
+        public bool IsEmpty {
+            get
+            {
+                return (!IsAtomCondition && (LeftCondition == null || RightCondition == null));
+            }
+        }
+
         public Condition()
         {
             Operator = RelationOperator.And;
