@@ -6,7 +6,7 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.Common.Syntax
 {
-    public class Operand
+    public class Operand:ICloneable
     {
         static Exception InvalidValueConvertion = new Exception("InvalidValueConvertion");
 
@@ -121,5 +121,20 @@ namespace DistDBMS.Common.Syntax
 
         #endregion
 
+
+        #region ICloneable Members
+
+        public object Clone()
+        {
+            Operand result = new Operand();
+            result.IsValue = IsValue;
+            if (Field != null)
+                result.Field = Field.Clone() as Field;
+            result.ValueType = ValueType;
+            result.Value = Value;
+            return result;
+        }
+
+        #endregion
     }
 }

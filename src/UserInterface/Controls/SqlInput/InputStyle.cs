@@ -59,6 +59,7 @@ namespace DistDBMS.UserInterface.Controls.SqlInput
                     blackStyle.HighLightColors.Add(Color.Red);
                     blackStyle.HighLightColors.Add(Color.Yellow);
                     blackStyle.HighLightColors.Add(Color.Green);
+                    blackStyle.HighLightColors.Add(Color.Pink);
                     blackStyle.KeywordColor = Color.Blue;
                     blackStyle.Name = "黑底白字";
                 }
@@ -74,7 +75,7 @@ namespace DistDBMS.UserInterface.Controls.SqlInput
                 if (whiteStyle == null)
                 {
                     whiteStyle = new InputStyle();
-                    whiteStyle.HighLightColors.AddRange(new Color[] { Color.Red, Color.Orange, Color.Green });
+                    whiteStyle.HighLightColors.AddRange(new Color[] { Color.Red, Color.Orange, Color.Green, Color.Purple });
                     whiteStyle.Name = "白底黑字";
                 }
                 return whiteStyle;

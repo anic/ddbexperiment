@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.UserInterface.Controls.SqlInput;
 using DistDBMS.Common.Table;
+using DistDBMS.Common.RelationalAlgebra.Entity;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -105,9 +106,45 @@ namespace DistDBMS.UserInterface.Controls
             uscTableViewer1.Table = table;
         }
 
+        public void SetQueryTree(Relation queryTree)
+        {
+            rawQTreeViewer.ShowRelation(queryTree);
+        }
+
+
         public event EventHandler OnExecuteSQL;
         
+        public bool SqlTextReadOnly
+        {
+            get { return sqlTextBox.ReadOnly; }
+            set { 
+                sqlTextBox.ReadOnly = value;
+            }
+        }
 
+        public bool ShowTip
+        {
+            get { return sqlTextBox.ShowTip; }
+            set { sqlTextBox.ShowTip = value; }
+        }
+
+        public enum ResultTab
+        { 
+            Console = 0,
+            Table,
+            QueryTree
+        }
         
+
+        public ResultTab Tab
+        {
+            get { return tab; }
+            set { 
+                tab = value;
+                tabControl1.SelectedIndex = (int)tab;
+                
+            }
+        }
+        ResultTab tab = ResultTab.Console;
     }
 }

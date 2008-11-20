@@ -8,7 +8,7 @@ namespace DistDBMS.Common.Syntax
     /// <summary>
     /// 原子条件，更像谓词
     /// </summary>
-    public class AtomCondition
+    public class AtomCondition:ICloneable
     {
         /// <summary>
         /// 操作符
@@ -26,18 +26,11 @@ namespace DistDBMS.Common.Syntax
         /// </summary>
         public Operand RightOperand { get; set; }
         
-
-        /// <summary>
-        /// 内容字符串
-        /// </summary>
-        public string Content { get; set; }
-
         public AtomCondition()
         {
             Operator = LogicOperator.Equal;
             LeftOperand = new Operand();
             RightOperand = new Operand();
-            Content = "";
         }
 
         public new string ToString()
@@ -71,5 +64,18 @@ namespace DistDBMS.Common.Syntax
             return LeftOperand.ToString() + op + RightOperand.ToString();
         }
 
+
+        #region ICloneable Members
+
+        public object Clone()
+        {
+            AtomCondition result = new AtomCondition();
+            result.LeftOperand = LeftOperand.Clone() as Operand;
+            result.RightOperand = RightOperand.Clone() as Operand;
+            result.Operator = Operator;
+            return result;
+        }
+
+        #endregion
     }
 }

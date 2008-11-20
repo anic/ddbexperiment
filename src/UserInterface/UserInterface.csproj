@@ -51,11 +51,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\FrmWaitingcs.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\FrmWaitingcs.Designer.cs">
+      <DependentUpon>FrmWaitingcs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\UscExecuteQuery.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\UscExecuteQuery.Designer.cs">
       <DependentUpon>UscExecuteQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UscSiteViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UscSiteViewer.Designer.cs">
+      <DependentUpon>UscSiteViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\UscTableSchemaViewer.cs">
       <SubType>UserControl</SubType>
@@ -77,14 +89,19 @@
     </Compile>
     <Compile Include="Handler\MenuTreeSwitcher.cs" />
     <Compile Include="LogWriter.cs" />
-    <Compile Include="PanelSwitchManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Controls\FrmWaitingcs.resx">
+      <DependentUpon>FrmWaitingcs.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\SqlInput\SqlTextBox.resx">
       <DependentUpon>SqlTextBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\UscExecuteQuery.resx">
       <DependentUpon>UscExecuteQuery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\UscSiteViewer.resx">
+      <DependentUpon>UscSiteViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\UscTableSchemaViewer.resx">
       <DependentUpon>UscTableSchemaViewer.cs</DependentUpon>
@@ -102,6 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SqlInput\FrmTip.resx">
       <DependentUpon>FrmTip.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\UscQTreeViewer.resx">
+      <DependentUpon>UscQTreeViewer.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -131,6 +151,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\SqlInput\InputStyle.cs" />
+    <Compile Include="Controls\UscQTreeViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UscQTreeViewer.Designer.cs">
+      <DependentUpon>UscQTreeViewer.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
@@ -147,10 +173,14 @@
     <None Include="Resources\img_colortable.png" />
     <Content Include="Resources\img_column.png" />
     <None Include="Resources\img_exesql.png" />
+    <Content Include="Resources\img_dictionary.png" />
+    <Content Include="Resources\img_hfragment.png" />
     <Content Include="Resources\img_keyword.png" />
     <Content Include="Resources\img_magnifier.png" />
+    <Content Include="Resources\img_site.png" />
     <Content Include="Resources\img_table.png" />
     <None Include="Resources\img_tool.png" />
+    <Content Include="Resources\img_vfragment.png" />
     <Content Include="Resources\Triangle.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

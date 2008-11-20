@@ -193,6 +193,7 @@ namespace DistDBMS.ControlSite
                 if (f.Type == FragmentType.Vertical)
                 {
                     TableSchema ts = f.Schema;
+                    ts.TableName = logicTable.TableName;
                     for (int i = 0; i < ts.Fields.Count;i++ )
                     {
                         //从逻辑表中找到那个字段，然后用其覆盖，因为其信息是最全的

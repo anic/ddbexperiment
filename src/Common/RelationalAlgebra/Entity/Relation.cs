@@ -84,10 +84,10 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// </summary>
         public TableSchema RelativeAttributes { get; set; }
 
-        /// <summary>
-        /// 内容
-        /// </summary>
-        public string Content { get; set; }
+        ///// <summary>
+        ///// 内容
+        ///// </summary>
+        //public string Content { get; set; }
 
         public Relation()
         {
@@ -96,7 +96,7 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             DirectTableSchema = null;
             RelativeAttributes = new TableSchema();
             Predication = new Condition();
-            Content = "";
+            //Content = "";
             Type = RelationalType.Selection;
         }
 
@@ -111,10 +111,12 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             if (IsDirectTableSchema)
                 result += " " + DirectTableSchema.ToString();
 
-            if (Predication != null)
+            if (Predication != null && !Predication.IsEmpty
+                && Type == RelationalType.Selection)
                 result += " Predication: " + Predication.ToString();
 
-            if (RelativeAttributes.Fields.Count > 0 || RelativeAttributes.TableName != "")
+            if ((RelativeAttributes.Fields.Count > 0 || RelativeAttributes.TableName != "")
+                && (Type == RelationalType.Join || Type == RelationalType.Projection))
                 result += " Attributes: " + RelativeAttributes.ToString();
 
             return result;

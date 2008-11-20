@@ -30,16 +30,14 @@ namespace DistDBMS.UserInterface
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("优化树");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("查询", new System.Windows.Forms.TreeNode[] {
-            treeNode1});
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("站点");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("表");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("分片");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("数据字典", new System.Windows.Forms.TreeNode[] {
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("查询");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("站点");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("表");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("分片");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("数据字典", new System.Windows.Forms.TreeNode[] {
+            treeNode2,
             treeNode3,
-            treeNode4,
-            treeNode5});
+            treeNode4});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmApp));
             this.tvwMenu = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
@@ -56,8 +54,10 @@ namespace DistDBMS.UserInterface
             this.menuItemOption = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.uscTableSchemaViewer = new DistDBMS.UserInterface.Controls.UscTableSchemaViewer();
+            this.timer = new System.Windows.Forms.Timer(this.components);
             this.uscExecuteQuery = new DistDBMS.UserInterface.Controls.UscExecuteQuery();
+            this.uscSiteViewer = new DistDBMS.UserInterface.Controls.UscSiteViewer();
+            this.uscTableSchemaViewer = new DistDBMS.UserInterface.Controls.UscTableSchemaViewer();
             this.pnlControl.SuspendLayout();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
@@ -65,32 +65,33 @@ namespace DistDBMS.UserInterface
             // tvwMenu
             // 
             this.tvwMenu.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tvwMenu.ImageIndex = 0;
+            this.tvwMenu.ImageList = this.imageList;
             this.tvwMenu.ItemHeight = 23;
             this.tvwMenu.Location = new System.Drawing.Point(10, 10);
             this.tvwMenu.Name = "tvwMenu";
-            treeNode1.Name = "Node2";
-            treeNode1.Text = "优化树";
-            treeNode2.ImageIndex = -2;
-            treeNode2.Name = "Node0";
-            treeNode2.Text = "查询";
-            treeNode3.Name = "Node3";
-            treeNode3.Text = "站点";
-            treeNode4.Name = "Node4";
-            treeNode4.Text = "表";
-            treeNode5.Name = "Node6";
-            treeNode5.Text = "分片";
-            treeNode6.Name = "Node1";
-            treeNode6.Text = "数据字典";
+            treeNode1.ImageIndex = -2;
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "查询";
+            treeNode2.Name = "Node3";
+            treeNode2.Text = "站点";
+            treeNode3.Name = "Node4";
+            treeNode3.Text = "表";
+            treeNode4.Name = "Node6";
+            treeNode4.Text = "分片";
+            treeNode5.Name = "Node1";
+            treeNode5.Text = "数据字典";
             this.tvwMenu.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2,
-            treeNode6});
+            treeNode1,
+            treeNode5});
+            this.tvwMenu.SelectedImageIndex = 0;
             this.tvwMenu.Size = new System.Drawing.Size(183, 415);
             this.tvwMenu.TabIndex = 2;
             // 
             // imageList
             // 
             this.imageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-            this.imageList.ImageSize = new System.Drawing.Size(30, 30);
+            this.imageList.ImageSize = new System.Drawing.Size(20, 20);
             this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // splitter1
@@ -191,33 +192,52 @@ namespace DistDBMS.UserInterface
             this.menuItemAbout.Size = new System.Drawing.Size(100, 22);
             this.menuItemAbout.Text = "关于";
             // 
-            // uscTableSchemaViewer
+            // timer
             // 
-            this.uscTableSchemaViewer.Location = new System.Drawing.Point(281, 109);
-            this.uscTableSchemaViewer.Name = "uscTableSchemaViewer";
-            this.uscTableSchemaViewer.Padding = new System.Windows.Forms.Padding(10);
-            this.uscTableSchemaViewer.Size = new System.Drawing.Size(495, 317);
-            this.uscTableSchemaViewer.TabIndex = 8;
+            this.timer.Interval = 300;
             // 
             // uscExecuteQuery
             // 
             this.uscExecuteQuery.CommandResultText = "";
+            this.uscExecuteQuery.Dock = System.Windows.Forms.DockStyle.Fill;
             this.uscExecuteQuery.EnableTip = true;
-            this.uscExecuteQuery.Location = new System.Drawing.Point(203, 64);
+            this.uscExecuteQuery.Location = new System.Drawing.Point(206, 327);
             this.uscExecuteQuery.Name = "uscExecuteQuery";
             this.uscExecuteQuery.Padding = new System.Windows.Forms.Padding(10);
-            this.uscExecuteQuery.Size = new System.Drawing.Size(422, 315);
+            this.uscExecuteQuery.ShowTip = true;
+            this.uscExecuteQuery.Size = new System.Drawing.Size(491, 133);
             this.uscExecuteQuery.SQLText = "";
+            this.uscExecuteQuery.SqlTextReadOnly = false;
+            this.uscExecuteQuery.Tab = DistDBMS.UserInterface.Controls.UscExecuteQuery.ResultTab.Console;
             this.uscExecuteQuery.TabIndex = 6;
             this.uscExecuteQuery.OnExecuteSQL += new System.EventHandler(this.uscExecuteQuery_OnExecuteSQL);
+            // 
+            // uscSiteViewer
+            // 
+            this.uscSiteViewer.Dock = System.Windows.Forms.DockStyle.Top;
+            this.uscSiteViewer.Location = new System.Drawing.Point(206, 185);
+            this.uscSiteViewer.Name = "uscSiteViewer";
+            this.uscSiteViewer.Padding = new System.Windows.Forms.Padding(10);
+            this.uscSiteViewer.Size = new System.Drawing.Size(491, 142);
+            this.uscSiteViewer.TabIndex = 9;
+            // 
+            // uscTableSchemaViewer
+            // 
+            this.uscTableSchemaViewer.Dock = System.Windows.Forms.DockStyle.Top;
+            this.uscTableSchemaViewer.Location = new System.Drawing.Point(206, 25);
+            this.uscTableSchemaViewer.Name = "uscTableSchemaViewer";
+            this.uscTableSchemaViewer.Padding = new System.Windows.Forms.Padding(10);
+            this.uscTableSchemaViewer.Size = new System.Drawing.Size(491, 160);
+            this.uscTableSchemaViewer.TabIndex = 8;
             // 
             // FrmApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(697, 460);
-            this.Controls.Add(this.uscTableSchemaViewer);
             this.Controls.Add(this.uscExecuteQuery);
+            this.Controls.Add(this.uscSiteViewer);
+            this.Controls.Add(this.uscTableSchemaViewer);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.pnlControl);
             this.Controls.Add(this.mainMenu);
@@ -254,6 +274,8 @@ namespace DistDBMS.UserInterface
         private DistDBMS.UserInterface.Controls.UscTableSchemaViewer uscTableSchemaViewer;
         private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
+        private System.Windows.Forms.Timer timer;
+        private DistDBMS.UserInterface.Controls.UscSiteViewer uscSiteViewer;
         
     }
 }

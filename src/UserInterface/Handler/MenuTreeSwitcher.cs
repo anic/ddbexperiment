@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.Common.Table;
 using DistDBMS.UserInterface.Controls;
+using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.UserInterface.Handler
 {
@@ -20,10 +21,14 @@ namespace DistDBMS.UserInterface.Handler
 
         UscExecuteQuery uscQuery;
         UscTableSchemaViewer uscSchemaViewer;
+        UscSiteViewer uscSiteViewer;
 
-        public MenuTreeSwitcher(TreeView tree)
+        FrmApp frmApp;
+
+        public MenuTreeSwitcher(TreeView tree,FrmApp frmApp)
         {
             this.tree = tree;
+            this.frmApp = frmApp;
 
             queryNode = tree.Nodes[0];
             gddNode = tree.Nodes[1];
@@ -32,8 +37,17 @@ namespace DistDBMS.UserInterface.Handler
             tablesNode = gddNode.Nodes[1];
             fragmentsNode = gddNode.Nodes[2];
 
+
+            queryNode.SelectedImageKey = queryNode.ImageKey = "magnifier";
+            gddNode.SelectedImageKey = gddNode.ImageKey = "dictionary";
+            sitesNode.SelectedImageKey = sitesNode.ImageKey = "site";
+            tablesNode.SelectedImageKey = tablesNode.ImageKey = "table";
+            fragmentsNode.SelectedImageKey = fragmentsNode.ImageKey = "hfragment";
+
             tree.AfterSelect += new TreeViewEventHandler(tree_AfterSelect);
         }
+
+
 
         public void SetControl(Control ctr)
         {
@@ -44,6 +58,31 @@ namespace DistDBMS.UserInterface.Handler
                 uscQuery = ctr as UscExecuteQuery;
             else if (ctr is UscTableSchemaViewer)
                 uscSchemaViewer = ctr as UscTableSchemaViewer;
+            else if (ctr is UscSiteViewer)
+                uscSiteViewer = ctr as UscSiteViewer;
+
+        }
+
+        private string GenerateSQL(TableSchema schema, Condition condition)
+        { return GenerateSQL(schema, condition, schema.TableName); }
+
+        private string GenerateSQL(TableSchema schema,Condition condition,string logicTablename)
+        {
+            string result = "select ";
+            for (int i = 0; i < schema.Fields.Count;i++ )
+            {
+                if (i != 0)
+                    result += ", ";
+
+                result += schema.Fields[i].AttributeName;
+            }
+
+            result += " from " + logicTablename;
+
+            if (condition != null && !condition.IsEmpty)
+                result += " where " + condition.ToString();
+
+            return result;
         }
 
         void tree_AfterSelect(object sender, TreeViewEventArgs e)
@@ -52,32 +91,68 @@ namespace DistDBMS.UserInterface.Handler
             {
                 if (tree.SelectedNode.Tag is TableSchema)
                 {
-                    uscQuery.Visible = false;
-
                     uscSchemaViewer.Visible = true;
+                    uscSiteViewer.Visible = false;
+                    uscQuery.Visible = true;
+
                     uscSchemaViewer.ShowTableSchema(tree.SelectedNode.Tag as TableSchema);
-                    uscSchemaViewer.Dock = DockStyle.Fill;
+                    string sql  =GenerateSQL(tree.SelectedNode.Tag as TableSchema,null);
+                    bool oldValue = uscQuery.ShowTip;
+
+                    uscQuery.SqlTextReadOnly = true;
+                    uscQuery.ShowTip = false;
+                    uscQuery.SQLText = sql;
+                    uscQuery.ShowTip = oldValue;
+                    uscQuery.Tab = UscExecuteQuery.ResultTab.Table;
+                    
+                    
                 }
                 else if (tree.SelectedNode == queryNode)
                 {
+                    
+                    
+                    
                     uscQuery.Visible = true;
-                    uscQuery.Dock = DockStyle.Fill;
                     uscSchemaViewer.Visible = false;
+                    uscSiteViewer.Visible = false;
+
+                    uscQuery.SqlTextReadOnly = false;
+                    uscQuery.Tab = UscExecuteQuery.ResultTab.Console;
                     
                 }
                 else if (tree.SelectedNode.Tag is Fragment)
                 {
-                    uscQuery.Visible = false;
 
+                    uscQuery.Visible = true;
                     uscSchemaViewer.Visible = true;
-                    uscSchemaViewer.ShowFragment(tree.SelectedNode.Tag as Fragment);
-                    uscSchemaViewer.Dock = DockStyle.Fill;
-                }
-            }
-        }
+                    uscSiteViewer.Visible = false;
 
-        private void SetControlVisible(Control ctr)
-        {
+                    uscSchemaViewer.ShowFragment(tree.SelectedNode.Tag as Fragment);
+
+                    string sql = GenerateSQL((tree.SelectedNode.Tag as Fragment).Schema, 
+                        (tree.SelectedNode.Tag as Fragment).Condition, 
+                        (tree.SelectedNode.Tag as Fragment).LogicTable.TableName);
+
+                    bool oldValue = uscQuery.ShowTip;
+
+                    uscQuery.SqlTextReadOnly = true;
+                    uscQuery.ShowTip = false;
+                    uscQuery.SQLText = sql;
+                    uscQuery.ShowTip = oldValue;
+                    uscQuery.Tab = UscExecuteQuery.ResultTab.Table;
+
+                    
+                }
+                else if (tree.SelectedNode.Tag is Site)
+                {
+                    uscQuery.Visible = false;
+                    uscSchemaViewer.Visible = false;
+                    uscSiteViewer.Visible = true;
+
+                    uscSiteViewer.SetSite(tree.SelectedNode.Tag as Site);
+                }
+                tree.Focus();
+            }
         }
 
 
@@ -87,6 +162,7 @@ namespace DistDBMS.UserInterface.Handler
             foreach (Site s in gdd.Sites)
             {
                 TreeNode node = sitesNode.Nodes.Add(s.Name);
+                node.SelectedImageKey = node.ImageKey = "site";
                 node.Tag = s;
             }
 
@@ -94,6 +170,7 @@ namespace DistDBMS.UserInterface.Handler
             foreach (TableSchema t in gdd.Schemas)
             {
                 TreeNode node = tablesNode.Nodes.Add(t.TableName);
+                node.SelectedImageKey = node.ImageKey = "table";
                 node.Tag = t;
             }
 
@@ -108,7 +185,20 @@ namespace DistDBMS.UserInterface.Handler
         {
             TreeNode childNode = node.Nodes.Add(fragment.Name);
             childNode.Tag = fragment;
+            switch(fragment.Type)
+            {
+                case FragmentType.None:
+                    childNode.SelectedImageKey = childNode.ImageKey = "table";
+                    break;
+                case FragmentType.Horizontal:
+                    childNode.SelectedImageKey = childNode.ImageKey = "hfragment";
+                    break;
+                case FragmentType.Vertical:
+                    childNode.SelectedImageKey = childNode.ImageKey = "vfragment";
+                    break;
 
+            }
+            
             foreach (Fragment f in fragment.Children)
                 AddFragment(childNode, f);
         }

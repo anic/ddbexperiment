@@ -4,6 +4,7 @@ using System.Text;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Table;
 using DistDBMS.Common.Dictionary;
+using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.Common.Execution
 {
@@ -138,10 +139,18 @@ namespace DistDBMS.Common.Execution
         {
             ResultID = initID;
 
-            this.Content = r.Content;
-            this.DirectTableSchema = r.DirectTableSchema;
-            this.Predication = r.Predication;
-            this.RelativeAttributes = r.RelativeAttributes;
+            //this.Content = r.Content;
+            if (r.DirectTableSchema != null)
+                this.DirectTableSchema = r.DirectTableSchema.Clone() as TableSchema;
+            if (DirectTableSchema != null)
+                for (int i = 0; i < DirectTableSchema.Fields.Count; i++)
+                    DirectTableSchema.Fields[i] = DirectTableSchema.Fields[i].Clone() as Field;
+
+            if (r.Predication != null)
+                this.Predication = r.Predication.Clone() as Condition;
+            if (r.RelativeAttributes!=null)
+                this.RelativeAttributes = r.RelativeAttributes.Clone() as TableSchema;
+    
             this.Type = r.Type;
 
             int index = 0;

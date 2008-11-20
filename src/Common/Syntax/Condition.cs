@@ -5,7 +5,7 @@ using DistDBMS.Common;
 
 namespace DistDBMS.Common.Syntax
 {
-    public class Condition
+    public class Condition:ICloneable
     {
         /// <summary>
         /// 连接符，And / Or
@@ -32,11 +32,6 @@ namespace DistDBMS.Common.Syntax
         /// </summary>
         public AtomCondition AtomCondition { get; set; }
 
-        /// <summary>
-        /// 内容字符串
-        /// </summary>
-        public string Content { get; set; }
-
         //判断条件是否为空的条件
         public bool IsEmpty {
             get
@@ -51,7 +46,7 @@ namespace DistDBMS.Common.Syntax
             LeftCondition = null;
             RightCondition = null;
             AtomCondition = null;
-            Content = "";
+            
         }
 
         public new string ToString()
@@ -59,9 +54,30 @@ namespace DistDBMS.Common.Syntax
             if (IsAtomCondition)
                 return AtomCondition.ToString();
             else if (LeftCondition != null && RightCondition != null)
-                return LeftCondition.ToString() + " " + Operator.ToString() + " " + RightCondition.ToString() ;
+                return LeftCondition.ToString() + " " + Operator.ToString() + " " + RightCondition.ToString();
             else
-                return "Undone Condition ";
+                return "Empty";
         }
+
+
+        #region ICloneable Members
+
+        public object Clone()
+        {
+            Condition result = new Condition();
+            result.Operator = Operator;
+            if (AtomCondition != null)
+                result.AtomCondition = AtomCondition.Clone() as AtomCondition;
+
+            if (LeftCondition != null)
+                result.LeftCondition = LeftCondition.Clone() as Condition;
+
+            if (RightCondition != null)
+                result.RightCondition = RightCondition.Clone() as Condition;
+
+            return result;
+        }
+
+        #endregion
     }
 }
