@@ -74,9 +74,23 @@ namespace DistDBMS.UserInterface.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap img_dictionary {
+            get {
+                object obj = ResourceManager.GetObject("img_dictionary", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap img_exesql {
             get {
                 object obj = ResourceManager.GetObject("img_exesql", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap img_hfragment {
+            get {
+                object obj = ResourceManager.GetObject("img_hfragment", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -95,6 +109,13 @@ namespace DistDBMS.UserInterface.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap img_site {
+            get {
+                object obj = ResourceManager.GetObject("img_site", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap img_table {
             get {
                 object obj = ResourceManager.GetObject("img_table", resourceCulture);
@@ -105,6 +126,13 @@ namespace DistDBMS.UserInterface.Properties {
         internal static System.Drawing.Bitmap img_tool {
             get {
                 object obj = ResourceManager.GetObject("img_tool", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap img_vfragment {
+            get {
+                object obj = ResourceManager.GetObject("img_vfragment", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

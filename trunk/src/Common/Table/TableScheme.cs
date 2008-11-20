@@ -101,7 +101,8 @@ namespace DistDBMS.Common.Table
             result.TableName = TableName;
             result.NickName = NickName;
             result.IsDbTable = IsDbTable;
-            result.Fields.AddRange(Fields);
+            foreach (Field f in Fields)
+                result.Fields.Add(f.Clone() as Field);
             result.IsAllFields = IsAllFields;
             return result;
         }

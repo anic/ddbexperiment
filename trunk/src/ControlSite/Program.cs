@@ -53,7 +53,7 @@ namespace DistDBMS.ControlSite
             r.DirectTableSchema.IsAllFields = true; //因为*
             r.DirectTableSchema.IsDbTable = true;
 
-            r.Predication.Content = "credit_hour>2 and location=\'CB‐6\'";
+            //r.Predication.Content = "credit_hour>2 and location=\'CB‐6\'";
 
             string output = (new RelationDebugger()).GetDebugString(r);
             System.Console.WriteLine("\n\nSample1 Relation:");
@@ -118,7 +118,7 @@ namespace DistDBMS.ControlSite
             Relation select1 = joinRelation.LeftRelation;
             select1.Type = RelationalType.Selection;
             //谓词
-            select1.Predication.Content = "Course.credit_hour>2";
+            //select1.Predication.Content = "Course.credit_hour>2";
             //关系一个表
             Relation join = new Relation();
             join.Type = RelationalType.Join;
@@ -156,7 +156,7 @@ namespace DistDBMS.ControlSite
             Relation select2 = joinRelation.RightRelation;
             select2.Type = RelationalType.Selection;
             //谓词
-            select2.Predication.Content = "Teacher.title=3";
+            //select2.Predication.Content = "Teacher.title=3";
             //关系一个表
             //select2.IsDirectTableSchema = true;
             //select2.DirectTableSchema.TableName = "Teacher";

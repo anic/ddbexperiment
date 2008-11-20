@@ -18,6 +18,14 @@ namespace DistDBMS.UserInterface.Controls
             InitializeComponent();
         }
 
+        public void SetSite(Site site)
+        {
+            if (site == null)
+                lblSite.Text = "";
+            else
+                lblSite.Text = site.ToString();
+        }
+
         public void ShowTableSchema(TableSchema table)
         {
             lvwTable.Columns.Clear();
@@ -54,6 +62,8 @@ namespace DistDBMS.UserInterface.Controls
             ShowTableSchema(f.Schema);
 
             lblTableName.Text = f.Name;
+            SetSite(f.Site);
+
             if (f.Condition != null)
                 lblCondition.Text = f.Condition.ToString();
         }

@@ -13,6 +13,7 @@ using DistDBMS.UserInterface.Controls;
 using DistDBMS.UserInterface.Properties;
 using DistDBMS.Common.Table;
 using DistDBMS.UserInterface.Handler;
+using DistDBMS.Common.RelationalAlgebra.Entity;
 
 namespace DistDBMS.UserInterface
 {
@@ -25,12 +26,17 @@ namespace DistDBMS.UserInterface
         {
             InitializeComponent();
 
-            imageList.Images.Add(Resources.img_magnifier);
+            imageList.Images.Add("magnifier",Resources.img_magnifier);
+            imageList.Images.Add("dictionary",Resources.img_dictionary);
+            imageList.Images.Add("site",Resources.img_site);
+            imageList.Images.Add("table",Resources.img_table);
+            imageList.Images.Add("hfragment",Resources.img_hfragment);
+            imageList.Images.Add("vfragment", Resources.img_vfragment);
 
-            switcher = new MenuTreeSwitcher(tvwMenu);
+            switcher = new MenuTreeSwitcher(tvwMenu, this);
             switcher.SetControl(uscExecuteQuery);
             switcher.SetControl(uscTableSchemaViewer);
-
+            switcher.SetControl(uscSiteViewer);
 
             vInterface = new DistDBMS.ControlSite.VirtualInterface2();
             
@@ -49,9 +55,14 @@ namespace DistDBMS.UserInterface
             uscExecuteQuery.AddCommandResult(result);
 
 
-            //测试执行sql
+            
             uscExecuteQuery.EnableTip = false;
             
+        }
+
+        public void ExecuteSQL()
+        {
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
         }
 
         void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
@@ -59,11 +70,13 @@ namespace DistDBMS.UserInterface
             
             Table data;
             string result;
+            Relation queryTree;
             try
             {
-                vInterface.ExecuteSQL(uscExecuteQuery.SQLText, out data, out result);
+                vInterface.ExecuteSQL(uscExecuteQuery.SQLText, out data, out result, out queryTree);
                 uscExecuteQuery.AddCommandResult(result);
                 uscExecuteQuery.SetResultTable(data);
+                uscExecuteQuery.SetQueryTree(queryTree);
             }
             catch (Exception ex)
             {
@@ -78,6 +91,7 @@ namespace DistDBMS.UserInterface
 
         private void FrmApp_Shown(object sender, EventArgs e)
         {
+            //测试执行sql
             /*
             uscExecuteQuery.SQLText = "select * from Student";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
@@ -97,13 +111,13 @@ namespace DistDBMS.UserInterface
             
             uscExecuteQuery.SQLText = "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-            */
 
-
+            
             uscExecuteQuery.SQLText = "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-            
+           */
 
+            uscExecuteQuery.EnableTip = true;
             
         }
 
