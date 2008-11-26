@@ -26,7 +26,7 @@ namespace DistDBMS.ControlSite.Plan
         
             foreach (Table table in importer.Tables)
             {
-                Fragment fragment = gdd.Fragments.GetFragmentByName(table.Schema.NickName);
+                Fragment fragment = gdd.Fragments.GetFragmentByName(table.Schema.TableName);
                 ExecutionPlan plan = GetPlanBySite(fragment.Site);
 
                 ExecutionStep step = new ExecutionStep();

@@ -80,7 +80,7 @@ namespace DistDBMS.ControlSite
             foreach (TableSchema ts in gdd.Schemas)
             {
                 Fragment fragment = new Fragment();
-                fragment.LogicTable = ts;
+                fragment.LogicSchema = ts;
                 fragment.Condition = null;
                 //分片名为表名
                 fragment.Name = ts.TableName;
@@ -99,7 +99,11 @@ namespace DistDBMS.ControlSite
             return gdd;
         }
 
+       
 
+        /// <summary>
+        /// 分配站点
+        /// </summary>
         private void AllocateSite()
         {
             foreach (Allocation al in allocationList)
@@ -170,7 +174,7 @@ namespace DistDBMS.ControlSite
 
             //填写Fragment的一致性信息
             foreach (Fragment topFragment in gdd.Fragments)
-                FillFragments(topFragment.LogicTable, topFragment);
+                FillFragments(topFragment.LogicSchema, topFragment);
         }
 
         /// <summary>
@@ -182,7 +186,7 @@ namespace DistDBMS.ControlSite
         {
             if (f.Type != FragmentType.None)
             {
-                f.LogicTable = logicTable;
+                f.LogicSchema = logicTable;
                 if (f.Condition != null)
                 {
                     ConditionConsistencyFiller filler = new ConditionConsistencyFiller();

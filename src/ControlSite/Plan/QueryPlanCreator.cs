@@ -103,7 +103,7 @@ namespace DistDBMS.ControlSite.Plan
                     {
                   
                         leftBottom.DirectTableSchema = fragment.Schema.Clone() as TableSchema;
-                        leftBottom.DirectTableSchema.TableName = fragment.LogicTable.TableName;
+                        leftBottom.DirectTableSchema.TableName = fragment.LogicSchema.TableName;
                         leftBottom.DirectTableSchema.NickName = fragment.Name;
 
                         currentPlan = GetPlanBySite(fragment.Site);
@@ -205,7 +205,7 @@ namespace DistDBMS.ControlSite.Plan
         {
             if (leftBottom.Parent != null)
             {
-                ExecutionRelation parent = leftBottom.Parent;
+                ExecutionRelation parent = leftBottom.Parent ;
                 for (int i = 0; i < parent.Children.Count; i++)
                 {
                     ExecutionRelation currentRelation = (parent.Children[i] as ExecutionRelation);

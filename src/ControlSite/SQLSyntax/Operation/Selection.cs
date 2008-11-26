@@ -35,18 +35,12 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         /// </summary>
         public Condition Condition { get; set; } //Where ...
         
-
-        /// <summary>
-        /// 内容字符串
-        /// </summary>
-        public string Content { get; set; }
-
         public Selection()
         {
             Fields = new TableSchema();
             sources = new List<TableSchema>();
             Condition = null;
-            Content = "";
+            //Content = "";
         }
 
         public new string ToString()

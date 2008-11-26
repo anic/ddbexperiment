@@ -82,6 +82,8 @@ namespace DistDBMS.ControlSite
                     {
                         using (DataAccess.DataAccessor da = new DistDBMS.ControlSite.DataAccess.DataAccessor(name))
                         {
+                            TableSchema logicSchema = ldd.Fragments.GetFragmentByName(step.Table.Name).LogicSchema;
+                            step.Table.Schema.ReplaceTableName(logicSchema.TableName);
                             da.InsertValues(step.Table);
                         }
                     }
@@ -98,7 +100,7 @@ namespace DistDBMS.ControlSite
                 foreach(Fragment f in ldd.Fragments)
                 {
                     TableSchema localTable = f.Schema.Clone() as TableSchema;
-                    localTable.TableName = f.LogicTable.TableName;
+                    localTable.TableName = f.LogicSchema.TableName;
                     da.CreateTable(localTable);
                 }
             }

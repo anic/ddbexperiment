@@ -32,7 +32,7 @@ namespace DistDBMS.Common.Dictionary
         /// <summary>
         /// 原始的逻辑表格
         /// </summary>
-        public TableSchema LogicTable { get; set; }
+        public TableSchema LogicSchema { get; set; }
 
         /// <summary>
         /// 划分条件,可以为无
@@ -62,18 +62,37 @@ namespace DistDBMS.Common.Dictionary
         public FragmentType Type { get; set; }
 
         /// <summary>
-        /// 分片后最终的样式表
+        /// 分片后最终的样式表,tablename将会换成Name
         /// </summary>
         public TableSchema Schema {
             get
             {
-                //垂直分片或者顶层分片
-                if (Type == FragmentType.Vertical || Type == FragmentType.None)
-                    return ts;
-                else if (Parent!=null) //水平分片
-                    return Parent.Schema;
-                else 
-                    return null;
+                
+                switch(Type)
+                {
+                    case FragmentType.None: //顶层分片
+                        return ts.Clone() as TableSchema;
+                    case FragmentType.Vertical: //垂直分片
+                        {
+                            TableSchema result = ts.Clone() as TableSchema;
+                            TableSchema logicSchema = LogicSchema;
+                            for (int i = 0; i < result.Fields.Count; i++)
+                            {
+                                Field resultField = result.Fields[i];
+                                Field logicField = logicSchema[resultField.AttributeName];
+                                result.Fields[i] = logicField.Clone() as Field;
+                            }
+                            result.ReplaceTableName(Name);
+                            return result;
+                        }
+                    case FragmentType.Horizontal://水平分片
+                        {
+                            TableSchema result = Parent.Schema.Clone() as TableSchema;
+                            result.ReplaceTableName(Name);
+                            return result;
+                        }
+                }
+                return null;
             }
             set
             {
@@ -87,13 +106,11 @@ namespace DistDBMS.Common.Dictionary
         /// </summary>
         public string Name { get; set; }
 
-        
-        
         public Fragment()
         {
             children = new List<Fragment>();
             Site = null;
-            LogicTable = null;
+            LogicSchema = null;
             Condition = null;
             Parent = null;
             Type = FragmentType.Horizontal;

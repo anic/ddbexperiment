@@ -13,12 +13,12 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         /// </summary>
         public Site Site { get; set; }
         
-        public string Content { get; set; }
+        
 
         public SiteDefinition()
         {
             Site = new Site();
-            Content = "";
+            //Content = "";
         }
 
         public new string ToString()

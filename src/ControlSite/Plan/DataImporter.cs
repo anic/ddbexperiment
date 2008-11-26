@@ -178,8 +178,8 @@ namespace DistDBMS.ControlSite.Plan
             //没有对应的表
             Table result = new Table();
             result.Schema = fragment.Schema.Clone() as TableSchema;
-            result.Schema.NickName = fragment.Name;
-            result.Schema.TableName = fragment.LogicTable.TableName;
+            //result.Schema.NickName = fragment.Name;
+            //result.Schema.TableName = fragment.LogicTable.TableName;
             tableList.Add(result);
             return result;
         

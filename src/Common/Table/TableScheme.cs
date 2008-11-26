@@ -47,6 +47,17 @@ namespace DistDBMS.Common.Table
             }
         }
 
+        /// <summary>
+        /// 将这个Schema里所有表名替换
+        /// </summary>
+        /// <param name="tablename"></param>
+        public void ReplaceTableName(string tablename)
+        {
+            this.TableName = tablename;
+            foreach (Field field in Fields)
+                field.TableName = tablename;
+        }
+
         public TableSchema()
         {
             TableName = "";

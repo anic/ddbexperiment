@@ -54,10 +54,7 @@ namespace DistDBMS.UserInterface
             vInterface.ImportData("Data.txt", out result);
             uscExecuteQuery.AddCommandResult(result);
 
-
-            
             uscExecuteQuery.EnableTip = false;
-            
         }
 
         public void ExecuteSQL()
