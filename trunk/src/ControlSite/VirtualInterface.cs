@@ -59,6 +59,10 @@ namespace DistDBMS.ControlSite
             converter.SetQueryCalculus(s3);
             Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
 
+            //TODO 这里作为测试，临时修改，填写ResultName
+            TempModifier tempModifier = new TempModifier();
+            tempModifier.Modify(relationalgebra);
+
             string output = (new RelationDebugger()).GetDebugString(relationalgebra);
             System.Diagnostics.Debug.WriteLine(output);
 
@@ -66,13 +70,15 @@ namespace DistDBMS.ControlSite
             List<ExecutionPlan> plans = new List<ExecutionPlan>();
 
             QueryPlanCreator creator = new QueryPlanCreator(gdd);
-            ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
+            ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, 0);
             plans = creator.SplitPlan(gPlan);
+
+            
 
             foreach (ExecutionPlan p in plans)
             {
                 ExecutionPackage package = new ExecutionPackage();
-                package.ID = "1";
+                package.ID = 0;
                 package.Object = p;
                 package.Type = ExecutionPackage.PackageType.Plan;
 
@@ -84,7 +90,7 @@ namespace DistDBMS.ControlSite
 
             Wait(gPlan.Steps[0].Operation.ResultID);
 
-            data = buffer[gPlan.Steps[0].Operation.ResultID].Object as Table;
+            data = buffer.GetPackageById(gPlan.Steps[0].Operation.ResultID).Object as Table;
             result = "Command executed successfully.";
             result += "\r\n"+data.Tuples.Count+ " tuples selected";
             queryTree = relationalgebra;
@@ -101,14 +107,14 @@ namespace DistDBMS.ControlSite
             return true;
         }
 
-        private void Wait(string id)
+        private void Wait(int id)
         {
             while (true)
             {
                 //wait for something
                 lock (buffer)
                 {
-                    if (buffer[id] != null)
+                    if (buffer.GetPackageById(id) != null)
                         break;
                 }
 
@@ -170,18 +176,9 @@ namespace DistDBMS.ControlSite
                 package.Type = ExecutionPackage.PackageType.Plan;
                 package.Object = p;
 
-                //ThreadExample ex = new ThreadExample(virInterfaces[p.ExecutionSite.Name] as VirtualInterface, package);
-                //Thread t = new Thread(new ThreadStart(ex.ThreadProc));
-                //threads.Add(ex);
-                //t.Start();
-                //(virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
-                
                 //同步执行
                 (virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
             }
-
-            //Wait();
-            
 
             result = "Data imported successful";
             return true;

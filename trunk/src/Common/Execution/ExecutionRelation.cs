@@ -10,7 +10,7 @@ namespace DistDBMS.Common.Execution
 {
     public class ExecutionRelation:Relation
     {
-        public string ResultID { get; set; }
+        public int ResultID { get; set; }
 
         public bool InLocalSite { get; set; }
 
@@ -28,117 +28,143 @@ namespace DistDBMS.Common.Execution
         public TableSchema ResultSchema {
             get
             {
-                if (IsDirectTableSchema && DirectTableSchema != null
-                    && DirectTableSchema.Fields.Count > 0)
-                    return DirectTableSchema;
-
-                switch(Type)
+                TableSchema result = null;
+                if (IsDirectTableSchema && DirectTableSchema.Fields.Count > 0)
+                    result = DirectTableSchema;
+                else
                 {
-                    case RelationalType.Projection:
-                        {
-                            return RelativeAttributes.Clone() as TableSchema;
-                        }
-                    case RelationalType.Join:
-                        {
-                            TableSchema result = new TableSchema();
-                            //TODO:这里要考虑是否是同一个表，如果是同一个逻辑表，则join属性合成一个，否则不合成一个
-                            for (int i = 0; i < RelativeAttributes.Fields.Count; i++)
+                    switch (Type)
+                    {
+                        case RelationalType.Projection:
                             {
-                                if (i % 2 == 0)
-                                    result.Fields.Add(RelativeAttributes.Fields[i]);
+                                result = RelativeAttributes.Clone() as TableSchema;
+                                break;
                             }
-                            
-                            foreach (ExecutionRelation r in Children)
+                        case RelationalType.Join:
                             {
-                                
-                                TableSchema childResult = r.ResultSchema;
-                                if (childResult != null)
+                                result = new TableSchema();
+                                //TODO:这里要考虑是否是同一个表，如果是同一个逻辑表，则join属性合成一个，否则不合成一个
+                                for (int i = 0; i < RelativeAttributes.Fields.Count; i++)
                                 {
-                                    if (result.TableName == "")
-                                        result.TableName = childResult.TableName;
-                                    else
-                                    {
-                                        //两个表有同样的表名字,表名是同一个表
+                                    if (i % 2 == 0)
+                                        result.Fields.Add(RelativeAttributes.Fields[i]);
+                                }
 
-                                        if (childResult.TableName != result.TableName) //否则A_B_C
-                                            result.TableName += "_" + childResult.TableName;
-                                    }
+                                foreach (ExecutionRelation r in Children)
+                                {
 
-                                    foreach(Field f in childResult.Fields)
+                                    TableSchema childResult = r.ResultSchema;
+                                    if (childResult != null)
                                     {
-                                        Field searchF = RelativeAttributes[f.AttributeName];
-                                        if (searchF == null) //不在相关属性之中
+                                        if (result.TableName == "")
+                                            result.TableName = childResult.TableName;
+                                        else
                                         {
-                                            Field newField = f.Clone() as Field;
-                                            if (childResult.NickName != "")
-                                                newField.TableName = childResult.NickName;
-                                            result.Fields.Add(newField);
+                                            //两个表有同样的表名字,表名是同一个表
+
+                                            if (childResult.TableName != result.TableName) //否则A_B_C
+                                                result.TableName += "_" + childResult.TableName;
+                                        }
+
+                                        foreach (Field f in childResult.Fields)
+                                        {
+                                            Field searchF = RelativeAttributes[f.AttributeName];
+                                            if (searchF == null) //不在相关属性之中
+                                            {
+                                                Field newField = f.Clone() as Field;
+                                                if (childResult.NickName != "")
+                                                    newField.TableName = childResult.NickName;
+                                                result.Fields.Add(newField);
+                                            }
                                         }
                                     }
                                 }
+
+                                break;
                             }
-                            
-                            return result;
-                        }
-                    case RelationalType.Union:
-                        {
-                            if (Children.Count > 0)
+                        case RelationalType.Union:
                             {
-                                TableSchema result = (Children[0] as ExecutionRelation).ResultSchema.Clone() as TableSchema;
-                                if (result!=null)
+                                if (Children.Count > 0)
                                 {
-                                    //某个表中nickname = Course.2.1,tablename = Course，则Union后，应该nickname为Course.2，Tablename为Course
-                                    int index  = result.NickName.LastIndexOf(".");
-                                    if (index!=-1)
-                                        result.NickName = result.NickName.Substring(0, index);
-                                    return result;
-                                }
-                            }
-                            break;
-                        }
-                    case RelationalType.Selection:
-                        {
-                            
-                            if (IsDirectTableSchema)
-                                return DirectTableSchema;
-                            else if (Children.Count > 0)
-                                return (Children[0] as ExecutionRelation).ResultSchema;
-                               
-                            break;
-                        }
-                    case RelationalType.CartesianProduct:
-                        {
-                            TableSchema result = null;
-                            foreach (ExecutionRelation r in Children)
-                            {
-                                if (result == null)
-                                {
-                                    result = r.ResultSchema;
-                                    if (result!=null)
-                                        result = result.Clone() as TableSchema;
-                                }
-                                else
-                                {
-                                    TableSchema tmp = r.ResultSchema;
-                                    if (tmp != null)
+                                    result = (Children[0] as ExecutionRelation).ResultSchema.Clone() as TableSchema;
+                                    if (result != null)
                                     {
-                                        result.Fields.AddRange(tmp.Fields);
-                                        result.TableName += "_" + tmp.TableName;
+                                        //某个表中nickname = Course.2.1,tablename = Course，则Union后，应该nickname为Course.2，Tablename为Course
+                                        int index = result.NickName.LastIndexOf(".");
+                                        if (index != -1)
+                                            result.NickName = result.NickName.Substring(0, index);
                                     }
                                 }
+                                break;
                             }
-                            return result;
-                        }
-                        
+                        case RelationalType.Selection:
+                            {
+
+                                if (IsDirectTableSchema)
+                                    return DirectTableSchema;
+                                else if (Children.Count > 0)
+                                    return (Children[0] as ExecutionRelation).ResultSchema;
+
+                                break;
+                            }
+                        case RelationalType.CartesianProduct:
+                            {
+                                foreach (ExecutionRelation r in Children)
+                                {
+                                    if (result == null)
+                                    {
+                                        result = r.ResultSchema;
+                                        if (result != null)
+                                            result = result.Clone() as TableSchema;
+                                    }
+                                    else
+                                    {
+                                        TableSchema tmp = r.ResultSchema;
+                                        if (tmp != null)
+                                        {
+                                            result.Fields.AddRange(tmp.Fields);
+                                            result.TableName += "_" + tmp.TableName;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+
+                    }
                 }
-                return null;
+                if (result !=null)
+                {
+                    if (this.ResultName != "")
+                        result.ReplaceTableName(ResultName);
+                }
+                //不论是否null
+                return result;
             }
         }
 
-        public ExecutionRelation(Relation r,string initID,int createLevel)
+        public ExecutionRelation(Relation r,ref int initID,int createLevel)
         {
-            ResultID = initID;
-            
+            ResultID = initID++;
+
+            CopyMember(r);
+
+            if (createLevel -1 >0|| createLevel == -1)
+            {
+                foreach (Relation child in r.Children)
+                {
+                    //ExecutionRelation exChild = new ExecutionRelation(child, GenerateChildId(initID++), (createLevel == -1) ? -1 : createLevel - 1);
+                    ExecutionRelation exChild = new ExecutionRelation(child, ref initID, (createLevel == -1) ? -1 : createLevel - 1);
+                    exChild.parent = this;
+                    this.Children.Add(exChild);
+                    
+                }
+            }
+
+         
+        }
+
+        private void CopyMember(Relation r)
+        {
             if (r.DirectTableSchema != null)
                 this.DirectTableSchema = r.DirectTableSchema.Clone() as TableSchema;
             if (DirectTableSchema != null)
@@ -147,32 +173,31 @@ namespace DistDBMS.Common.Execution
 
             if (r.Predication != null)
                 this.Predication = r.Predication.Clone() as Condition;
-            if (r.RelativeAttributes!=null)
+            if (r.RelativeAttributes != null)
                 this.RelativeAttributes = r.RelativeAttributes.Clone() as TableSchema;
-    
+
             this.Type = r.Type;
             this.ResultName = r.ResultName;
-
-            int index = 0;
-            if (createLevel -1 >0|| createLevel == -1)
-            {
-                foreach (Relation child in r.Children)
-                {
-                    ExecutionRelation exChild = new ExecutionRelation(child, GenerateChildId(index), (createLevel == -1) ? -1 : createLevel - 1);
-                    exChild.parent = this;
-                    this.Children.Add(exChild);
-                    index++;
-                }
-            }
 
             this.InLocalSite = false;
             this.ExecutionSite = null;
         }
 
-        public ExecutionRelation(ExecutionRelation r, int createLevel):
-            this(r,r.ResultID,createLevel)
+        public ExecutionRelation(ExecutionRelation r, int createLevel)
         { 
+            ResultID = r.ResultID;
+            CopyMember(r);
 
+            if (createLevel - 1 > 0 || createLevel == -1)
+            {
+                foreach (ExecutionRelation child in r.Children)
+                {
+                    ExecutionRelation exChild = new ExecutionRelation(child, (createLevel == -1) ? -1 : createLevel - 1);
+                    exChild.parent = this;
+                    this.Children.Add(exChild);
+
+                }
+            }
         }
 
         /// <summary>
@@ -180,9 +205,10 @@ namespace DistDBMS.Common.Execution
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public string GenerateChildId(int index)
+        public int GenerateChildId(int index)
         {
-            return ResultID + "." + index.ToString();
+            //return ResultID + "." + index.ToString();
+            return index + 1;
         }
 
         public override string ToString()

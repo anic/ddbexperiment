@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DistDBMS.Common.Table
 {
-    public class TableSchema:ICloneable
+    public class TableSchema : ICloneable
     {
         /// <summary>
         /// 表名
@@ -37,13 +37,30 @@ namespace DistDBMS.Common.Table
         /// <summary>
         /// 返回是主键的属性域
         /// </summary>
-        public Field PrimaryKeyField {
-            get {
+        public Field PrimaryKeyField
+        {
+            get
+            {
                 foreach (Field f in Fields)
                     if (f.IsPrimaryKey)
                         return f;
 
                 return null;
+            }
+        }
+
+        public bool IsMixed
+        {
+            get
+            {
+                //检查是否只有一个表
+                if (TableName == "")
+                    return true;
+
+                bool sameTable = true;
+                foreach (Field f in Fields)
+                    sameTable &= (f.TableName == TableName);
+                return !sameTable;
             }
         }
 
@@ -69,27 +86,24 @@ namespace DistDBMS.Common.Table
 
         public new string ToString()
         {
-            if (IsAllFields)
-            {
-                if (TableName != "")
-                    return TableName;
-                else
-                    return "*";
-            }
-            else
-            {
-                string result = TableName;
-                result += "(";
-                for (int i = 0; i < Fields.Count; i++)
-                {
-                    if (i != 0)
-                        result += ", ";
+            //检查是否只有一个表
+            bool sameTable = !IsMixed;
 
-                    result += Fields[i].ToString();
-                }
-                result += ")";
-                return result;
+            string result = TableName;
+            result += "(";
+            for (int i = 0; i < Fields.Count; i++)
+            {
+                if (i != 0)
+                    result += ", ";
+
+                if (!sameTable) //所有Field的Tablename和Tablemane一致，则不写
+                    result += Fields[i].TableName + ".";
+
+                result += Fields[i].AttributeName;
             }
+            result += ")";
+            return result;
+
         }
 
         public Field this[string fieldName]

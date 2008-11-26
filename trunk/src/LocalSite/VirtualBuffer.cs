@@ -10,18 +10,15 @@ namespace DistDBMS.ControlSite
     /// </summary>
     public class VirtualBuffer:List<ExecutionPackage>
     {
-        public ExecutionPackage this[string id]
+        public ExecutionPackage GetPackageById(int id)
         {
-            get
+            for (int i = 0; i < this.Count; i++)
             {
-                for (int i = 0; i < this.Count; i++)
-                {
-                    ExecutionPackage package = this[i];
-                    if (package.ID == id)
-                        return package;
-                }
-                return null;
+                ExecutionPackage package = this[i];
+                if (package.ID == id)
+                    return package;
             }
+            return null;
         }
 
         public new void Add(ExecutionPackage item)

@@ -6,7 +6,7 @@ namespace DistDBMS.Common.Execution
 {
     public class ExecutionPackage
     {
-        public string ID { get; set; }
+        public int ID { get; set; }
 
         public enum PackageType
         { 
@@ -18,7 +18,7 @@ namespace DistDBMS.Common.Execution
 
         public ExecutionPackage()
         {
-            ID = "";
+            ID = -1;
             Type = PackageType.Data;
             Object = null;
         }
@@ -31,7 +31,7 @@ namespace DistDBMS.Common.Execution
 
         public new string ToString()
         {
-            return ID;
+            return ID.ToString();
         }
     }
 }

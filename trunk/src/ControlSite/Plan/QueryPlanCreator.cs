@@ -6,6 +6,7 @@ using DistDBMS.Common.RelationalAlgebra.Entity;
 using System.Collections;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.Common.Table;
+using DistDBMS.Common.RelationalAlgebra;
 
 namespace DistDBMS.ControlSite.Plan
 {
@@ -23,9 +24,12 @@ namespace DistDBMS.ControlSite.Plan
         /// <param name="root"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ExecutionPlan CreateGlobalPlan(Relation root,string id)
+        public ExecutionPlan CreateGlobalPlan(Relation root,int id)
         {
-            ExecutionRelation exR = new ExecutionRelation(root, id, -1);
+            ExecutionRelation exR = new ExecutionRelation(root, ref id, -1);
+
+            string output = (new RelationDebugger()).GetDebugString(exR);
+            System.Diagnostics.Debug.WriteLine(output);
             
             ////////////////生成执行计划//////////////////////////
             ExecutionPlan plan = new ExecutionPlan();
@@ -103,8 +107,8 @@ namespace DistDBMS.ControlSite.Plan
                     {
                   
                         leftBottom.DirectTableSchema = fragment.Schema.Clone() as TableSchema;
-                        leftBottom.DirectTableSchema.TableName = fragment.LogicSchema.TableName;
-                        leftBottom.DirectTableSchema.NickName = fragment.Name;
+                        //leftBottom.DirectTableSchema.TableName = fragment.LogicSchema.TableName;
+                        //leftBottom.DirectTableSchema.NickName = fragment.Name;
 
                         currentPlan = GetPlanBySite(fragment.Site);
                         currentPlan.Steps.Add(gPlan.Steps[i]);
@@ -142,7 +146,7 @@ namespace DistDBMS.ControlSite.Plan
         }
 
 
-        private ExecutionStep GetStepById(string id)
+        private ExecutionStep GetStepById(int id)
         {
             ExecutionPlan plan = (ExecutionPlan)id2PlanTable[id];
             if (plan != null)
