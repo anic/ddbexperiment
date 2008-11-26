@@ -13,7 +13,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         /// </summary>
         public Site Site { get; set; }
         
-        public string Content { get; set; }
+        
 
         public TableSchema Table { get; set; }
         
@@ -21,7 +21,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         {
             Site = new Site();
             Table = new TableSchema();
-            Content = "";
+            //Content = "";
         }
 
         public new string ToString()

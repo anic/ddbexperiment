@@ -231,7 +231,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             Fragment fragments = null;
             foreach (Fragment f in gdd.Fragments)
             {
-                if (f.LogicTable.TableName == selection.DirectTableSchema.TableName)
+                if (f.LogicSchema.TableName == selection.DirectTableSchema.TableName)
                 {
                     fragments = f;
                     break;

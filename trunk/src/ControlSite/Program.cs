@@ -36,7 +36,7 @@ namespace DistDBMS.ControlSite
 
         }
 
-        Selection s1, s2; //作为测试使用
+        
         Relation r;
         /// <summary>
         /// 关系代数的填写方法
@@ -72,18 +72,18 @@ namespace DistDBMS.ControlSite
             
             Field f1 = new Field();
             f1.AttributeName = "name";
-            f1.Content = "Course.name";
+  //          f1.Content = "Course.name";
             f1.TableName = "Course";
             //做进一步解析后，可以将f1.Table也赋值过去
 
             Field f2 = new Field();
             f2.AttributeName = "credit_hour";
-            f2.Content = "Course.credit_hour";
+//            f2.Content = "Course.credit_hour";
             f2.TableName = "Course";
 
             Field f3 = new Field();
             f3.AttributeName = "name";
-            f3.Content = "Teacher.name";
+            //f3.Content = "Teacher.name";
             f3.TableName = "Teacher";
 
             //在Project中的相关属性，表明投影到这些属性的空间上
@@ -102,12 +102,12 @@ namespace DistDBMS.ControlSite
             Field f4 = new Field();
             f4.TableName = "Course";
             f4.AttributeName = "teacher_id";
-            f4.Content = "Course.teacher_id";
+            //f4.Content = "Course.teacher_id";
 
             Field f5 = new Field();
             f5.TableName = "Teacher";
             f5.AttributeName = "id";
-            f5.Content = "Teacher.id";
+            //f5.Content = "Teacher.id";
 
             //做Join操作，相关属性是Course.teacher_id和Teacher.id
             joinRelation.RelativeAttributes.Fields.Add(f4);

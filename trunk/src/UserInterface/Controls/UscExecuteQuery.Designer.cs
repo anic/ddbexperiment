@@ -28,35 +28,35 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DistDBMS.UserInterface.Controls.SqlInput.InputStyle inputStyle1 = new DistDBMS.UserInterface.Controls.SqlInput.InputStyle();
+            DistDBMS.UserInterface.Controls.SqlInput.InputStyle inputStyle2 = new DistDBMS.UserInterface.Controls.SqlInput.InputStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tbp = new System.Windows.Forms.TabPage();
             this.txtResult = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.uscTableViewer1 = new DistDBMS.UserInterface.Controls.UscTableViewer();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.splitter2 = new System.Windows.Forms.Splitter();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.pnlOptTree = new System.Windows.Forms.Panel();
+            this.optQTreeViewer = new DistDBMS.UserInterface.Controls.UscQTreeViewer();
+            this.pnlRawTree = new System.Windows.Forms.Panel();
+            this.rawQTreeViewer = new DistDBMS.UserInterface.Controls.UscQTreeViewer();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.btnExecuteSQL = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.cmbColorStyle = new System.Windows.Forms.ToolStripComboBox();
-            this.btnExecuteSQL = new System.Windows.Forms.ToolStripButton();
             this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripSplitButton();
             this.menuItemShowTip = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemColorKeyword = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemColorTable = new System.Windows.Forms.ToolStripMenuItem();
-            this.uscTableViewer1 = new DistDBMS.UserInterface.Controls.UscTableViewer();
-            this.optQTreeViewer = new DistDBMS.UserInterface.Controls.UscQTreeViewer();
-            this.rawQTreeViewer = new DistDBMS.UserInterface.Controls.UscQTreeViewer();
             this.sqlTextBox = new DistDBMS.UserInterface.Controls.SqlInput.SqlTextBox();
             this.tabControl1.SuspendLayout();
             this.tbp.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.pnlOptTree.SuspendLayout();
+            this.pnlRawTree.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,10 +66,10 @@
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(10, 179);
+            this.tabControl1.Location = new System.Drawing.Point(10, 182);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(403, 112);
+            this.tabControl1.Size = new System.Drawing.Size(403, 109);
             this.tabControl1.TabIndex = 1;
             // 
             // tbp
@@ -78,7 +78,7 @@
             this.tbp.Location = new System.Drawing.Point(4, 22);
             this.tbp.Name = "tbp";
             this.tbp.Padding = new System.Windows.Forms.Padding(3);
-            this.tbp.Size = new System.Drawing.Size(395, 86);
+            this.tbp.Size = new System.Drawing.Size(395, 83);
             this.tbp.TabIndex = 0;
             this.tbp.Text = "控制台显示";
             this.tbp.UseVisualStyleBackColor = true;
@@ -91,7 +91,7 @@
             this.txtResult.Name = "txtResult";
             this.txtResult.ReadOnly = true;
             this.txtResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtResult.Size = new System.Drawing.Size(389, 80);
+            this.txtResult.Size = new System.Drawing.Size(389, 77);
             this.txtResult.TabIndex = 0;
             // 
             // tabPage2
@@ -105,11 +105,20 @@
             this.tabPage2.Text = "表格显示";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // uscTableViewer1
+            // 
+            this.uscTableViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uscTableViewer1.Location = new System.Drawing.Point(3, 3);
+            this.uscTableViewer1.Name = "uscTableViewer1";
+            this.uscTableViewer1.Size = new System.Drawing.Size(389, 77);
+            this.uscTableViewer1.TabIndex = 0;
+            this.uscTableViewer1.Table = null;
+            // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.splitter2);
-            this.tabPage1.Controls.Add(this.panel2);
-            this.tabPage1.Controls.Add(this.panel1);
+            this.tabPage1.Controls.Add(this.pnlOptTree);
+            this.tabPage1.Controls.Add(this.pnlRawTree);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -121,38 +130,54 @@
             // splitter2
             // 
             this.splitter2.BackColor = System.Drawing.SystemColors.Control;
-            this.splitter2.Location = new System.Drawing.Point(202, 3);
+            this.splitter2.Location = new System.Drawing.Point(196, 3);
             this.splitter2.Name = "splitter2";
             this.splitter2.Size = new System.Drawing.Size(3, 77);
             this.splitter2.TabIndex = 2;
             this.splitter2.TabStop = false;
             // 
-            // panel2
+            // pnlOptTree
             // 
-            this.panel2.BackColor = System.Drawing.SystemColors.Control;
-            this.panel2.Controls.Add(this.optQTreeViewer);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(202, 3);
-            this.panel2.Name = "panel2";
-            this.panel2.Padding = new System.Windows.Forms.Padding(10);
-            this.panel2.Size = new System.Drawing.Size(190, 77);
-            this.panel2.TabIndex = 1;
+            this.pnlOptTree.BackColor = System.Drawing.SystemColors.Control;
+            this.pnlOptTree.Controls.Add(this.optQTreeViewer);
+            this.pnlOptTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlOptTree.Location = new System.Drawing.Point(196, 3);
+            this.pnlOptTree.Name = "pnlOptTree";
+            this.pnlOptTree.Padding = new System.Windows.Forms.Padding(10);
+            this.pnlOptTree.Size = new System.Drawing.Size(196, 77);
+            this.pnlOptTree.TabIndex = 1;
             // 
-            // panel1
+            // optQTreeViewer
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.Control;
-            this.panel1.Controls.Add(this.rawQTreeViewer);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(3, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Padding = new System.Windows.Forms.Padding(10);
-            this.panel1.Size = new System.Drawing.Size(199, 77);
-            this.panel1.TabIndex = 0;
+            this.optQTreeViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.optQTreeViewer.Location = new System.Drawing.Point(10, 10);
+            this.optQTreeViewer.Name = "optQTreeViewer";
+            this.optQTreeViewer.Size = new System.Drawing.Size(176, 57);
+            this.optQTreeViewer.TabIndex = 0;
+            // 
+            // pnlRawTree
+            // 
+            this.pnlRawTree.BackColor = System.Drawing.SystemColors.Control;
+            this.pnlRawTree.Controls.Add(this.rawQTreeViewer);
+            this.pnlRawTree.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnlRawTree.Location = new System.Drawing.Point(3, 3);
+            this.pnlRawTree.Name = "pnlRawTree";
+            this.pnlRawTree.Padding = new System.Windows.Forms.Padding(10);
+            this.pnlRawTree.Size = new System.Drawing.Size(193, 77);
+            this.pnlRawTree.TabIndex = 0;
+            // 
+            // rawQTreeViewer
+            // 
+            this.rawQTreeViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rawQTreeViewer.Location = new System.Drawing.Point(10, 10);
+            this.rawQTreeViewer.Name = "rawQTreeViewer";
+            this.rawQTreeViewer.Size = new System.Drawing.Size(173, 57);
+            this.rawQTreeViewer.TabIndex = 0;
             // 
             // splitter1
             // 
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter1.Location = new System.Drawing.Point(10, 288);
+            this.splitter1.Location = new System.Drawing.Point(10, 179);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(403, 3);
             this.splitter1.TabIndex = 2;
@@ -172,6 +197,16 @@
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
+            // btnExecuteSQL
+            // 
+            this.btnExecuteSQL.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnExecuteSQL.Image = global::DistDBMS.UserInterface.Properties.Resources.img_exesql;
+            this.btnExecuteSQL.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnExecuteSQL.Name = "btnExecuteSQL";
+            this.btnExecuteSQL.Size = new System.Drawing.Size(23, 22);
+            this.btnExecuteSQL.Text = "执行SQL";
+            this.btnExecuteSQL.Click += new System.EventHandler(this.btnExecuteSQL_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -189,16 +224,6 @@
             this.cmbColorStyle.Name = "cmbColorStyle";
             this.cmbColorStyle.Size = new System.Drawing.Size(121, 25);
             this.cmbColorStyle.SelectedIndexChanged += new System.EventHandler(this.cmbColorStyle_SelectedIndexChanged);
-            // 
-            // btnExecuteSQL
-            // 
-            this.btnExecuteSQL.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnExecuteSQL.Image = global::DistDBMS.UserInterface.Properties.Resources.img_exesql;
-            this.btnExecuteSQL.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnExecuteSQL.Name = "btnExecuteSQL";
-            this.btnExecuteSQL.Size = new System.Drawing.Size(23, 22);
-            this.btnExecuteSQL.Text = "执行SQL";
-            this.btnExecuteSQL.Click += new System.EventHandler(this.btnExecuteSQL_Click);
             // 
             // toolStripSplitButton1
             // 
@@ -239,31 +264,6 @@
             this.menuItemColorTable.Text = "彩色表格";
             this.menuItemColorTable.Click += new System.EventHandler(this.menuItemColorTable_Click);
             // 
-            // uscTableViewer1
-            // 
-            this.uscTableViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.uscTableViewer1.Location = new System.Drawing.Point(3, 3);
-            this.uscTableViewer1.Name = "uscTableViewer1";
-            this.uscTableViewer1.Size = new System.Drawing.Size(389, 77);
-            this.uscTableViewer1.TabIndex = 0;
-            this.uscTableViewer1.Table = null;
-            // 
-            // optQTreeViewer
-            // 
-            this.optQTreeViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.optQTreeViewer.Location = new System.Drawing.Point(10, 10);
-            this.optQTreeViewer.Name = "optQTreeViewer";
-            this.optQTreeViewer.Size = new System.Drawing.Size(170, 57);
-            this.optQTreeViewer.TabIndex = 0;
-            // 
-            // rawQTreeViewer
-            // 
-            this.rawQTreeViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rawQTreeViewer.Location = new System.Drawing.Point(10, 10);
-            this.rawQTreeViewer.Name = "rawQTreeViewer";
-            this.rawQTreeViewer.Size = new System.Drawing.Size(179, 57);
-            this.rawQTreeViewer.TabIndex = 0;
-            // 
             // sqlTextBox
             // 
             this.sqlTextBox.BackColor = System.Drawing.Color.White;
@@ -276,11 +276,11 @@
             this.sqlTextBox.Name = "sqlTextBox";
             this.sqlTextBox.ShowTip = true;
             this.sqlTextBox.Size = new System.Drawing.Size(403, 144);
-            inputStyle1.BackgroundColor = System.Drawing.Color.White;
-            inputStyle1.ForeColor = System.Drawing.Color.Black;
-            inputStyle1.KeywordColor = System.Drawing.Color.Blue;
-            inputStyle1.Name = "";
-            this.sqlTextBox.Style = inputStyle1;
+            inputStyle2.BackgroundColor = System.Drawing.Color.White;
+            inputStyle2.ForeColor = System.Drawing.Color.Black;
+            inputStyle2.KeywordColor = System.Drawing.Color.Blue;
+            inputStyle2.Name = "";
+            this.sqlTextBox.Style = inputStyle2;
             this.sqlTextBox.TabIndex = 0;
             this.sqlTextBox.Text = "";
             // 
@@ -295,13 +295,14 @@
             this.Name = "UscExecuteQuery";
             this.Padding = new System.Windows.Forms.Padding(10);
             this.Size = new System.Drawing.Size(423, 301);
+            this.SizeChanged += new System.EventHandler(this.UscExecuteQuery_SizeChanged);
             this.tabControl1.ResumeLayout(false);
             this.tbp.ResumeLayout(false);
             this.tbp.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
+            this.pnlOptTree.ResumeLayout(false);
+            this.pnlRawTree.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -328,8 +329,8 @@
         private System.Windows.Forms.TextBox txtResult;
         private UscTableViewer uscTableViewer1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel pnlOptTree;
+        private System.Windows.Forms.Panel pnlRawTree;
         private UscQTreeViewer rawQTreeViewer;
         private UscQTreeViewer optQTreeViewer;
         private System.Windows.Forms.Splitter splitter2;

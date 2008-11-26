@@ -54,7 +54,8 @@ namespace DistDBMS.UserInterface.Controls
                 }
                 lvwTable.Items.Add(item);
             }
-            
+
+            SetSite(null);
         }
 
         public void ShowFragment(Fragment f)

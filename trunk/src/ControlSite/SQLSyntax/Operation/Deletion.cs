@@ -21,14 +21,14 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         public Condition Condition { get; set; }
         
 
-        public string Content { get; set; }
+        
 
         public Deletion()
         {
             Source = new TableSchema();
             Condition = new Condition();
 
-            Content = "";
+            //Content = "";
         }
 
         public new string ToString()

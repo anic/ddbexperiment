@@ -84,10 +84,10 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// </summary>
         public TableSchema RelativeAttributes { get; set; }
 
-        ///// <summary>
-        ///// 内容
-        ///// </summary>
-        //public string Content { get; set; }
+        /// <summary>
+        /// 结果的名称，如果为“”，则不修改表名；如果不为“”，则修改表名。
+        /// </summary>
+        public string ResultName { get; set; }
 
         public Relation()
         {
@@ -96,8 +96,9 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             DirectTableSchema = null;
             RelativeAttributes = new TableSchema();
             Predication = new Condition();
-            //Content = "";
             Type = RelationalType.Selection;
+
+            ResultName = "";
         }
 
         public static Relation EmptyRelation

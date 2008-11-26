@@ -131,7 +131,7 @@ namespace DistDBMS.UserInterface.Handler
 
                     string sql = GenerateSQL((tree.SelectedNode.Tag as Fragment).Schema, 
                         (tree.SelectedNode.Tag as Fragment).Condition, 
-                        (tree.SelectedNode.Tag as Fragment).LogicTable.TableName);
+                        (tree.SelectedNode.Tag as Fragment).LogicSchema.TableName);
 
                     bool oldValue = uscQuery.ShowTip;
 

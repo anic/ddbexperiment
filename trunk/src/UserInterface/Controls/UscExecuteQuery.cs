@@ -146,5 +146,10 @@ namespace DistDBMS.UserInterface.Controls
             }
         }
         ResultTab tab = ResultTab.Console;
+
+        private void UscExecuteQuery_SizeChanged(object sender, EventArgs e)
+        {
+            pnlRawTree.Width = this.Width / 2;
+        }
     }
 }

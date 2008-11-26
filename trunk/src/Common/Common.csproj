@@ -44,6 +44,7 @@
     <Compile Include="RelationalAlgebra\Entity\ConjunctiveNormalForm.cs" />
     <Compile Include="RelationalAlgebra\Entity\DisjunctiveNormalForm.cs" />
     <Compile Include="RelationalAlgebra\Entity\Relation.cs" />
+    <Compile Include="RelationalAlgebra\Entity\RelationList.cs" />
     <Compile Include="RelationalAlgebra\RelationDebugger.cs" />
     <Compile Include="Table\Field.cs" />
     <Compile Include="Table\Table.cs" />

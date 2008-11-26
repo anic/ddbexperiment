@@ -39,10 +39,7 @@ namespace DistDBMS.Common.Table
         /// </summary>
         public bool IsPrimaryKey { get; set; }
 
-        /// <summary>
-        /// 内容字符串
-        /// </summary>
-        public string Content { get; set; }
+        
 
         public Field()
         {

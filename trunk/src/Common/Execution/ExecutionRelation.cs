@@ -138,8 +138,7 @@ namespace DistDBMS.Common.Execution
         public ExecutionRelation(Relation r,string initID,int createLevel)
         {
             ResultID = initID;
-
-            //this.Content = r.Content;
+            
             if (r.DirectTableSchema != null)
                 this.DirectTableSchema = r.DirectTableSchema.Clone() as TableSchema;
             if (DirectTableSchema != null)
@@ -152,6 +151,7 @@ namespace DistDBMS.Common.Execution
                 this.RelativeAttributes = r.RelativeAttributes.Clone() as TableSchema;
     
             this.Type = r.Type;
+            this.ResultName = r.ResultName;
 
             int index = 0;
             if (createLevel -1 >0|| createLevel == -1)
