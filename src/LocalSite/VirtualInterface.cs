@@ -54,7 +54,7 @@ namespace DistDBMS.ControlSite
                             lock (buffer)
                             {
                                 for (int i = 0; i < step.WaitingId.Count; i++)
-                                    allReady &= (buffer[step.WaitingId[i]] != null);
+                                    allReady &= (buffer.GetPackageById(step.WaitingId[i]) != null);
 
                                 if (allReady)
                                     break;

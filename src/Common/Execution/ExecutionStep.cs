@@ -26,17 +26,17 @@ namespace DistDBMS.Common.Execution
         /// <summary>
         /// 等待的ID
         /// </summary>
-        public List<string> WaitingId { get { return waitingList; } }
-        List<string> waitingList;
+        public List<int> WaitingId { get { return waitingList; } }
+        List<int> waitingList;
 
         /// <summary>
         /// 是否等待ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public bool IsWaiting(string id)
+        public bool IsWaiting(int id)
         {
-            foreach (string s in waitingList)
+            foreach (int s in waitingList)
                 if (s == id)
                     return true;
 
@@ -68,7 +68,7 @@ namespace DistDBMS.Common.Execution
 
         public ExecutionStep()
         {
-            waitingList = new List<string>();
+            waitingList = new List<int>();
             Index = 0;
             TransferSite = null;
             Status = null;

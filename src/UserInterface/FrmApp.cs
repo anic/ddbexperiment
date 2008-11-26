@@ -89,7 +89,7 @@ namespace DistDBMS.UserInterface
         private void FrmApp_Shown(object sender, EventArgs e)
         {
             //测试执行sql
-            /*
+            
             uscExecuteQuery.SQLText = "select * from Student";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
@@ -109,10 +109,10 @@ namespace DistDBMS.UserInterface
             uscExecuteQuery.SQLText = "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
-            
+           
             uscExecuteQuery.SQLText = "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-           */
+           
 
             uscExecuteQuery.EnableTip = true;
             

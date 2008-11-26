@@ -18,7 +18,6 @@ namespace DistDBMS.Common.RelationalAlgebra
         public string GetDebugString(ExecutionRelation root)
         {
             return GetNextLevelString(root, 0);
-
         }
 
         

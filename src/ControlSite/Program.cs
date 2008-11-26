@@ -189,7 +189,8 @@ namespace DistDBMS.ControlSite
 
         private void TestExecutionPlan()
         {
-            ExecutionRelation exR = new ExecutionRelation(r, "PLAN", -1);
+            int index = 0;
+            ExecutionRelation exR = new ExecutionRelation(r, ref index, -1);
             string output = (new RelationDebugger()).GetDebugString(exR);
             System.Console.WriteLine("\n\nSample2 Relation:");
             System.Console.WriteLine(output);
@@ -214,7 +215,7 @@ namespace DistDBMS.ControlSite
             }
 
             QueryPlanCreator creator = new QueryPlanCreator(gdd);
-            ExecutionPlan plan = creator.CreateGlobalPlan(r, "PLAN");
+            ExecutionPlan plan = creator.CreateGlobalPlan(r, 0);
             System.Console.WriteLine("\n\n\n*****\n" + plan.ToString() + "\n*****\n");
             plans = creator.SplitPlan(plan);
 
@@ -273,7 +274,7 @@ namespace DistDBMS.ControlSite
                 Waiting:
                 Transfer:
              */
-#endregion
+            #endregion
 
             #region 测试插入的数据
             //ExecutionPlan insertPlan = new ExecutionPlan();
@@ -297,14 +298,14 @@ namespace DistDBMS.ControlSite
             //ExecutionPlan testPlan = plans[3];
             #endregion
 
-            
+
             foreach (ExecutionPlan p in plans)
             {
                 ExecutionPackage package = new ExecutionPackage();
-                package.ID = "1";
+                package.ID = 0;
                 package.Object = p;
                 package.Type = ExecutionPackage.PackageType.Plan;
-                
+
                 Thread t = new Thread(new ThreadStart(new ThreadExample(virInterfaces[p.ExecutionSite.Name] as VirtualInterface, package).ThreadProc));
                 t.Start();
             }

@@ -108,9 +108,12 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
 
         public override string ToString()
         {
-            string result = Type.ToString() + ": ";
+            string result = Type.ToString() + ":";
             if (IsDirectTableSchema)
                 result += " " + DirectTableSchema.ToString();
+
+            if (ResultName != "")
+                result += " as " + ResultName;
 
             if (Predication != null && !Predication.IsEmpty
                 && Type == RelationalType.Selection)
@@ -119,6 +122,7 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             if ((RelativeAttributes.Fields.Count > 0 || RelativeAttributes.TableName != "")
                 && (Type == RelationalType.Join || Type == RelationalType.Projection))
                 result += " Attributes: " + RelativeAttributes.ToString();
+
 
             return result;
         }

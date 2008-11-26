@@ -19,11 +19,23 @@ namespace DistDBMS.ControlSite.Processor
         /// 从外部来的表格
         /// </summary>
         TableSchemaList tempSources = new TableSchemaList();
+        
+        /// <summary>
+        /// 表名与Id的映射
+        /// </summary>
         Hashtable source2Id = new Hashtable();
+        
+        /// <summary>
+        /// 将旧的表名，替换为新的表名
+        /// </summary>
+        Hashtable oldname2Newname = new Hashtable();
+
+        /// <summary>
+        /// 将混合的表的属性域替换为新的表的属性域
+        /// </summary>
+        Hashtable oldfield2Newfield = new Hashtable();
 
         TableSchemaList localSources = new TableSchemaList();
-
-        Hashtable name2Schema = new Hashtable();
 
         List<Condition> conditions = new List<Condition>();
 
@@ -48,9 +60,11 @@ namespace DistDBMS.ControlSite.Processor
                 string sql = GenerateQueryString(true);
                 System.Diagnostics.Debug.WriteLine(sql);
 
+                target.ReplaceTableName(localSources[0].TableName);
                 Table result = accessor.Query(sql, target);
-                
-       
+                if (result == null)
+                    throw new Exception("sql:" + sql + " error.Info" + accessor.LastException.Message);
+
                 string union = "Union " + localSources[0].TableName;
                 foreach (TableSchema schema in tempSources)
                     union += " ," + schema.TableName;
@@ -61,7 +75,7 @@ namespace DistDBMS.ControlSite.Processor
                 foreach (TableSchema t in tempSources)
                 {
                     //填入临时数据
-                    Table tmpTable = buffer[(string)source2Id[t.TableName]].Object as Table;
+                    Table tmpTable = buffer.GetPackageById((int)source2Id[t.TableName]).Object as Table;
                     result.Tuples.AddRange(tmpTable.Tuples);
                 }
 
@@ -83,7 +97,7 @@ namespace DistDBMS.ControlSite.Processor
                     if (r)
                     {
                         //填入临时数据
-                        Table tmpTable = buffer[(string)source2Id[t.TableName]].Object as Table;
+                        Table tmpTable = buffer.GetPackageById((int)source2Id[t.TableName]).Object as Table;
                         tmpTable.Schema = t;
                         int nResult = accessor.InsertValues(tmpTable);
                     }
@@ -93,8 +107,9 @@ namespace DistDBMS.ControlSite.Processor
                 
                 string sql = GenerateQueryString(false);
                 System.Diagnostics.Debug.WriteLine(sql);
-
                 Table result = accessor.Query(sql, target);
+                if (result == null)
+                    throw new Exception("sql:" + sql + " execute error. Info: " + accessor.LastException.Message);
        
                 //删除临时表格
                 foreach (TableSchema t in tempSources)
@@ -113,9 +128,10 @@ namespace DistDBMS.ControlSite.Processor
             tempSources.Clear();
             localSources.Clear();
             conditions.Clear();
-            tableIndex = 0;
+            tmpIndex = 0;
             source2Id.Clear();
-
+            oldname2Newname.Clear();
+            oldfield2Newfield.Clear();
             this.step = step;
             this.dbname = dbname;
             this.buffer = buffer;
@@ -124,43 +140,90 @@ namespace DistDBMS.ControlSite.Processor
             VisitRelation(step.Operation);
 
             //设置目标
-            target = step.Operation.ResultSchema;
+            target = step.Operation.ResultSchema.Clone() as TableSchema;
+            
 
             Table result;
             if (step.Operation.Type == RelationalType.Union) //如果是Union ，在内存中做
                 result = HandleUnion();
             else
+            {
+                ModifyTarget();
                 result = HandleQuery(); //否则做Select
+            }
 
             return result;
 
         }
 
-        /// <summary>
-        /// 通过nickname获得对应的表名
-        /// </summary>
-        /// <param name="nickname"></param>
-        /// <returns></returns>
-        private string GetSourceName(string nickname)
+        private TableSchema GetTableSchema(string name)
         {
-            foreach (TableSchema table in localSources)
-                if (table.NickName == nickname || table.TableName == nickname)
-                    return table.TableName;
+            TableSchema result = localSources[name];
+            if (result != null)
+                return result;
+            else
+                return tempSources[name];
+        }
 
-            foreach (TableSchema table in tempSources)
-                if (table.NickName == nickname || table.TableName == nickname)
-                    return table.TableName;
+        private void ReplaceField(Field field)
+        {
+            string tablename = GetLocalTablename(field.TableName);
+            string attributename = field.AttributeName;
+                //如果有映射的表名，则修改之，并检查属性是否存在于该表
+                //还需要检查该属性是否已经更名
+                if (tablename != null)
+                {
+                    TableSchema table = GetTableSchema(tablename);
+                    if (table[attributename] != null)   //有该属性
+                        field.TableName = tablename;
+                    else
+                    {
+                        //如果没有该属性，则查看属性变更表
+                        string fieldname = (string)this.oldfield2Newfield[field.TableName + "." + field.AttributeName];
+                        if (fieldname != null)
+                            field.AttributeName = fieldname;
+                    }
+                    field.TableName = tablename;
+                }
+                else//如果没有映射表名，则找到有相同属性的表，如果找到只有一个，则填写该表名
+                {
+                    int found = 0;
+                    bool localfound = false;
+                    foreach (TableSchema schema in localSources)
+                        if (schema[attributename] != null)
+                        {
+                            tablename = schema.TableName;
+                            found++;
+                            localfound = true;
+                        }
 
-            //近似匹配
-            foreach (TableSchema table in localSources)
-                if (table.NickName.IndexOf(nickname) != -1 || table.TableName.IndexOf(nickname) != -1)
-                    return table.TableName;
+                    foreach (TableSchema schema in tempSources)
+                        if (schema[attributename] != null)
+                        {
+                            tablename = schema.TableName;
+                            found++;
+                        }
 
-            foreach (TableSchema table in tempSources)
-                if (table.NickName.IndexOf(nickname) != -1 || table.TableName.IndexOf(nickname) != -1)
-                    return table.TableName;
+                    if (found == 1)
+                    {
+                        field.TableName = tablename;
+                    }
+                    else      //如果没有映射表名，多个表都有这个属性
+                    {
+                        if (localfound && localSources.Count == 1)  //如果本地的表有，且只有一个本地表
+                            field.TableName = localSources[0].TableName;
+                        else
+                            throw new Exception();
+                    }
+                    
+                    
+                }
+        }
 
-            return nickname;
+        private void ModifyTarget()
+        {
+            for (int i = 0; i < target.Fields.Count; i++)
+                ReplaceField(target.Fields[i]);
         }
 
         /// <summary>
@@ -173,16 +236,8 @@ namespace DistDBMS.ControlSite.Processor
             string result = "select ";
             bool multiSource = (localSources.Count + tempSources.Count > 1);
             bool isAllField = false;
-            /*
-            if (!multiSource && localSources.Count == 1 && target.Fields.Count == localSources[0].Fields.Count)
-            {
-                isAllField = true;
-                for (int i = 0; i < target.Fields.Count; i++)
-                    isAllField &= (target.Fields[i].TableName == localSources[0].Fields[i].TableName
-                        && target.Fields[i].AttributeName == localSources[0].Fields[i].AttributeName);
-            }*/
-            
-
+       
+            //TODO:添加对* 的判断
             if (isAllField)
                 result += "*";
             else
@@ -193,8 +248,14 @@ namespace DistDBMS.ControlSite.Processor
                         result += ", ";
                     if (multiSource)
                     {
-                        string name1 = FindTablenameByField(target.Fields[i].AttributeName, target.Fields[i].TableName);
-                        result += name1 + "." + target.Fields[i].AttributeName;
+                        if (bUnion)
+                            result += target.Fields[i].AttributeName;
+                        else
+                        {
+                            /*string name1 = GetLocalTablename(target.Fields[i].TableName);
+                            result += name1 + "." + target.Fields[i].AttributeName;*/
+                            result += target.Fields[i].TableName + "." + target.Fields[i].AttributeName;
+                        }
                         
                     }
                     else
@@ -239,25 +300,11 @@ namespace DistDBMS.ControlSite.Processor
 
             }
 
-            
-
             return result;
         }
 
         private void ReplaceAllConditionField()
         {
-            //foreach (TableSchema schema in localSources)
-            //{
-            //    foreach (Condition condition in conditions)
-            //        ReplaceConditionField(condition, schema.NickName, schema.TableName);
-            //}
-
-            //foreach (TableSchema schema in tempSources)
-            //{
-            //    foreach (Condition condition in conditions)
-            //        ReplaceConditionField(condition, schema.NickName, schema.TableName);
-            //}
-
             foreach (Condition condition in conditions)
             {
                 ReplaceConditionField(condition);
@@ -270,26 +317,24 @@ namespace DistDBMS.ControlSite.Processor
             {
                 if (condition.AtomCondition.LeftOperand.IsField)
                 {
-                    string name = this.FindTablenameByField(condition.AtomCondition.LeftOperand.Field.AttributeName, 
-                        condition.AtomCondition.LeftOperand.Field.TableName);
+                    condition.AtomCondition.LeftOperand.Field = condition.AtomCondition.LeftOperand.Field.Clone() as Field;
 
-                    if (name != "")
-                    {
-                        condition.AtomCondition.LeftOperand.Field = condition.AtomCondition.LeftOperand.Field.Clone() as Field;
+                    string name = this.GetLocalTablename(condition.AtomCondition.LeftOperand.Field.TableName);
+                    if (name != null)
                         condition.AtomCondition.LeftOperand.Field.TableName = name;
-                    }
+                    else
+                        ReplaceField(condition.AtomCondition.LeftOperand.Field);//如果给的是逻辑表名，如Course，因为local中也是用该作为表名，所以不用变化
                 }
 
                 if (condition.AtomCondition.RightOperand.IsField)
                 {
-                    string name = this.FindTablenameByField(condition.AtomCondition.RightOperand.Field.AttributeName,
-                        condition.AtomCondition.RightOperand.Field.TableName);
+                    condition.AtomCondition.RightOperand.Field = condition.AtomCondition.RightOperand.Field.Clone() as Field;
 
-                    if (name != "")
-                    {
-                        condition.AtomCondition.RightOperand.Field = condition.AtomCondition.RightOperand.Field.Clone() as Field;
+                    string name = this.GetLocalTablename(condition.AtomCondition.RightOperand.Field.TableName);
+                    if (name != null)
                         condition.AtomCondition.RightOperand.Field.TableName = name;
-                    }
+                    else
+                        ReplaceField(condition.AtomCondition.RightOperand.Field);//如果给的是逻辑表名，如Course，因为local中也是用该作为表名，所以不用变化
                 }
             }
             else
@@ -304,31 +349,8 @@ namespace DistDBMS.ControlSite.Processor
             
         }
 
-        private void ReplaceConditionField(Condition condition,string oldTablename,string newTablename)
-        {
-            if (condition.IsAtomCondition)
-            {
-                if (condition.AtomCondition.LeftOperand.IsField
-                    && condition.AtomCondition.LeftOperand.Field.TableName == oldTablename)
-                    condition.AtomCondition.LeftOperand.Field.TableName = newTablename;
 
-                if (condition.AtomCondition.RightOperand.IsField
-                    && condition.AtomCondition.RightOperand.Field.TableName == oldTablename)
-                    condition.AtomCondition.RightOperand.Field.TableName = newTablename;
-            }
-            else
-            {
-                if (condition.LeftCondition != null)
-                    ReplaceConditionField(condition.LeftCondition, oldTablename, newTablename);
-
-                if (condition.RightCondition != null)
-                    ReplaceConditionField(condition.RightCondition, oldTablename, newTablename);
-            }
-        }
-        
-
-
-        static int tableIndex = 0;
+        static int tmpIndex = 0;
 
         /// <summary>
         /// 生成一个临时的表名
@@ -338,12 +360,44 @@ namespace DistDBMS.ControlSite.Processor
         private string GenerateTempName(string tablename)
         {
             if (tablename != "")
-                return tablename + "_temp" + (tableIndex++).ToString();
+            {
+                int index = tablename.IndexOf('.'); //去除所有.
+                if (index != -1)
+                    tablename = tablename.Substring(0, index);
+
+                return tablename + "_temp" + (tmpIndex++).ToString();
+            }
             else
-                return "temp" + (tableIndex++).ToString();
+                return "temp" + (tmpIndex++).ToString();
         }
 
-        
+        private string GenerateTempFieldName(string fieldname)
+        {
+            return fieldname + (tmpIndex++).ToString();
+        }
+
+        private void SetNewname(TableSchema schema,string newname)
+        {
+            //TODO:Course_teacher(Course.id,Teacher.id,....) 如果有条件Course.id = Teacher.id，则如果Course_teacher更改表名，则这个信息就会被掩盖了
+
+            if (schema.IsMixed)
+            {
+                for (int i = 0; i < schema.Fields.Count; i++)
+                {
+                    oldname2Newname[schema.Fields[i].TableName] = newname;
+                    for(int j = i+1;j<schema.Fields.Count;j++)
+                        if (schema.Fields[j].AttributeName == schema.Fields[i].AttributeName) //有相同的名字
+                        {
+                            string newField =GenerateTempFieldName(schema.Fields[j].AttributeName);
+                            oldfield2Newfield[schema.Fields[j].TableName + "." + schema.Fields[j].AttributeName] = newField;
+                            //更换了属性名
+                            schema.Fields[j].AttributeName = newField;
+                        }
+                }
+            }
+            oldname2Newname[schema.TableName] = newname;    
+            schema.ReplaceTableName(newname);
+        }
 
         /// <summary>
         /// 浏览每个节点，设置信息
@@ -355,25 +409,23 @@ namespace DistDBMS.ControlSite.Processor
             {
                 if (r.InLocalSite && !step.IsWaiting(r.ResultID))
                 {
-                    localSources.Add(r.DirectTableSchema);
+                    Fragment fragment = ldd.Fragments.GetFragmentByName(r.DirectTableSchema.TableName);
+                    TableSchema result = r.DirectTableSchema.Clone() as TableSchema;
+                    //设置改变的名称
+                    SetNewname(result, fragment.LogicSchema.TableName);
+
+                    localSources.Add(result);
                 }
                 else
                 {
                     if (r.DirectTableSchema.Fields.Count > 0)
                     {
                         TableSchema outTable = r.DirectTableSchema.Clone() as TableSchema;
-                        if (outTable.NickName == "") //如果原来有nickname，表名条件中用到
-                            outTable.NickName = outTable.TableName;
-
-                        outTable.TableName = GenerateTempName(outTable.TableName);
-
-                        //将域中的表名替换为临时表的 表名
-                        for (int i = 0; i < outTable.Fields.Count; i++)
-                        {
-                            outTable.Fields[i] = outTable.Fields[i].Clone() as Field;
-                            outTable.Fields[i].TableName = outTable.TableName;
-                        }
-
+                        
+                        string tempName = GenerateTempName(outTable.TableName);
+                        //设置改变的名称
+                        SetNewname(outTable, tempName);
+                        
                         tempSources.Add(outTable);
                         source2Id[outTable.TableName] = r.ResultID;
                     }
@@ -410,38 +462,13 @@ namespace DistDBMS.ControlSite.Processor
                 VisitRelation(child);
         }
 
-        private string FindTablenameByField(string fieldname, string tablename)
+
+        private string GetLocalTablename(string tablename)
         {
-            int found = 0;
-            string result = "";
-            foreach (TableSchema schema in localSources)
-                foreach (Field f in schema.Fields)
-                    if (f.AttributeName == fieldname)
-                    {
-                        if (result == "")
-                            result = schema.TableName;
-
-                        found++;
-                    }
-
-            foreach (TableSchema schema in tempSources)
-                foreach (Field f in schema.Fields)
-                    if (f.AttributeName == fieldname)
-                    {
-                        if (result == "")
-                            result = schema.TableName;
-
-                        found++;
-                    }
-
-
-
-            if (found == 1)
-                return result;
-            else//  found ==0 || found >1
-                return GetSourceName(tablename);
-
+            return (string)oldname2Newname[tablename];
         }
+
+     
         
 
     }
