@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Table;
+using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.ControlSite
 {
@@ -11,11 +12,36 @@ namespace DistDBMS.ControlSite
     /// </summary>
     class TempModifier
     {
+        GlobalDirectory gdd;
+        public TempModifier(GlobalDirectory gdd)
+        {
+            this.gdd = gdd;
+        }
+
         public void Modify(Relation r)
         {
+            ModifyRelativeAttribute(r);
             ModifySelection(r);
             ModifyUnion(r);
             ModifyJoin(r);
+        }
+
+        private void ModifyRelativeAttribute(Relation r)
+        {
+            if (r.RelativeAttributes != null && r.RelativeAttributes.Fields.Count > 0)
+            {
+                for (int i = 0; i < r.RelativeAttributes.Fields.Count; i++)
+                {
+                    Field f = r.RelativeAttributes.Fields[i];
+                    TableSchema logicSchema = gdd.Schemas[f.TableName];
+                    if (logicSchema != null) //如果有对应的，则修改，没有对应的，如Course.1.id，则不修改
+                    {
+                        r.RelativeAttributes.Fields[i] = logicSchema[f.AttributeName].Clone() as Field;
+                    }
+                }
+            }
+            foreach (Relation child in r.Children)
+                ModifySelection(child);
         }
 
         private void ModifySelection(Relation r)

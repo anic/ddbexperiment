@@ -26,7 +26,6 @@ namespace DistDBMS.ControlSite
 
         public bool ExecuteSQL(string sql,out Table data,out string result,out Relation queryTree)
         {
-            //Relation r = CreateTempRelation();
             threads.Clear();
             buffer.Clear();
 
@@ -36,7 +35,7 @@ namespace DistDBMS.ControlSite
             if (!bParse)
             {
                 data = null;
-                result = "Parse sql error.";
+                result = "Parse sql error. \nInfo:" + ps.LastError;
                 queryTree = null;
                 return false;
             }
@@ -60,7 +59,7 @@ namespace DistDBMS.ControlSite
             Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
 
             //TODO 这里作为测试，临时修改，填写ResultName
-            TempModifier tempModifier = new TempModifier();
+            TempModifier tempModifier = new TempModifier(gdd);
             tempModifier.Modify(relationalgebra);
 
             string output = (new RelationDebugger()).GetDebugString(relationalgebra);
@@ -72,8 +71,6 @@ namespace DistDBMS.ControlSite
             QueryPlanCreator creator = new QueryPlanCreator(gdd);
             ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, 0);
             plans = creator.SplitPlan(gPlan);
-
-            
 
             foreach (ExecutionPlan p in plans)
             {

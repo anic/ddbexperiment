@@ -84,7 +84,7 @@ namespace DistDBMS.ControlSite
                         {
                             TableSchema logicSchema = ldd.Fragments.GetFragmentByName(step.Table.Name).LogicSchema;
                             step.Table.Schema.ReplaceTableName(logicSchema.TableName);
-                            da.InsertValues(step.Table);
+                            int result = da.InsertValues(step.Table);
                         }
                     }
                 }

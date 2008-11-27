@@ -174,9 +174,11 @@ namespace DistDBMS.ControlSite.Processor
                 if (tablename != null)
                 {
                     TableSchema table = GetTableSchema(tablename);
-                    if (table[attributename] != null)   //有该属性
-                        field.TableName = tablename;
-                    else
+                    //if (table[attributename] != null)   //有该属性
+                    //    field.TableName = tablename;
+                    
+                    //无论是否有属性，也得检查一下是否已经改名
+                    //else
                     {
                         //如果没有该属性，则查看属性变更表
                         string fieldname = (string)this.oldfield2Newfield[field.TableName + "." + field.AttributeName];
@@ -319,10 +321,10 @@ namespace DistDBMS.ControlSite.Processor
                 {
                     condition.AtomCondition.LeftOperand.Field = condition.AtomCondition.LeftOperand.Field.Clone() as Field;
 
-                    string name = this.GetLocalTablename(condition.AtomCondition.LeftOperand.Field.TableName);
-                    if (name != null)
-                        condition.AtomCondition.LeftOperand.Field.TableName = name;
-                    else
+                    //string name = this.GetLocalTablename(condition.AtomCondition.LeftOperand.Field.TableName);
+                    //if (name != null)
+                    //    condition.AtomCondition.LeftOperand.Field.TableName = name;
+                    //else
                         ReplaceField(condition.AtomCondition.LeftOperand.Field);//如果给的是逻辑表名，如Course，因为local中也是用该作为表名，所以不用变化
                 }
 
@@ -330,10 +332,10 @@ namespace DistDBMS.ControlSite.Processor
                 {
                     condition.AtomCondition.RightOperand.Field = condition.AtomCondition.RightOperand.Field.Clone() as Field;
 
-                    string name = this.GetLocalTablename(condition.AtomCondition.RightOperand.Field.TableName);
-                    if (name != null)
-                        condition.AtomCondition.RightOperand.Field.TableName = name;
-                    else
+                    //string name = this.GetLocalTablename(condition.AtomCondition.RightOperand.Field.TableName);
+                    //if (name != null)
+                    //    condition.AtomCondition.RightOperand.Field.TableName = name;
+                    //else
                         ReplaceField(condition.AtomCondition.RightOperand.Field);//如果给的是逻辑表名，如Course，因为local中也是用该作为表名，所以不用变化
                 }
             }
