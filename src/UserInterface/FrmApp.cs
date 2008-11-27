@@ -79,7 +79,7 @@ namespace DistDBMS.UserInterface
             {
                 LogWriter writer = new LogWriter();
                 writer.WriteLog(uscExecuteQuery.SQLText + "\r\n" + ex.StackTrace);
-                MessageBox.Show("执行出现异常，并已经记录到error.log中", "出错");
+                MessageBox.Show("执行出现异常，并已经记录到error.log中", "出错", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
 
             }
@@ -89,7 +89,7 @@ namespace DistDBMS.UserInterface
         private void FrmApp_Shown(object sender, EventArgs e)
         {
             //测试执行sql
-            
+
             uscExecuteQuery.SQLText = "select * from Student";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
@@ -105,14 +105,17 @@ namespace DistDBMS.UserInterface
             uscExecuteQuery.SQLText = "select Course.name, Course.credit_hour, Teacher.name from Course, Teacher where Course.teacher_id=Teacher.id and Course.credit_hour>2 and Teacher.title=3";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
-            
+
             uscExecuteQuery.SQLText = "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
-           
+
             uscExecuteQuery.SQLText = "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'";
             uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-           
+
+            uscExecuteQuery.SQLText = "select Student.name, Teacher.name from Student, Teacher,Course where Student.id = Teacher.id and Course.teacher_id = Teacher.id";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+
 
             uscExecuteQuery.EnableTip = true;
             
