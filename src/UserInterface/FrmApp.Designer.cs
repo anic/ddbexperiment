@@ -57,7 +57,7 @@ namespace DistDBMS.UserInterface
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.uscExecuteQuery = new DistDBMS.UserInterface.Controls.UscExecuteQuery();
             this.uscSiteViewer = new DistDBMS.UserInterface.Controls.UscSiteViewer();
-            this.uscTableSchemaViewer = new DistDBMS.UserInterface.Controls.UscTableSchemaViewer();
+            this.uscFragmentViewer = new DistDBMS.UserInterface.Controls.UscFragmentViewer();
             this.pnlControl.SuspendLayout();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
@@ -201,11 +201,11 @@ namespace DistDBMS.UserInterface
             this.uscExecuteQuery.CommandResultText = "";
             this.uscExecuteQuery.Dock = System.Windows.Forms.DockStyle.Fill;
             this.uscExecuteQuery.EnableTip = true;
-            this.uscExecuteQuery.Location = new System.Drawing.Point(206, 327);
+            this.uscExecuteQuery.Location = new System.Drawing.Point(206, 280);
             this.uscExecuteQuery.Name = "uscExecuteQuery";
             this.uscExecuteQuery.Padding = new System.Windows.Forms.Padding(10);
             this.uscExecuteQuery.ShowTip = true;
-            this.uscExecuteQuery.Size = new System.Drawing.Size(491, 133);
+            this.uscExecuteQuery.Size = new System.Drawing.Size(491, 180);
             this.uscExecuteQuery.SQLText = "";
             this.uscExecuteQuery.SqlTextReadOnly = false;
             this.uscExecuteQuery.Tab = DistDBMS.UserInterface.Controls.UscExecuteQuery.ResultTab.Console;
@@ -215,20 +215,19 @@ namespace DistDBMS.UserInterface
             // uscSiteViewer
             // 
             this.uscSiteViewer.Dock = System.Windows.Forms.DockStyle.Top;
-            this.uscSiteViewer.Location = new System.Drawing.Point(206, 185);
+            this.uscSiteViewer.Location = new System.Drawing.Point(206, 170);
             this.uscSiteViewer.Name = "uscSiteViewer";
             this.uscSiteViewer.Padding = new System.Windows.Forms.Padding(10);
-            this.uscSiteViewer.Size = new System.Drawing.Size(491, 142);
+            this.uscSiteViewer.Size = new System.Drawing.Size(491, 110);
             this.uscSiteViewer.TabIndex = 9;
             // 
-            // uscTableSchemaViewer
+            // uscFragmentViewer
             // 
-            this.uscTableSchemaViewer.Dock = System.Windows.Forms.DockStyle.Top;
-            this.uscTableSchemaViewer.Location = new System.Drawing.Point(206, 25);
-            this.uscTableSchemaViewer.Name = "uscTableSchemaViewer";
-            this.uscTableSchemaViewer.Padding = new System.Windows.Forms.Padding(10);
-            this.uscTableSchemaViewer.Size = new System.Drawing.Size(491, 160);
-            this.uscTableSchemaViewer.TabIndex = 8;
+            this.uscFragmentViewer.Dock = System.Windows.Forms.DockStyle.Top;
+            this.uscFragmentViewer.Location = new System.Drawing.Point(206, 25);
+            this.uscFragmentViewer.Name = "uscFragmentViewer";
+            this.uscFragmentViewer.Size = new System.Drawing.Size(491, 145);
+            this.uscFragmentViewer.TabIndex = 10;
             // 
             // FrmApp
             // 
@@ -237,7 +236,7 @@ namespace DistDBMS.UserInterface
             this.ClientSize = new System.Drawing.Size(697, 460);
             this.Controls.Add(this.uscExecuteQuery);
             this.Controls.Add(this.uscSiteViewer);
-            this.Controls.Add(this.uscTableSchemaViewer);
+            this.Controls.Add(this.uscFragmentViewer);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.pnlControl);
             this.Controls.Add(this.mainMenu);
@@ -271,11 +270,11 @@ namespace DistDBMS.UserInterface
         private System.Windows.Forms.ToolStripMenuItem menuItemImportScript;
         private System.Windows.Forms.ToolStripMenuItem menuItemImportData;
         private System.Windows.Forms.ImageList imageList;
-        private DistDBMS.UserInterface.Controls.UscTableSchemaViewer uscTableSchemaViewer;
         private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
         private System.Windows.Forms.Timer timer;
         private DistDBMS.UserInterface.Controls.UscSiteViewer uscSiteViewer;
+        private DistDBMS.UserInterface.Controls.UscFragmentViewer uscFragmentViewer;
         
     }
 }

@@ -135,7 +135,7 @@ namespace DistDBMS.ControlSite
                 sr.Close();
                 gdd = gddCreator.CreateGDD();
                 
-                
+
                 //初始化每个二级接口
                 foreach (Site site in gdd.Sites)
                 {

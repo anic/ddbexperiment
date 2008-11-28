@@ -34,10 +34,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\assembly\GAC_MSIL\System.Web.Services\2.0.0.0__b03f5f7f11d50a3a\System.Web.Services.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -57,28 +63,47 @@
     <Compile Include="Controls\FrmWaitingcs.Designer.cs">
       <DependentUpon>FrmWaitingcs.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\UscQTreeViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UscQTreeViewer.Designer.cs">
+      <DependentUpon>UscQTreeViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Viewer\TableUtility.cs" />
     <Compile Include="Controls\UscExecuteQuery.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\UscExecuteQuery.Designer.cs">
       <DependentUpon>UscExecuteQuery.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\UscSiteViewer.cs">
+    <Compile Include="Controls\Viewer\UscFragmentShower.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\UscSiteViewer.Designer.cs">
+    <Compile Include="Controls\Viewer\UscFragmentShower.Designer.cs">
+      <DependentUpon>UscFragmentShower.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Viewer\UscFragmentViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Viewer\UscFragmentViewer.Designer.cs">
+      <DependentUpon>UscFragmentViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Viewer\UscSiteViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Viewer\UscSiteViewer.Designer.cs">
       <DependentUpon>UscSiteViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\UscTableSchemaViewer.cs">
+    <Compile Include="Controls\Viewer\UscSchemaViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\UscTableSchemaViewer.Designer.cs">
-      <DependentUpon>UscTableSchemaViewer.cs</DependentUpon>
+    <Compile Include="Controls\Viewer\UscSchemaViewer.Designer.cs">
+      <DependentUpon>UscSchemaViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\UscTableViewer.cs">
+    <Compile Include="Controls\Viewer\UscTableViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\UscTableViewer.Designer.cs">
+    <Compile Include="Controls\Viewer\UscTableViewer.Designer.cs">
       <DependentUpon>UscTableViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="FrmApp.cs">
@@ -100,13 +125,22 @@
     <EmbeddedResource Include="Controls\UscExecuteQuery.resx">
       <DependentUpon>UscExecuteQuery.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\UscSiteViewer.resx">
+    <EmbeddedResource Include="Controls\UscQTreeViewer.resx">
+      <DependentUpon>UscQTreeViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Viewer\UscFragmentShower.resx">
+      <DependentUpon>UscFragmentShower.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Viewer\UscFragmentViewer.resx">
+      <DependentUpon>UscFragmentViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Viewer\UscSiteViewer.resx">
       <DependentUpon>UscSiteViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\UscTableSchemaViewer.resx">
-      <DependentUpon>UscTableSchemaViewer.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\Viewer\UscSchemaViewer.resx">
+      <DependentUpon>UscSchemaViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\UscTableViewer.resx">
+    <EmbeddedResource Include="Controls\Viewer\UscTableViewer.resx">
       <DependentUpon>UscTableViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmApp.resx">
@@ -119,9 +153,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SqlInput\FrmTip.resx">
       <DependentUpon>FrmTip.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\UscQTreeViewer.resx">
-      <DependentUpon>UscQTreeViewer.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -151,12 +182,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\SqlInput\InputStyle.cs" />
-    <Compile Include="Controls\UscQTreeViewer.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\UscQTreeViewer.Designer.cs">
-      <DependentUpon>UscQTreeViewer.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
