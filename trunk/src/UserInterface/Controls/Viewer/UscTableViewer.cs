@@ -23,12 +23,14 @@ namespace DistDBMS.UserInterface.Controls
             get { return table; }
             set { 
                 table = value;
-                ShowTableSchema(table);
+                ShowTable(table);
             }
       
         }
 
-        private void ShowTableSchema(Table table)
+        
+
+        private void ShowTable(Table table)
         {
             lvwTable.Columns.Clear();
             lvwTable.Items.Clear();
@@ -56,11 +58,17 @@ namespace DistDBMS.UserInterface.Controls
                         sub.Text = tuple.Data[i];
                         item.SubItems.Add(sub);
                     }
+
                     lvwTable.Items.Add(item);
                 }
             }
 
+            TableUtility util = new TableUtility();
+            util.PaintCrossColor(lvwTable, Color.White, Color.LightGray);
+            util.FitSize(lvwTable, lvwTable.Size);
+
         }
+
 
     }
 }

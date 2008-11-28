@@ -1,6 +1,6 @@
 ﻿namespace DistDBMS.UserInterface.Controls
 {
-    partial class UscTableSchemaViewer
+    partial class UscSchemaViewer
     {
         /// <summary> 
         /// Required designer variable.
@@ -37,6 +37,7 @@
             // lvwTable
             // 
             this.lvwTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvwTable.FullRowSelect = true;
             this.lvwTable.Location = new System.Drawing.Point(10, 71);
             this.lvwTable.Name = "lvwTable";
             this.lvwTable.Size = new System.Drawing.Size(475, 236);
@@ -78,7 +79,7 @@
             this.lblSite.TabIndex = 3;
             this.lblSite.Text = "label1";
             // 
-            // UscTableSchemaViewer
+            // UscSchemaViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -86,7 +87,7 @@
             this.Controls.Add(this.lblSite);
             this.Controls.Add(this.lblCondition);
             this.Controls.Add(this.lblTableName);
-            this.Name = "UscTableSchemaViewer";
+            this.Name = "UscSchemaViewer";
             this.Padding = new System.Windows.Forms.Padding(10);
             this.Size = new System.Drawing.Size(495, 317);
             this.ResumeLayout(false);
