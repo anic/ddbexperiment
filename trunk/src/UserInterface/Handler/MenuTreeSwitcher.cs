@@ -20,7 +20,7 @@ namespace DistDBMS.UserInterface.Handler
         TreeNode fragmentsNode;
 
         UscExecuteQuery uscQuery;
-        UscTableSchemaViewer uscSchemaViewer;
+        UscFragmentViewer uscFragmentViewer;
         UscSiteViewer uscSiteViewer;
 
         FrmApp frmApp;
@@ -56,8 +56,8 @@ namespace DistDBMS.UserInterface.Handler
 
             if (ctr is UscExecuteQuery)
                 uscQuery = ctr as UscExecuteQuery;
-            else if (ctr is UscTableSchemaViewer)
-                uscSchemaViewer = ctr as UscTableSchemaViewer;
+            else if (ctr is UscFragmentViewer)
+                uscFragmentViewer = ctr as UscFragmentViewer;
             else if (ctr is UscSiteViewer)
                 uscSiteViewer = ctr as UscSiteViewer;
 
@@ -91,11 +91,12 @@ namespace DistDBMS.UserInterface.Handler
             {
                 if (tree.SelectedNode.Tag is TableSchema)
                 {
-                    uscSchemaViewer.Visible = true;
+                    uscFragmentViewer.Visible = true;
                     uscSiteViewer.Visible = false;
                     uscQuery.Visible = true;
 
-                    uscSchemaViewer.ShowTableSchema(tree.SelectedNode.Tag as TableSchema);
+                    uscFragmentViewer.ShowSchema(tree.SelectedNode.Tag as TableSchema);
+                    
                     string sql  =GenerateSQL(tree.SelectedNode.Tag as TableSchema,null);
                     bool oldValue = uscQuery.ShowTip;
 
@@ -113,7 +114,7 @@ namespace DistDBMS.UserInterface.Handler
                     
                     
                     uscQuery.Visible = true;
-                    uscSchemaViewer.Visible = false;
+                    uscFragmentViewer.Visible = false;
                     uscSiteViewer.Visible = false;
 
                     uscQuery.SqlTextReadOnly = false;
@@ -124,11 +125,11 @@ namespace DistDBMS.UserInterface.Handler
                 {
 
                     uscQuery.Visible = true;
-                    uscSchemaViewer.Visible = true;
+                    uscFragmentViewer.Visible = true;
                     uscSiteViewer.Visible = false;
 
-                    uscSchemaViewer.ShowFragment(tree.SelectedNode.Tag as Fragment);
-
+                    uscFragmentViewer.ShowFragment(tree.SelectedNode.Tag as Fragment, gdd);
+                    
                     string sql = GenerateSQL((tree.SelectedNode.Tag as Fragment).Schema, 
                         (tree.SelectedNode.Tag as Fragment).Condition, 
                         (tree.SelectedNode.Tag as Fragment).LogicSchema.TableName);
@@ -146,7 +147,7 @@ namespace DistDBMS.UserInterface.Handler
                 else if (tree.SelectedNode.Tag is Site)
                 {
                     uscQuery.Visible = false;
-                    uscSchemaViewer.Visible = false;
+                    uscFragmentViewer.Visible = false;
                     uscSiteViewer.Visible = true;
 
                     uscSiteViewer.SetSite(tree.SelectedNode.Tag as Site);
@@ -155,7 +156,7 @@ namespace DistDBMS.UserInterface.Handler
             }
         }
 
-
+        GlobalDirectory gdd;
         public void SetGlobalDirectory(GlobalDirectory gdd)
         {
             //添加站点
@@ -179,6 +180,8 @@ namespace DistDBMS.UserInterface.Handler
             {
                 AddFragment(fragmentsNode, f);
             }
+
+            this.gdd = gdd;
         }
 
         private void AddFragment(TreeNode node, Fragment fragment)
