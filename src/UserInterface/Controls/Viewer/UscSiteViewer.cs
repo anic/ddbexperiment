@@ -39,5 +39,7 @@ namespace DistDBMS.UserInterface.Controls
 
             lvwSite.Items.Add(item);
         }
+
+        
     }
 }

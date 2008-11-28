@@ -41,7 +41,7 @@
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3});
-            this.lvwSite.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvwSite.Dock = System.Windows.Forms.DockStyle.Top;
             this.lvwSite.Location = new System.Drawing.Point(10, 34);
             this.lvwSite.Name = "lvwSite";
             this.lvwSite.Size = new System.Drawing.Size(383, 87);
@@ -84,7 +84,7 @@
             this.Controls.Add(this.lblSitename);
             this.Name = "UscSiteViewer";
             this.Padding = new System.Windows.Forms.Padding(10);
-            this.Size = new System.Drawing.Size(403, 131);
+            this.Size = new System.Drawing.Size(403, 368);
             this.ResumeLayout(false);
             this.PerformLayout();
 
