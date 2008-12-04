@@ -63,9 +63,6 @@ namespace DistDBMS.ControlSite
                             Thread.Sleep(new Random().Next(1000)); //现在是停等，以后应该是异步等，或者唤醒机制
                         }
 
-                        
-                        
-
                         //相当于发数据
                         
                         lock (buffer)
