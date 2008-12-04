@@ -6,95 +6,6 @@ using System.Threading;
 
 namespace DistDBMS.Network
 {
-    public enum ControlSitePacketTags
-    {
-        None,
-        OK,
-        Command,
-        Object,
-    }
-
-    public class ControlSitePacket : NetworkPacket
-    {
-        public static ControlSitePacket NetworkPacketToControlSitePacket(NetworkPacket networkPacket)
-        {
-            switch ((ControlSitePacketTags)networkPacket.Tag)
-            {
-                case ControlSitePacketTags.OK:
-                    {
-                        return networkPacket.ToPacket<ControlSiteOKPacket>();
-                    }
-                case ControlSitePacketTags.Command:
-                    {
-                        return networkPacket.ToPacket<ControlSiteCommandPacket>();
-                    }
-                case ControlSitePacketTags.Object:
-                    {
-                        return networkPacket.ToPacket<ControlSiteObjectPacket>();
-                    }
-                default:
-                    System.Diagnostics.Debugger.Break();
-                    break;
-
-            }
-            return null;
-        }
-
-
-    }
-
-    public class ControlSiteOKPacket : ControlSitePacket
-    {
-        public override bool Encapsulate()
-        {
-            Tag = (byte)ControlSitePacketTags.OK;
-            if (!base.Encapsulate())
-                return false;
-            return true;
-        }
-    }
-
-
-    public class ControlSiteCommandPacket : ControlSitePacket
-    {
-        public string Command;
-
-        public override bool Encapsulate()
-        {
-            Tag = (byte)ControlSitePacketTags.Command;
-            if (!base.Encapsulate())
-                return false;
-            return WriteString(Command);
-        }
-
-        protected override void Unencapsulate()
-        {
-            base.Unencapsulate();
-            Command = ReadString();
-        }
-    }
-
-    public class ControlSiteObjectPacket : ControlSitePacket
-    {
-        public object Object;
-
-        public override bool Encapsulate()
-        {
-            Tag = (byte)ControlSitePacketTags.Object;
-            if (!base.Encapsulate())
-                return false;
-            return WriteObject(Object);
-        }
-
-        protected override void Unencapsulate()
-        {
-            base.Unencapsulate();
-            Object = ReadObject();
-        }
-    }
-
-
-
 
 
 
@@ -131,46 +42,48 @@ namespace DistDBMS.Network
 
         void SendOKPacket()
         {
-            LocalSiteOKPacket packet = new LocalSiteOKPacket();
+            ServerClientTextPacket packet = new ServerClientTextPacket();
             packet.Encapsulate();
             SendPacket(packet);
         }
 
         override public void OnPacketArrived(NetworkPacket networkPacket)
         {
-            ControlSitePacket csPacket = ControlSitePacket.NetworkPacketToControlSitePacket(networkPacket);
+            ServerClientPacket csPacket = ServerClientPacket.NetworkPacketToServerClientPacket(networkPacket);
 
-            if(csPacket is ControlSiteCommandPacket)
+            if (csPacket is ServerClientTextPacket)
             {
-                ControlSiteCommandPacket packet = (ControlSiteCommandPacket)csPacket;
-                string[] args = packet.Command.Split(":".ToCharArray());
+                ServerClientTextPacket packet = (ServerClientTextPacket)csPacket;
+                string[] args = packet.Text.Split(":".ToCharArray());
                 if (args[0] == "Test")
                 {
-                    LocalSiteCommandPacket lsPacket = new LocalSiteCommandPacket();
+                    LocalSiteServerTextPacket lsPacket = new LocalSiteServerTextPacket();
                     lsPacket.SessionId = sessionId;
 
-                    lsPacket.StepIndex = LocalSitePacket.StepIndexNone;
-                    lsPacket.StepFromIndex = LocalSitePacket.StepIndexNone;
-                    lsPacket.Command = "Test:Set:10";
+                    lsPacket.StepIndex = LocalSiteServerPacket.StepIndexNone;
+                    lsPacket.StepFromIndex = LocalSiteServerPacket.StepIndexNone;
+                    lsPacket.Text = "Test:Set:10";
                     lsPacket.Encapsulate();
                     GetLocalSiteClient("L1").SendPacket(lsPacket);
                     GetLocalSiteClient("L1").Packets.WaitAndRead();
                     Debug.WriteLine("recv reply for L1");
 
 
+                    //Thread.Sleep(2000);
+
 
                     lsPacket.StepIndex = 0;
-                    lsPacket.StepFromIndex = LocalSitePacket.StepIndexNone;
-                    lsPacket.Command = "Test:Send:L2";
+                    lsPacket.StepFromIndex = LocalSiteServerPacket.StepIndexNone;
+                    lsPacket.Text = "Test:Send:L2";
                     lsPacket.Encapsulate();
                     GetLocalSiteClient("L1").SendPacket(lsPacket);
 
 
-                    //Thread.Sleep(1000);
                     
-                    lsPacket.StepIndex = LocalSitePacket.StepIndexNone;
-                    lsPacket.StepFromIndex = LocalSitePacket.StepIndexNone;
-                    lsPacket.Command = "Test:Set:20";
+                    
+                    lsPacket.StepIndex = LocalSiteServerPacket.StepIndexNone;
+                    lsPacket.StepFromIndex = LocalSiteServerPacket.StepIndexNone;
+                    lsPacket.Text = "Test:Set:20";
                     lsPacket.Encapsulate();
                     GetLocalSiteClient("L2").SendPacket(lsPacket);
                     GetLocalSiteClient("L2").Packets.WaitAndRead();
@@ -179,21 +92,21 @@ namespace DistDBMS.Network
 
                     lsPacket.StepIndex = 1;
                     lsPacket.StepFromIndex = 0;
-                    lsPacket.Command = "Test:Sub";
+                    lsPacket.Text = "Test:Sub";
                     lsPacket.Encapsulate();
                     GetLocalSiteClient("L2").SendPacket(lsPacket);
 
 
                     lsPacket.StepIndex = 2;
                     lsPacket.StepFromIndex = 1;
-                    lsPacket.Command = "Test:Return";
+                    lsPacket.Text = "Test:Return";
                     lsPacket.Encapsulate();
                     GetLocalSiteClient("L2").SendPacket(lsPacket);
                     GetLocalSiteClient("L2").Packets.WaitAndRead();
                     Debug.WriteLine("recv return for L2");
 
 
-                    ControlSiteObjectPacket clientPacket = new ControlSiteObjectPacket();
+                    ServerClientTextObjectPacket clientPacket = new ServerClientTextObjectPacket();
                     clientPacket.Object = "Hello From ControlServer";
                     clientPacket.Encapsulate();
                     SendPacket(clientPacket);
@@ -228,13 +141,13 @@ namespace DistDBMS.Network
 
         override public void OnPacketArrived(NetworkPacket packet)
         {
-            Packets.Append(ControlSitePacket.NetworkPacketToControlSitePacket(packet));
+            Packets.Append(ServerClientPacket.NetworkPacketToServerClientPacket(packet));
         }
 
         public void SendCommand(string s)
         {
-            ControlSiteCommandPacket packet = new ControlSiteCommandPacket();
-            packet.Command = s;
+            ServerClientTextPacket packet = new ServerClientTextPacket();
+            packet.Text = s;
             packet.Encapsulate();
             SendPacket(packet);
         }
