@@ -37,6 +37,7 @@ namespace DistDBMS.Network
     {
         public Socket PeerSocket;
         public byte[] Buffer = new byte[65536];
+        //public byte[] Buffer = new byte[10*1024*1024];
         public int DataSizeInBuffer = 0;
 
         public string Name { get; set; }
@@ -181,6 +182,19 @@ namespace DistDBMS.Network
                         }
                     }
 
+
+                    if (peerConn.Buffer.Length >= 1024 * 1024 && peerConn.DataSizeInBuffer < peerConn.Buffer.Length / 2)
+                    {
+                        byte[] old = peerConn.Buffer;
+                        peerConn.Buffer = new byte[peerConn.Buffer.Length / 2];
+                        Array.Copy(old, 0, peerConn.Buffer, 0, peerConn.DataSizeInBuffer);
+                    }
+                    if (peerConn.Buffer.Length - peerConn.DataSizeInBuffer <= 8 * 1024)
+                    {
+                        byte[] old = peerConn.Buffer;
+                        peerConn.Buffer = new byte[peerConn.DataSizeInBuffer + 8 * 1024];
+                        old.CopyTo(peerConn.Buffer, 0);
+                    }
 
                     peerConn.PeerSocket.BeginReceive(peerConn.Buffer, (int)peerConn.DataSizeInBuffer, (int)(peerConn.Buffer.Length - peerConn.DataSizeInBuffer), SocketFlags.None,  new AsyncCallback(PeerAsyncReceiveCallback), peerConn);
                 }

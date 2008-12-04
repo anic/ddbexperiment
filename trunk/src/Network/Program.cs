@@ -7,6 +7,37 @@ using DistDBMS.Network;
 using System.IO;
 using System.Threading;
 
+
+/*
+通信用的数据包：
+
+  
+  
+                                                                            
+                                                                     +------------->  
+                                                                     |                [LocalSite] <---\
+                                                                     |     +-------<    /|\            \ 
+                                                                     |     |             |              \
+                                                                     |     |             | P2PPacket     \
+                 ServerClientPacket                  LocalSitePacket |     |             |               |
+                 ------------------>               >-----------------+     |            \|/              | P2PPacket
+       [Client]                      [ControlSite]                    \    |          [LocalSite]        |
+                 <-----------------                <-------------------\---+            /|\              |
+                  ServerClientPacket                 ServerClientPacket \   \            |               /
+                                                                         \   \           | P2PPacket    /
+                                                                          \   \          |             /
+                                                                           \   +---->   \|/           /
+                                                                            \          [LocalSite]<--"
+                                                                             +------<
+
+  
+
+ * 每类Packet都有对应的派生的TextPacket(纯字符串)和TextObjectPacket(字符串+二进制对象)
+ * 数据包限制：1024*1024*1024 ，大约1G
+  
+  
+*/
+
 namespace DistDBMS
 {
     /*
@@ -73,10 +104,10 @@ namespace DistDBMS
                 controlSiteClient.Packets.WaitAndRead();
                 */
                 controlSiteClient.SendCommand("Test");
-                ControlSitePacket csPacket = ControlSitePacket.NetworkPacketToControlSitePacket(controlSiteClient.Packets.WaitAndRead());
-                if(csPacket is ControlSiteObjectPacket)
+                ServerClientPacket csPacket = ServerClientPacket.NetworkPacketToServerClientPacket(controlSiteClient.Packets.WaitAndRead());
+                if (csPacket is ServerClientTextObjectPacket)
                 {
-                    Debug.WriteLine((csPacket as ControlSiteObjectPacket).Object.ToString());
+                    Debug.WriteLine((csPacket as ServerClientTextObjectPacket).Object.ToString());
                 }
                 //+ "Test:Return:L2\n";
             }

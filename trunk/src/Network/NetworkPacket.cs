@@ -10,16 +10,17 @@ namespace DistDBMS.Network
 {
     public class NetworkPacket
     {
-        const int HeaderSize = 2;
+        const int HeaderSize = 4;
         const int DefaultNewPacketBufferSize = 1400;
-        const int MaxSize = 60000;  //不能用到 65535 或之上!!!
+        const int MaxSize = 1024 * 1024 * 1024;
         
         byte[] data;
         int size;
         int pos;  //读写偏移
 
         public byte[] Data  { get {
-            BitConverter.GetBytes((ushort)IPAddress.HostToNetworkOrder((short)(size))).CopyTo(data, 0);
+            //BitConverter.GetBytes((ushort)IPAddress.HostToNetworkOrder((short)(size))).CopyTo(data, 0);
+            BitConverter.GetBytes((uint)IPAddress.HostToNetworkOrder((int)(size))).CopyTo(data, 0);
             return data;
         } }
 
@@ -71,11 +72,11 @@ namespace DistDBMS.Network
 
         public static bool IsInvalidPacket(byte[] buffer, int size)
         {
-            if (size >= 2)
+            if (size >= HeaderSize)
             {
-                UInt16 packetSize = (UInt16)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+                int packetSize = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
 
-                if (packetSize <= 0 || packetSize >= MaxSize)  //必须保留等号，防止其他缓冲区溢出。我们不打算处理长度超过 65536 的包
+                if (packetSize <= 0 || packetSize > MaxSize)
                     return false;
 
             }
@@ -102,7 +103,7 @@ namespace DistDBMS.Network
             if (dataSizeInBuffer < HeaderSize)
                 return null;
 
-            UInt16 packetSize = (UInt16)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+            int packetSize = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
             if (packetSize <= dataSizeInBuffer)
             {
                 NetworkPacket packet = new NetworkPacket(buffer, dataSizeInBuffer);

@@ -10,14 +10,92 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DistDBMS.Network
 {
+    public enum ServerClientPacketTags
+    {
+        None,
+        Text,
+        TextObject,
+    }
+
+
+    public class ServerClientPacket : NetworkPacket
+    {
+        public static ServerClientPacket NetworkPacketToServerClientPacket(NetworkPacket networkPacket)
+        {
+            switch ((ServerClientPacketTags)networkPacket.Tag)
+            {
+                case ServerClientPacketTags.Text:
+                    {
+                        return networkPacket.ToPacket<ServerClientTextPacket>();
+                    }
+                case ServerClientPacketTags.TextObject:
+                    {
+                        return networkPacket.ToPacket<ServerClientTextObjectPacket>();
+                    }
+                default:
+                    System.Diagnostics.Debugger.Break();
+                    break;
+
+            }
+            return null;
+        }
+
+
+    }
+
+    public class ServerClientTextPacket : ServerClientPacket
+    {
+        public string Text = "";
+
+        public override bool Encapsulate()
+        {
+            Tag = (byte)ServerClientPacketTags.Text;
+            if (!base.Encapsulate())
+                return false;
+            return WriteString(Text);
+        }
+
+        protected override void Unencapsulate()
+        {
+            base.Unencapsulate();
+            Text = ReadString();
+        }
+    }
+
+    public class ServerClientTextObjectPacket : ServerClientPacket
+    {
+        public string Text = "";
+        public object Object;
+
+        public override bool Encapsulate()
+        {
+            Tag = (byte)ServerClientPacketTags.TextObject;
+            if (!base.Encapsulate())
+                return false;
+            return WriteObject(Object) && WriteString(Text);
+        }
+
+        protected override void Unencapsulate()
+        {
+            base.Unencapsulate();
+            Object = ReadObject();
+            Text = ReadString();
+        }
+    }
+
+
+
+
     public abstract class GenericNetworkConnection
     {
+        PacketQueue packets = new PacketQueue();
+        public PacketQueue Packets { get { return packets; } }
+
         protected TcpClient tcpClient;
         protected NetworkStream networkStream;
 
         byte[] buffer = new byte[65536];
         int dataSizeInBuffer = 0;
-
 
         public void AsyncReceiveCallback(IAsyncResult ar)
         {
@@ -49,10 +127,25 @@ namespace DistDBMS.Network
                                 break;
                         }
                     }
+
+
+
+                    if (buffer.Length >= 1024 * 1024 && dataSizeInBuffer < buffer.Length / 2)
+                    {
+                        byte[] old = buffer;
+                        buffer = new byte[buffer.Length / 2];
+                        Array.Copy(old, 0, buffer, 0, dataSizeInBuffer);
+                    }
+                    if (buffer.Length - dataSizeInBuffer <= 8 * 1024)
+                    {
+                        byte[] old = buffer;
+                        buffer = new byte[dataSizeInBuffer + 8 * 1024];
+                        old.CopyTo(buffer, 0);
+                    }
                     networkStream.BeginRead(buffer, dataSizeInBuffer, buffer.Length - dataSizeInBuffer, new AsyncCallback(AsyncReceiveCallback), this);
                 }
             }
-            catch (System.Exception)
+            catch (System.Net.Sockets.SocketException e)
             {
                 term = true;
             }
@@ -73,7 +166,10 @@ namespace DistDBMS.Network
         }
 
 
-        abstract public void OnPacketArrived(NetworkPacket packet);
+        virtual public void OnPacketArrived(NetworkPacket packet)
+        {
+            Packets.Append(packet);
+        }
     }
 
     public abstract class GenericServerConnection : GenericNetworkConnection
