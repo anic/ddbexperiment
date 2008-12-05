@@ -72,14 +72,14 @@ namespace DistDBMS.Network
             Tag = (byte)ServerClientPacketTags.TextObject;
             if (!base.Encapsulate())
                 return false;
-            return WriteObject(Object) && WriteString(Text);
+            return WriteString(Text) && WriteObject(Object);
         }
 
         protected override void Unencapsulate()
         {
             base.Unencapsulate();
-            Object = ReadObject();
             Text = ReadString();
+            Object = ReadObject();
         }
     }
 
@@ -96,6 +96,8 @@ namespace DistDBMS.Network
 
         byte[] buffer = new byte[65536];
         int dataSizeInBuffer = 0;
+
+        public Object State { get; set; }
 
         public void AsyncReceiveCallback(IAsyncResult ar)
         {
@@ -165,6 +167,22 @@ namespace DistDBMS.Network
             networkStream.Write(packet.Data, 0, packet.Size);
         }
 
+        public void SendServerClientTextPacket(string text)
+        {
+            ServerClientTextPacket packet = new ServerClientTextPacket();
+            packet.Text = text;
+            packet.Encapsulate();
+            SendPacket(packet);
+        }
+
+        public void SendServerClientTextObjectPacket(string text, object obj)
+        {
+            ServerClientTextObjectPacket packet = new ServerClientTextObjectPacket();
+            packet.Text = text;
+            packet.Object = obj;
+            packet.Encapsulate();
+            SendPacket(packet);
+        }
 
         virtual public void OnPacketArrived(NetworkPacket packet)
         {
@@ -206,6 +224,9 @@ namespace DistDBMS.Network
             public int ListenPort;
         }
 
+        public delegate void ConnectionStartCloseDelegate(GenericServerConnection conn);
+        public ConnectionStartCloseDelegate ConnectionStart { get; set; }
+
         public void ThreadProc(object obj)
         {
             ThreadParam param = (ThreadParam)obj;
@@ -217,6 +238,10 @@ namespace DistDBMS.Network
                 TcpClient tcpClient = listener.AcceptTcpClient();
                 CONNECTION conn = new CONNECTION();
                 conn.Attach(this, tcpClient);
+
+                if(ConnectionStart != null)
+                    ConnectionStart(conn);
+
                 conn.Start();
             }
         }
