@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Execution;
 using DistDBMS.Common.Dictionary;
-using DistDBMS.ControlSite.Processor;
+using DistDBMS.LocalSite.Processor;
 using System.IO;
 using DistDBMS.Common.Table;
 using System.Threading;
 
-namespace DistDBMS.ControlSite
+namespace DistDBMS.LocalSite
 {
     public class VirtualInterface
     {
@@ -77,7 +77,7 @@ namespace DistDBMS.ControlSite
                     }
                     else if (step.Type == ExecutionStep.ExecuteType.Insert)
                     {
-                        using (DataAccess.DataAccessor da = new DistDBMS.ControlSite.DataAccess.DataAccessor(name))
+                        using (DataAccess.DataAccessor da = new DistDBMS.LocalSite.DataAccess.DataAccessor(name))
                         {
                             TableSchema logicSchema = ldd.Fragments.GetFragmentByName(step.Table.Name).LogicSchema;
                             step.Table.Schema.ReplaceTableName(logicSchema.TableName);
@@ -92,7 +92,7 @@ namespace DistDBMS.ControlSite
         {
             ldd = new LocalDirectory(gdd, name);
 
-            using (DataAccess.DataAccessor da = new DistDBMS.ControlSite.DataAccess.DataAccessor(name))
+            using (DataAccess.DataAccessor da = new DistDBMS.LocalSite.DataAccess.DataAccessor(name))
             { 
                 foreach(Fragment f in ldd.Fragments)
                 {

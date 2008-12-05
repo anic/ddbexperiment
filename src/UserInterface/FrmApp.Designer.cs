@@ -246,6 +246,7 @@ namespace DistDBMS.UserInterface
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "分布式数据库实验系统";
             this.Shown += new System.EventHandler(this.FrmApp_Shown);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmApp_FormClosed);
             this.pnlControl.ResumeLayout(false);
             this.mainMenu.ResumeLayout(false);
             this.mainMenu.PerformLayout();

@@ -14,6 +14,8 @@ using DistDBMS.UserInterface.Properties;
 using DistDBMS.Common.Table;
 using DistDBMS.UserInterface.Handler;
 using DistDBMS.Common.RelationalAlgebra.Entity;
+using DistDBMS.Network;
+using DistDBMS.Common.Execution;
 
 namespace DistDBMS.UserInterface
 {
@@ -26,11 +28,11 @@ namespace DistDBMS.UserInterface
         {
             InitializeComponent();
 
-            imageList.Images.Add("magnifier",Resources.img_magnifier);
-            imageList.Images.Add("dictionary",Resources.img_dictionary);
-            imageList.Images.Add("site",Resources.img_site);
-            imageList.Images.Add("table",Resources.img_table);
-            imageList.Images.Add("hfragment",Resources.img_hfragment);
+            imageList.Images.Add("magnifier", Resources.img_magnifier);
+            imageList.Images.Add("dictionary", Resources.img_dictionary);
+            imageList.Images.Add("site", Resources.img_site);
+            imageList.Images.Add("table", Resources.img_table);
+            imageList.Images.Add("hfragment", Resources.img_hfragment);
             imageList.Images.Add("vfragment", Resources.img_vfragment);
 
             switcher = new MenuTreeSwitcher(tvwMenu, this);
@@ -39,10 +41,38 @@ namespace DistDBMS.UserInterface
             switcher.SetControl(uscSiteViewer);
 
             vInterface = new DistDBMS.ControlSite.VirtualInterface2();
-            
+
+            FrmInit frmInit = new FrmInit();
+            frmInit.ShowDialog(FrmInit.Type.Init);
+
+
+            NetworkInitiator initiator = new NetworkInitiator();
+            ClusterConfiguration clusterConfig = initiator.GetConfiguration("NetworkInitScript.txt");
+
+
+            ControlSiteClient controlSiteClient = new ControlSiteClient();
+            controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
+
+            StreamReader sr = new StreamReader("DbInitScript.txt", System.Text.Encoding.Default);
+            List<string> gddScript = new List<string>();
+            while (!sr.EndOfStream)
+                gddScript.Add(sr.ReadLine());
+            sr.Close();
+
+
+            ServerClientTextObjectPacket package = new ServerClientTextObjectPacket();
+            package.Object = gddScript;
+            //controlSiteClient.SendPacket(package);
+
+            //ServerClientPacket csPacket = ServerClientPacket.NetworkPacketToServerClientPacket(controlSiteClient.Packets.WaitAndRead());
+            //if (csPacket is ServerClientTextObjectPacket)
+            //{
+            //    Debug.WriteLine((csPacket as ServerClientTextObjectPacket).Object.ToString());
+            //}
+
             //初始化脚本
             string result;
-            vInterface.ImportScript("InitScript.txt",out gdd,out result);
+            vInterface.ImportScript("DbInitScript.txt", out gdd, out result);
             uscExecuteQuery.AddCommandResult(result);
 
             //本地设置gdd
@@ -64,7 +94,7 @@ namespace DistDBMS.UserInterface
 
         void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
         {
-            
+
             Table data;
             string result;
             Relation queryTree;
@@ -83,7 +113,7 @@ namespace DistDBMS.UserInterface
 
 
             }
-            
+
         }
 
         private void FrmApp_Shown(object sender, EventArgs e)
@@ -118,11 +148,17 @@ namespace DistDBMS.UserInterface
 
 
             uscExecuteQuery.EnableTip = true;
-            
+
+        }
+
+        private void FrmApp_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FrmInit frmDestroy = new FrmInit();
+            frmDestroy.ShowDialog(FrmInit.Type.Destroy);
         }
 
 
-        
-        
+
+
     }
 }

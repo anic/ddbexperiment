@@ -18,6 +18,8 @@ using DistDBMS.ControlSite.Plan;
 using System.Collections;
 using System.Threading;
 using DistDBMS.ControlSite.RelationalAlgebraUtility;
+using DistDBMS.LocalSite;
+using DistDBMS.Network;
 
 namespace DistDBMS.ControlSite
 {
@@ -27,13 +29,29 @@ namespace DistDBMS.ControlSite
 
         static void Main(string[] args)
         {
-            Program a = new Program();
+            //Program a = new Program();
 
-            a.TestGDD();
-            a.TestSQLSyntax();
-            //a.TestRelationAlgebra();
-            a.TestExecutionPlan();
+            //a.TestGDD();
+            //a.TestSQLSyntax();
+            ////a.TestRelationAlgebra();
+            //a.TestExecutionPlan();
 
+
+            if (args == null || args.Length == 0)
+                return;
+
+            NetworkInitiator initiator = new NetworkInitiator();
+            ClusterConfiguration clusterConfig = initiator.GetConfiguration(args[0]);
+
+            ControlSiteServer controlSiteServer = new ControlSiteServer(clusterConfig, args[1]);
+            controlSiteServer.Start();
+            
+            System.Console.WriteLine("ControlSite " + args[1] + " started!");
+            
+            while(true)
+            {
+                Thread.Sleep(500);
+            }
         }
 
         

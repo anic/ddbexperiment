@@ -1,0 +1,31 @@
+﻿define site S1 127.0.0.1 10000
+define site S2 127.0.0.1 20000
+define site S3 127.0.0.1 30000
+define site S4 127.0.0.1 40000
+create table Student (id int key, name char(25), sex char(1), age int, degree int)
+create table Teacher (id int key, name char(25), title int)
+create table Course (id int key, name char(80), location char(8), credit_hour int, teacher_id int)
+create table Exam (student_id int, course_id int, mark int)
+fragment Student horizontally into id<105000, id>=105000 and id<110000, id>=110000
+fragment Teacher horizontally into id<201000 and title<>3, id<201000 and title=3, id>=201000 and title<>3, id>=201000 and title=3
+fragment Course vertically into (id, name), (id, location, credit_hour, teacher_id)
+fragment Course.2 horizontally into credit_hour=1, credit_hour>1 and credit_hour<4,credit_hour=4
+fragment Exam horizontally into student_id<107000 and course_id<301200, student_id<107000 and course_id>=301200, student_id>=107000 and course_id<301200, student_id>=107000 and course_id>=301200
+allocate Student.1 to S1
+allocate Student.2 to S2
+allocate Student.3 to S3
+allocate Teacher.1 to S1
+allocate Teacher.2 to S2
+allocate Teacher.3 to S3
+allocate Teacher.4 to S4
+allocate Course.1 to S1
+allocate Course.2.1 to S2
+allocate Course.2.2 to S3
+allocate Course.2.3 to S4
+allocate Exam.1 to S1
+allocate Exam.2 to S2
+allocate Exam.3 to S3
+allocate Exam.4 to S4
+createdb ddb //create a database with name “ddb”
+drop table student
+drop the table dropdb ddb

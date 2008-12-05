@@ -159,6 +159,9 @@ namespace DistDBMS.UserInterface.Handler
         GlobalDirectory gdd;
         public void SetGlobalDirectory(GlobalDirectory gdd)
         {
+            if (gdd == null)
+                return;
+
             //添加站点
             foreach (Site s in gdd.Sites)
             {

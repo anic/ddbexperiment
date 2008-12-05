@@ -14,6 +14,7 @@ using DistDBMS.ControlSite.SQLSyntax.Operation;
 using DistDBMS.ControlSite.SQLSyntax;
 using DistDBMS.ControlSite.RelationalAlgebraUtility;
 using DistDBMS.Common.RelationalAlgebra;
+using DistDBMS.LocalSite;
 
 namespace DistDBMS.ControlSite
 {

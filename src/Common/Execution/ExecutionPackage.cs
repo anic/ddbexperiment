@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace DistDBMS.Common.Execution
 {
-    public class ExecutionPackage
+    public class ExecutionPackage 
     {
         public int ID { get; set; }
 
         public enum PackageType
         { 
-            Plan,
-            Data
+            Plan = 0,
+            Data,
+            GDDInit
         }
 
         public PackageType Type { get; set; }

@@ -103,12 +103,14 @@ namespace DistDBMS
                 controlSiteClient.SendCommand("Test:Move:L1:L2");
                 controlSiteClient.Packets.WaitAndRead();
                 */
+                
                 controlSiteClient.SendCommand("Test");
                 ServerClientPacket csPacket = ServerClientPacket.NetworkPacketToServerClientPacket(controlSiteClient.Packets.WaitAndRead());
                 if (csPacket is ServerClientTextObjectPacket)
                 {
                     Debug.WriteLine((csPacket as ServerClientTextObjectPacket).Object.ToString());
                 }
+
                 //+ "Test:Return:L2\n";
             }
 
