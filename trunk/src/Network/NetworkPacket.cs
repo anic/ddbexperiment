@@ -188,18 +188,20 @@ namespace DistDBMS.Network
             if(pos + len > size)
                 throw new EndOfStreamException();
             string s = System.Text.Encoding.UTF8.GetString(data, pos, len);
+            pos += len;
             return s;
         }
 
 
         public object ReadObject()
         {
-            ushort len = ReadUShort();
+            int len = ReadInt();
             if (pos + len > size)
                 throw new EndOfStreamException();
 
-            MemoryStream ms = new MemoryStream(data, pos, len);
+            MemoryStream ms = new MemoryStream(data, pos, (int)len);
             BinaryFormatter bs = new BinaryFormatter();
+            pos += len;
             return bs.Deserialize(ms);
         }
 
@@ -300,11 +302,11 @@ namespace DistDBMS.Network
             BinaryFormatter bs = new BinaryFormatter();
             bs.Serialize(ms, obj);
             ms.Position = 0;
-            if (!WriteUShort((ushort)ms.Length))
+            if (!WriteInt((int)ms.Length))
                 return false;
             if(!WriteBytes(ms.ToArray()))
             {
-                pos -= sizeof(ushort);
+                pos -= sizeof(int);
                 size = pos;
                 return false;
             }
