@@ -1,0 +1,22 @@
+﻿Teacher(...)
+200001	'Teacher A'	3
+200002	'Teacher B'	2
+201000	'Teacher C'	3
+201001	'Teacher D'	4
+110001	'Fake Teacher'	2
+Course(...)
+300001	'Chinese'	'Classroom 1'	3	200001
+301200	'English'	'Classroom 2'	2	200002
+301233	'Math'	'Classroom 1'	3	201000
+301231	'Math'	'Classroom 2'	3	110001
+Student(...)
+104999	'Student A'	'M'	20	1
+105000	'Student B'	'F'	41	2
+105005	'Student C'	'M'	21	3
+110001	'Student D'	'F'	30	2
+Exam(...)
+104999	300001	90
+104999	301200	100
+105000	301200	80
+105005	301200	90
+110001	301233	80
