@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
+using DistDBMS.Network;
+using DistDBMS.UserInterface.Handler;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -56,10 +58,14 @@ namespace DistDBMS.UserInterface.Controls
             UpdateDescription();
         }
 
-        public void ShowDialog(Type type)
+
+        ClusterConfiguration clusterConfig;
+        public void ShowDialog(Type type, ClusterConfiguration clusterConfig)
         {
             this.type = type;
+            this.clusterConfig = clusterConfig;
             this.ShowDialog();
+            
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -80,7 +86,13 @@ namespace DistDBMS.UserInterface.Controls
                         }
                     case Stage.InitDb:
                         {
-                            
+                            ControlSiteClient controlSiteClient = new ControlSiteClient();
+                            controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
+
+                            string[] gddScript = FileUploader.ReadFileToString("DbInitScript.txt");
+                            controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommon.GDDSCRIPT, gddScript);
+                            controlSiteClient.Packets.WaitAndRead();
+   
                             break;
                         }
                     case Stage.InitData:
@@ -118,6 +130,7 @@ namespace DistDBMS.UserInterface.Controls
         {
             lblStep.Text = ((int)current + 1).ToString();
             lblDescription.Text = "是否" + description[current];
+            this.Focus();
         }
 
         private void btnNo_Click(object sender, EventArgs e)
