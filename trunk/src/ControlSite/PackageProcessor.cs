@@ -27,7 +27,10 @@ namespace DistDBMS.ControlSite
                         {
                             //初始化每个二级接口
                             foreach (Site site in gdd.Sites)
-                                conn.GetLocalSiteClient(site.Name).SendServerClientTextObjectPacket(Common.NetworkCommon.GDDSCRIPT, gdd);
+                                conn.GetLocalSiteClient(site.Name).SendStepTextObjectPacket(conn.SessionId, 
+                                    Network.SessionStepPacket.StepIndexNone, 
+                                    Network.SessionStepPacket.StepIndexNone, 
+                                    Common.NetworkCommon.GDDSCRIPT, gdd);
                             
                             foreach (Site site in gdd.Sites)
                                 conn.GetLocalSiteClient(site.Name).Packets.WaitAndRead();
