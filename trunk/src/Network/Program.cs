@@ -133,8 +133,7 @@ namespace DistDBMS
                     conn.GetLocalSiteClient("L2").SendStepTextPacket(conn.SessionId, 0, 1, "Test:Sub");
 
                     conn.GetLocalSiteClient("L2").SendStepTextPacket(conn.SessionId, 1, 2, "Test:Return");
-
-
+                    
                     Thread.Sleep(2000);
 
 

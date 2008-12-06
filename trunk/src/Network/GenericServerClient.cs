@@ -204,7 +204,6 @@ namespace DistDBMS.Network
 
     public abstract class GenericClientConnection : GenericNetworkConnection
     {
-
         public void Connect(string ip, int port)
         {
             tcpClient = new TcpClient();
