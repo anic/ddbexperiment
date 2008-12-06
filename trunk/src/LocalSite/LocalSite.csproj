@@ -69,4 +69,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PreBuildEvent>BatchScript/KillAllSites.bat</PreBuildEvent>
+  </PropertyGroup>
 </Project>

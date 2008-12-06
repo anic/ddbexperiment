@@ -118,6 +118,7 @@
     <Compile Include="FrmApp.Designer.cs">
       <DependentUpon>FrmApp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Handler\FileUploader.cs" />
     <Compile Include="Handler\MenuTreeSwitcher.cs" />
     <Compile Include="LogWriter.cs" />
     <Compile Include="Program.cs" />
@@ -208,9 +209,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BriefTODO.txt" />
-    <None Include="RunControlSite.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\img_colortable.png" />
     <Content Include="Resources\img_column.png" />
     <None Include="Resources\img_exesql.png" />
@@ -221,9 +219,6 @@
     <Content Include="Resources\img_site.png" />
     <Content Include="Resources\img_table.png" />
     <None Include="Resources\img_tool.png" />
-    <None Include="RunLocalSite.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <Content Include="Resources\img_vfragment.png" />
     <Content Include="Resources\Triangle.ico" />
   </ItemGroup>

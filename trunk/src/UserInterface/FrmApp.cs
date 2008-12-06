@@ -53,36 +53,23 @@ namespace DistDBMS.UserInterface
             ControlSiteClient controlSiteClient = new ControlSiteClient();
             controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
 
-            StreamReader sr = new StreamReader("DbInitScript.txt", System.Text.Encoding.Default);
-            List<string> gddScript = new List<string>();
-            while (!sr.EndOfStream)
-                gddScript.Add(sr.ReadLine());
-            sr.Close();
+            string[] gddScript = FileUploader.ReadFileToString("DbInitScript.txt");
+            controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommon.GDDSCRIPT, gddScript);
+            controlSiteClient.Packets.WaitAndRead();
+            
+            ////初始化脚本
+            //string result;
+            //vInterface.ImportScript("DbInitScript.txt", out gdd, out result);
+            //uscExecuteQuery.AddCommandResult(result);
+
+            ////本地设置gdd
+            //uscExecuteQuery.SetGlobalDirectory(gdd);
+            //switcher.SetGlobalDirectory(gdd);
 
 
-            ServerClientTextObjectPacket package = new ServerClientTextObjectPacket();
-            package.Object = gddScript;
-            //controlSiteClient.SendPacket(package);
-
-            //ServerClientPacket csPacket = ServerClientPacket.NetworkPacketToServerClientPacket(controlSiteClient.Packets.WaitAndRead());
-            //if (csPacket is ServerClientTextObjectPacket)
-            //{
-            //    Debug.WriteLine((csPacket as ServerClientTextObjectPacket).Object.ToString());
-            //}
-
-            //初始化脚本
-            string result;
-            vInterface.ImportScript("DbInitScript.txt", out gdd, out result);
-            uscExecuteQuery.AddCommandResult(result);
-
-            //本地设置gdd
-            uscExecuteQuery.SetGlobalDirectory(gdd);
-            switcher.SetGlobalDirectory(gdd);
-
-
-            //导入数据
-            vInterface.ImportData("Data.txt", out result);
-            uscExecuteQuery.AddCommandResult(result);
+            ////导入数据
+            //vInterface.ImportData("Data.txt", out result);
+            //uscExecuteQuery.AddCommandResult(result);
 
             uscExecuteQuery.EnableTip = false;
         }

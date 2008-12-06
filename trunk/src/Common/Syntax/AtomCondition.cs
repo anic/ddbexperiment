@@ -8,6 +8,7 @@ namespace DistDBMS.Common.Syntax
     /// <summary>
     /// 原子条件，更像谓词
     /// </summary>
+    [Serializable]
     public class AtomCondition:ICloneable
     {
         /// <summary>

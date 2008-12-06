@@ -4,6 +4,7 @@ using System.Text;
 
 namespace DistDBMS.Common.Dictionary
 {
+    [Serializable]
     public class FragmentList:List<Fragment>
     {
         /// <summary>
