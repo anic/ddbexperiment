@@ -233,7 +233,7 @@ namespace DistDBMS.Network
             base.Tag = (byte)LocalSiteServerPacketTags.TextObject;
             if (!base.Encapsulate())
                 return false;
-            return WriteObject(Object) && WriteString(Text);
+            return WriteString(Text) && WriteObject(Object);
         }
 
         protected override void Unencapsulate()
@@ -527,6 +527,15 @@ namespace DistDBMS.Network
             packet.Object = obj;
             packet.Encapsulate();
             SendPacket(packet);
+        }
+
+        new public void SendServerClientTextObjectPacket(string text, object obj)
+        {
+            throw new Exception("Use SendStepTextObjectPacket instead");
+        }
+        new public void SendServerClientTextPacket(string text)
+        {
+            throw new Exception("Use SendServerClientTextPacket instead");
         }
 
         override public void OnPacketArrived(NetworkPacket packet)
