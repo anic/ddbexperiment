@@ -4,6 +4,7 @@ using System.Text;
 
 namespace DistDBMS.Common.Table
 {
+    [Serializable]
     public class Tuple
     {
         /// <summary>

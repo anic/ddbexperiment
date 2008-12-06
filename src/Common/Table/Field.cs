@@ -7,6 +7,7 @@ namespace DistDBMS.Common.Table
     /// <summary>
     /// 表中的域
     /// </summary>
+    [Serializable]
     public class Field:ICloneable
     {
         /// <summary>

@@ -5,6 +5,7 @@ using DistDBMS.Common;
 
 namespace DistDBMS.Common.Syntax
 {
+    [Serializable]
     public class Condition:ICloneable
     {
         /// <summary>

@@ -43,6 +43,7 @@
     <None Include="NetworkInitScript.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="NetworkCommon.cs" />
     <Compile Include="RelationalAlgebra\Entity\Common.cs" />
     <Compile Include="RelationalAlgebra\Entity\ConjunctiveNormalForm.cs" />
     <Compile Include="RelationalAlgebra\Entity\DisjunctiveNormalForm.cs" />
@@ -74,6 +75,15 @@
   <ItemGroup>
     <None Include="DbInitScript.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="BatchScript\KillAllSites.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BatchScript\RunControlSite.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BatchScript\RunLocalSite.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

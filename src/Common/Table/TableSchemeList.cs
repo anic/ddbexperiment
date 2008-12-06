@@ -5,6 +5,7 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.Common.Dictionary
 {
+    [Serializable]
     public class TableSchemaList:List<TableSchema>
     {
         public TableSchema this[string key]

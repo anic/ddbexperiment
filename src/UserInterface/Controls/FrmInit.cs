@@ -42,6 +42,7 @@ namespace DistDBMS.UserInterface.Controls
 
             scripts.Add(Stage.InitLocalSite, "RunLocalSite.bat");
             scripts.Add(Stage.InitControlSite, "RunControlSite.bat");
+            scripts.Add(Stage.ClearNetwork, "KillAllSites.bat");
 
             description.Add(Stage.ClearNetwork, "清空所有网络平台");
             description.Add(Stage.InitLocalSite, "执行初始化LocalSite脚本");
@@ -68,23 +69,12 @@ namespace DistDBMS.UserInterface.Controls
                 switch (current)
                 {
                     case Stage.ClearNetwork:
-                        {
-                            System.Diagnostics.Process[] procs = System.Diagnostics.Process.GetProcessesByName("LocalSite");
-                            foreach (Process proc in procs)
-                                proc.Kill();
-
-                            procs = System.Diagnostics.Process.GetProcessesByName("ControlSite");
-                            foreach (Process proc in procs)
-                                proc.Kill();
-
-                            break;
-                        }
                     case Stage.InitLocalSite:
                     case Stage.InitControlSite:
                         {
                             
                             string cmd = scripts[current];
-                            System.Diagnostics.Process proc = System.Diagnostics.Process.Start(cmd);
+                            System.Diagnostics.Process proc = System.Diagnostics.Process.Start(@"BatchScript\" + cmd);
                             proc.WaitForExit();
                             break;
                         }
@@ -101,7 +91,7 @@ namespace DistDBMS.UserInterface.Controls
                 }
 
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
 
             NextStage();
         }
@@ -115,7 +105,7 @@ namespace DistDBMS.UserInterface.Controls
             else
                 current = Stage.Length;
 
-            if (current == Stage.Length)
+            if (current >= Stage.Length)
             {
                 this.Close();
                 return;
@@ -146,5 +136,11 @@ namespace DistDBMS.UserInterface.Controls
                 btnOk_Click(this, e);
         
         }
+
+        private void FrmInit_Shown(object sender, EventArgs e)
+        {
+            this.Focus();
+        }
+
     }
 }

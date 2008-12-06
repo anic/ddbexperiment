@@ -4,6 +4,10 @@ using System.Text;
 
 namespace DistDBMS.Common.Dictionary
 {
+    /// <summary>
+    /// 站点定义
+    /// </summary>
+    [Serializable]
     public class Site
     {
         /// <summary>

@@ -22,6 +22,10 @@ namespace DistDBMS.Common.Dictionary
         Vertical
     }
 
+    /// <summary>
+    /// 分片定义
+    /// </summary>
+    [Serializable]
     public class Fragment
     {
         /// <summary>
