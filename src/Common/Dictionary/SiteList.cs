@@ -4,7 +4,6 @@ using System.Text;
 
 namespace DistDBMS.Common.Dictionary
 {
-    [Serializable]
     public class SiteList : List<Site>
     {
         public Site this[string key]

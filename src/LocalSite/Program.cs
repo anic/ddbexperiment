@@ -2,55 +2,82 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Data.SQLite;
-using DistDBMS.LocalSite.DataAccess;
+using DistDBMS.ControlSite.DataAccess;
 using System.IO;
+using DistDBMS.ControlSite;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.Common.Table;
-using DistDBMS.Network;
-using System.Threading;
 
 namespace DistDBMS.LocalSite
 {
     class Program
     {
-        class PackageProcessor
-        {
-            public void LocalSitePackageProcess(LocalSiteServerConnection conn, LocalSiteServerPacket packet)
-            {
-                System.Console.WriteLine("packet received");
-                int a = 0;
-            }
-
-            public void P2PPackageProcess(LocalSiteServerConnection conn, P2PPacket packet)
-            {
-                int b = 0;
-                System.Console.WriteLine("packet received");
-            }
-        }
-
         static void Main(string[] args)
         {
-            if (args == null || args.Length == 0)
-                return;
-
-            NetworkInitiator initiator = new NetworkInitiator();
-            ClusterConfiguration clusterConfig = initiator.GetConfiguration(args[0]);
-
-            LocalSiteServer localSiteServer = new LocalSiteServer(clusterConfig, args[1]);
-            PackageProcessor processor = new PackageProcessor();
-            localSiteServer.LocalSitePacketProcessor = new LocalSiteServer.LocalSitePacketProcessorDelegate(processor.LocalSitePackageProcess);
-            localSiteServer.P2PPacketProcessor = new LocalSiteServer.P2PPacketProcessorDelegate(processor.P2PPackageProcess);
-
-            localSiteServer.Start();
-
-            System.Console.WriteLine("LocalSite " + args[1] + " started!");
-            //while (true)
+            
+            //本不应该依赖
+            //GDDCreator gddCreator = new GDDCreator();
+            //GlobalDirectory gdd = null;
+            //string path = "InitScript.txt";
+            //if (File.Exists(path))
             //{
-            //    try { Thread.Sleep(500); }
-            //    catch { }
-            //}
+            //    StreamReader sr = new StreamReader(path, System.Text.Encoding.Default);
 
-            Console.ReadLine();
+            //    while (!sr.EndOfStream)
+            //    {
+            //        gddCreator.InsertCommand(sr.ReadLine());
+            //    }
+            //    sr.Close();
+            //    gdd = gddCreator.CreateGDD();
+
+            //}
+            //try
+            //{
+            //    File.Delete("Default");
+            //}
+            //catch(Exception ex) { }
+
+            //using (DataAccessor da = new DataAccessor("Default"))
+            //{
+            //    if (da.CreateTable(gdd.Schemas[0]))
+            //    {
+            //        Table table = new Table();
+            //        table.Schema = gdd.Schemas[0];
+            //        Tuple t = new Tuple();
+            //        t.Data.Add("1");
+            //        t.Data.Add("Liu Zhang");
+            //        t.Data.Add("M");
+            //        t.Data.Add("22");
+            //        t.Data.Add("100");
+            //        table.Tuples.Add(t);
+
+            //        t = new Tuple();
+            //        t.Data.Add("2");
+            //        t.Data.Add("Cheng Yaoan");
+            //        t.Data.Add("M");
+            //        t.Data.Add("23");
+            //        t.Data.Add("99");
+            //        table.Tuples.Add(t);
+
+
+            //        t = new Tuple();
+            //        t.Data.Add("3");
+            //        t.Data.Add("Wang Xiaoguang");
+            //        t.Data.Add("M");
+            //        t.Data.Add("22");
+            //        t.Data.Add("101");
+            //        table.Tuples.Add(t);
+
+            //        da.InsertValues(table);
+
+            //        //da.DropTable(table.Schema.TableName);
+
+            //        string sql = "select * from student where degree >= 100";
+            //        Table table2 = da.Select(sql, gdd.Schemas[0]);
+                    
+            //    }
+            //    //create table Student (id int key, name char(25), sex char(1), age int, degree int)
+            //}
         }
     }
 }

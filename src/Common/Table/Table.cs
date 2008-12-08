@@ -8,7 +8,6 @@ namespace DistDBMS.Common.Table
     /// <summary>
     /// 一个包含数据的表
     /// </summary>
-    [Serializable]
     public class Table
     {
         /// <summary>

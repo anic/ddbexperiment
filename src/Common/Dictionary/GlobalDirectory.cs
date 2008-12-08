@@ -9,7 +9,6 @@ namespace DistDBMS.Common.Dictionary
     /// <summary>
     /// 全局数据字典
     /// </summary>
-    [Serializable]
     public class GlobalDirectory
     {
         /// <summary>

@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="Finder\FragmentFinder.cs" />
     <Compile Include="GDDCreator.cs" />
-    <Compile Include="PackageProcessor.cs" />
     <Compile Include="Plan\DataImporter.cs" />
     <Compile Include="Plan\ImportPlanCreator.cs" />
     <Compile Include="Plan\QueryPlanCreator.cs" />
@@ -88,13 +87,16 @@
       <Project>{7281B7B1-BC54-4D6D-B745-9C950B1BE110}</Project>
       <Name>LocalSite</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Network\Network.csproj">
-      <Project>{3D729BA4-7360-4CEF-8676-BC1E686B1F12}</Project>
-      <Name>Network</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Util\" />
+    <None Include="InitScript.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -104,7 +106,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <PropertyGroup>
-    <PreBuildEvent>BatchScript/KillAllSites.bat</PreBuildEvent>
-  </PropertyGroup>
 </Project>

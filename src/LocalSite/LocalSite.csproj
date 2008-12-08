@@ -8,8 +8,8 @@
     <ProjectGuid>{7281B7B1-BC54-4D6D-B745-9C950B1BE110}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DistDBMS.LocalSite</RootNamespace>
-    <AssemblyName>LocalSite</AssemblyName>
+    <RootNamespace>DistDBMS.ControlSite</RootNamespace>
+    <AssemblyName>ServerSite</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkSubset>
@@ -56,10 +56,6 @@
       <Project>{6732C2FA-0941-4ED3-9DD1-E8B3783A2869}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Network\Network.csproj">
-      <Project>{3D729BA4-7360-4CEF-8676-BC1E686B1F12}</Project>
-      <Name>Network</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -69,7 +65,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <PropertyGroup>
-    <PreBuildEvent>BatchScript/KillAllSites.bat</PreBuildEvent>
-  </PropertyGroup>
 </Project>

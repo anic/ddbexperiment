@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Dictionary;
 
-namespace DistDBMS.LocalSite
+namespace DistDBMS.ControlSite
 {
     class LocalDirectory
     {

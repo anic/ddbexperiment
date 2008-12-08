@@ -5,7 +5,7 @@ using DistDBMS.Common.Table;
 using System.Data.SQLite;
 using DistDBMS.Common;
 
-namespace DistDBMS.LocalSite.DataAccess
+namespace DistDBMS.ControlSite.DataAccess
 {
     class DataAccessor:IDisposable
     {

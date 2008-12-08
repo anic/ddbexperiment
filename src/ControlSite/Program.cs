@@ -18,8 +18,6 @@ using DistDBMS.ControlSite.Plan;
 using System.Collections;
 using System.Threading;
 using DistDBMS.ControlSite.RelationalAlgebraUtility;
-using DistDBMS.LocalSite;
-using DistDBMS.Network;
 
 namespace DistDBMS.ControlSite
 {
@@ -27,57 +25,18 @@ namespace DistDBMS.ControlSite
     {
         GlobalDirectory gdd;
 
-        //class PackageProcessor
-        //{
-        //    public void PackageProcess(ControlSiteServerConnection conn, ServerClientPacket packet)
-        //    {
-        //        //packet
-        //        if (packet is ServerClientPacket) //从Client来的包
-        //        { 
-        //            if (packet is ServerClientTextObjectPacket)
-        //            {
-        //                if ((packet as ServerClientTextObjectPacket).Text == Common.NetworkCommon.GDDSCRIPT)
-        //                {
-        //                    string[] gddScript = (packet as ServerClientTextObjectPacket).Object as string[];
-        //                }
-                        
-        //            }
-        //        }
-                
-                
-        //        int a = 0;
-        //    }
-        //}
-
         static void Main(string[] args)
         {
-            //Program a = new Program();
-            //a.TestGDD();
-            //a.TestSQLSyntax();
-            ////a.TestRelationAlgebra();
-            //a.TestExecutionPlan();
+            Program a = new Program();
 
+            a.TestGDD();
+            a.TestSQLSyntax();
+            //a.TestRelationAlgebra();
+            a.TestExecutionPlan();
 
-            if (args == null || args.Length == 0)
-                return;
-
-            NetworkInitiator initiator = new NetworkInitiator();
-            ClusterConfiguration clusterConfig = initiator.GetConfiguration(args[0]);
-
-            ControlSiteServer controlSiteServer = new ControlSiteServer(clusterConfig, args[1]);
-            
-            //设置处理函数
-            PackageProcessor processor = new PackageProcessor();
-            controlSiteServer.PacketProcessor = new ControlSiteServer.PacketProcessorDelegate(processor.PackageProcess);
-
-            controlSiteServer.Start();
-
-            System.Console.WriteLine("ControlSite " + args[1] + " started!");
-
-            Console.ReadLine();
         }
-        #region 测试用代码
 
+        
         Relation r;
         /// <summary>
         /// 关系代数的填写方法
@@ -471,6 +430,5 @@ namespace DistDBMS.ControlSite
 
             }
         }
-        #endregion
     }
 }

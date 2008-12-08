@@ -57,12 +57,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\FrmInit.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\FrmInit.Designer.cs">
-      <DependentUpon>FrmInit.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\FrmWaitingcs.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -118,14 +112,10 @@
     <Compile Include="FrmApp.Designer.cs">
       <DependentUpon>FrmApp.cs</DependentUpon>
     </Compile>
-    <Compile Include="Handler\FileUploader.cs" />
     <Compile Include="Handler\MenuTreeSwitcher.cs" />
     <Compile Include="LogWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Controls\FrmInit.resx">
-      <DependentUpon>FrmInit.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Controls\FrmWaitingcs.resx">
       <DependentUpon>FrmWaitingcs.cs</DependentUpon>
     </EmbeddedResource>
@@ -202,10 +192,6 @@
       <Project>{1EDEE97A-4E3B-4F00-9A29-A8C246F49FEC}</Project>
       <Name>ControlSite</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Network\Network.csproj">
-      <Project>{3D729BA4-7360-4CEF-8676-BC1E686B1F12}</Project>
-      <Name>Network</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="BriefTODO.txt" />
@@ -230,8 +216,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
 </Project>

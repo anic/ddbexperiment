@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Execution;
 
-namespace DistDBMS.LocalSite
+namespace DistDBMS.ControlSite
 {
     /// <summary>
     /// 调试用的缓存

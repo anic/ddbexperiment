@@ -10,8 +10,9 @@ namespace DistDBMS.Network
     public enum P2PPacketTags
     {
         None,
-        Text,
-        TextObject,
+        Data,
+        Command,
+        Object,
     }
 
     public class SessionStepPacket : NetworkPacket
@@ -65,11 +66,11 @@ namespace DistDBMS.Network
 
             switch ((P2PPacketTags)packet.Tag)
             {
-                case P2PPacketTags.Text:
-                    packet = packet.ToPacket<P2PTextPacket>();
+                case P2PPacketTags.Command:
+                    packet = packet.ToPacket<P2PCommandPacket>();
                     break;
-                case P2PPacketTags.TextObject:
-                    packet = packet.ToPacket<P2PTextObjectPacket>();
+                case P2PPacketTags.Data:
+                    packet = packet.ToPacket<P2PDataPacket>();
                     break;
                 default:
                     System.Diagnostics.Debugger.Break();
@@ -82,44 +83,68 @@ namespace DistDBMS.Network
         }
     }
 
-    public class P2PTextPacket : P2PPacket
+    public class P2PDataPacket : P2PPacket
     {
-        public string Text = "";
-
+        public bool IsLast;
         public override bool Encapsulate()
         {
-            base.Tag = (byte)P2PPacketTags.Text;
+            base.Tag = (byte)P2PPacketTags.Data;
 
             if (!base.Encapsulate())
                 return false;
 
-            return WriteString(Text);
+            return WriteByte(IsLast ? (byte)1 : (byte)0);
         }
 
         protected override void Unencapsulate()
         {
             base.Unencapsulate();
-            Text = ReadString();
+            IsLast = (ReadByte() != 0);
         }
+
+        override public bool IsCompleted { get { return IsLast; } }
     }
 
-    public class P2PTextObjectPacket : P2PPacket
+    public class P2PCommandPacket : P2PPacket
     {
-        public string Text = "";
+        public string Command;
+
+        public override bool Encapsulate()
+        {
+            base.Tag = (byte)P2PPacketTags.Command;
+
+            if (!base.Encapsulate())
+                return false;
+
+            return WriteString(Command);
+        }
+
+        protected override void Unencapsulate()
+        {
+            base.Unencapsulate();
+            Command = ReadString();
+        }
+
+        override public bool IsCompleted { get { 
+            return !Command.Contains("Data");
+        } }
+    }
+
+    public class P2PObjectPacket : P2PPacket
+    {
         public object Object;
 
         public override bool Encapsulate()
         {
-            base.Tag = (byte)P2PPacketTags.TextObject;
+            base.Tag = (byte)P2PPacketTags.Object;
             if (!base.Encapsulate())
                 return false;
-            return WriteString(Text) && WriteObject(Object);
+            return WriteObject(Object);
         }
 
         protected override void Unencapsulate()
         {
             base.Unencapsulate();
-            Text = ReadString();
             Object = ReadObject();
         }
     }
@@ -153,15 +178,16 @@ namespace DistDBMS.Network
 
 
 
-    public enum LocalSiteServerPacketTags
+    public enum LocalSitePacketTags
     {
         None,
-        Text,
-        TextObject,
+        OK,
+        Command,
+        Object,
     }
 
 
-    public class LocalSiteServerPacket : SessionStepPacket
+    public class LocalSitePacket : SessionStepPacket
     {
         public int StepFromIndex;
 
@@ -179,19 +205,19 @@ namespace DistDBMS.Network
             StepFromIndex = ReadInt();
         }
 
-        public static LocalSiteServerPacket NetworkPacketToLocalSitePacket(NetworkPacket networkPacket)
+        public static LocalSitePacket NetworkPacketToLocalSitePacket(NetworkPacket networkPacket)
         {
-            LocalSiteServerPacket lsPacket = networkPacket.ToPacket<LocalSiteServerPacket>();
+            LocalSitePacket lsPacket = networkPacket.ToPacket<LocalSitePacket>();
 
-            switch ((LocalSiteServerPacketTags)lsPacket.Tag)
+            switch ((LocalSitePacketTags)lsPacket.Tag)
             {
-                case LocalSiteServerPacketTags.Text:
+                case LocalSitePacketTags.Command:
                     {
-                        return lsPacket.ToPacket<LocalSiteServerTextPacket>();
+                        return lsPacket.ToPacket<LocalSiteCommandPacket>();
                     }
-                case LocalSiteServerPacketTags.TextObject:
+                case LocalSitePacketTags.OK:
                     {
-                        return lsPacket.ToPacket<LocalSiteServerTextObjectPacket>();
+                        return lsPacket.ToPacket<LocalSiteOKPacket>();
                     }
                 default:
                     System.Diagnostics.Debugger.Break();
@@ -203,95 +229,95 @@ namespace DistDBMS.Network
 
     }
 
-    public class LocalSiteServerTextPacket : LocalSiteServerPacket
+    public class LocalSiteOKPacket : LocalSitePacket
     {
-        public string Text = "";
+        public override bool Encapsulate()
+        {
+            Tag = (byte)LocalSitePacketTags.OK;
+            if (!base.Encapsulate())
+                return false;
+            return true;
+        }
+    }
+
+    public class LocalSiteCommandPacket : LocalSitePacket
+    {
+        public string Command;
 
         public override bool Encapsulate()
         {
-            Tag = (byte)LocalSiteServerPacketTags.Text;
+            Tag = (byte)LocalSitePacketTags.Command;
             if (!base.Encapsulate())
                 return false;
 
-            return WriteString(Text);
+            return WriteString(Command);
         }
 
         protected override void Unencapsulate()
         {
             base.Unencapsulate();
-            Text = ReadString();
+            Command = ReadString();
         }
     }
 
-    public class LocalSiteServerTextObjectPacket : LocalSiteServerPacket
+    public class LocalSiteObjectPacket : LocalSitePacket
     {
-        public string Text = "";
         public object Object;
 
         public override bool Encapsulate()
         {
-            base.Tag = (byte)LocalSiteServerPacketTags.TextObject;
+            base.Tag = (byte)LocalSitePacketTags.Object;
             if (!base.Encapsulate())
                 return false;
-            return WriteString(Text) && WriteObject(Object);
+            return WriteObject(Object);
         }
 
         protected override void Unencapsulate()
         {
             base.Unencapsulate();
-            Text = ReadString();
             Object = ReadObject();
         }
     }
 
     public class LocalSiteServerConnection : GenericServerConnection
     {
-        
+        public PacketQueue Packets = new PacketQueue();
         public Guid SessionId;
-        public LocalSiteServer Server;
+        LocalSiteServer localSiteServer;
+        int TestValue = 0, TempValue = 0;
 
         override public void Start()
         {
-            Server = (LocalSiteServer)genericServer;
+            localSiteServer = (LocalSiteServer)genericServer;
 
             new Thread(new ThreadStart(ThreadProcessPackets)).Start();
             base.Start();
         }
 
-        /*
-        public void EncapsulateAndSendP2PPacket(string p2pDest, int stepIndex, P2PPacket p2pPacket)
+        void EncapsulateAndSendP2PPacket(string p2pDest, int stepIndex, P2PPacket p2pPacket)
         {
             p2pPacket.StepIndex = stepIndex;
             p2pPacket.SessionId = SessionId;
             p2pPacket.Encapsulate();
-        }
-        */
-
-        public void SendP2PStepTextPacket(string dest, int step, string text)
-        {
-            P2PTextPacket packet = new P2PTextPacket();
-            packet.SessionId = SessionId;
-            packet.StepIndex = step;
-            packet.Text = text;
-            packet.Encapsulate();
-            PeerConnection peerConn = Server.P2PNetwork.GetConnection(dest);
+            PeerConnection peerConn = localSiteServer.P2PNetwork.GetConnection(p2pDest);
             if (peerConn != null)
-                peerConn.SendPacket(packet);
+                peerConn.SendPacket(p2pPacket);
             else
                 System.Diagnostics.Debugger.Break();
         }
 
-        public void SendP2PStepTextObjectPacket(string dest, int step, string text, object obj)
+        void EncapsulateAndSendP2PData(string p2pDest, byte []data, int offset, int length, bool isLast)
         {
-            P2PTextObjectPacket packet = new P2PTextObjectPacket();
-            packet.SessionId = SessionId;
-            packet.StepIndex = step;
-            packet.Text = text;
-            packet.Object = obj;
-            packet.Encapsulate();
-            PeerConnection peerConn = Server.P2PNetwork.GetConnection(dest);
+            P2PDataPacket dataPacket = new P2PDataPacket();
+            dataPacket.StepIndex = P2PPacket.StepIndexNone;
+            dataPacket.SessionId = SessionId;
+            dataPacket.IsLast = isLast;
+            dataPacket.Encapsulate();
+            dataPacket.WriteBytes(data, offset, length);
+
+            PeerConnection peerConn = localSiteServer.P2PNetwork.GetConnection(p2pDest);
             if (peerConn != null)
-                peerConn.SendPacket(packet);
+                peerConn.SendPacket(dataPacket);
             else
                 System.Diagnostics.Debugger.Break();
         }
@@ -303,15 +329,76 @@ namespace DistDBMS.Network
 
         void ProcessSessionStepPacket(SessionStepPacket ssPacket)
         {
-            if (ssPacket is LocalSiteServerPacket)
+            if (ssPacket is LocalSiteCommandPacket)
             {
-                LocalSiteServerPacket packet = (LocalSiteServerPacket)ssPacket;
-                Server.LocalSitePacketProcessor(this, packet);
+                LocalSiteCommandPacket packet = (LocalSiteCommandPacket)ssPacket;
+
+                Debug.WriteLine(localSiteServer.Name + " LCL " + packet.Command);
+
+                string[] args = packet.Command.Split(":".ToCharArray());
+                if (args[0] == "Test")
+                {
+                    P2PCommandPacket p2pPacket = new P2PCommandPacket();
+                    if (args[1] == "Set")
+                    {
+                        TestValue = int.Parse(args[2]);
+                        SendOKPacket();
+                    }
+                    else if (args[1] == "Send")
+                    {
+                        /*
+                        p2pPacket.Command = "Test:Set:" + TestValue.ToString();
+                        EncapsulateAndSendP2PPacket(args[2], packet.StepIndex, p2pPacket);
+                        Debug.WriteLine(localSiteServer.Name + " send P2P " + p2pPacket.Command);
+                        */
+                        p2pPacket.Command = "Test:Data";
+                        EncapsulateAndSendP2PPacket(args[2], packet.StepIndex, p2pPacket);
+                        Debug.WriteLine(localSiteServer.Name + " send P2P " + p2pPacket.Command);
+
+                        EncapsulateAndSendP2PData(args[2], new byte[] { 1, 2, 3, 4, 5, 6 }, 0, 6, false);
+                        Debug.WriteLine(localSiteServer.Name + " send P2P data");
+
+                        EncapsulateAndSendP2PData(args[2], new byte[] { 9, 8, 7, 6, 5, 4 }, 0, 6, true);
+                        Debug.WriteLine(localSiteServer.Name + " send P2P data");
+                    }
+                    else if (args[1] == "Sub")
+                    {
+                        TestValue = - TempValue;
+                    }
+                    else if (args[1] == "Return")
+                    {
+                        Debug.WriteLine(localSiteServer.Name + " Return " + TestValue.ToString());
+                        SendOKPacket();
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debugger.Break();
+                    }
+                }
             }
-            else if (ssPacket is P2PTextPacket)
+            else if (ssPacket is P2PCommandPacket)
             {
-                P2PPacket packet = (P2PPacket)ssPacket;
-                Server.P2PPacketProcessor(this, packet);
+                P2PCommandPacket packet = (P2PCommandPacket)ssPacket;
+
+                Debug.WriteLine(localSiteServer.Name + " P2P " + packet.Command);
+
+                string[] args = packet.Command.Split(":".ToCharArray());
+                if (args[0] == "Test")
+                {
+                    if (args[1] == "Set")
+                    {
+                        TempValue = int.Parse(args[2]);
+                    }
+                    else if (args[1] == "Data")
+                    {
+                        P2PDataPacket dataPacket = (P2PDataPacket)packet.FollowingPackets[1];
+                        Debug.WriteLine(localSiteServer.Name + " P2P " + packet.Command + " " + dataPacket.ReadByte().ToString());
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debugger.Break();
+                    }
+                }
             }
         }
 
@@ -324,21 +411,18 @@ namespace DistDBMS.Network
                 {
                     if (ssPacket.SessionId != SessionId)
                     {
-                        if (ssPacket is LocalSiteServerPacket)
+                        if (ssPacket is LocalSitePacket)
                         {
                             Guid oldSessionId = SessionId;
                             SessionId = ssPacket.SessionId;
 
                             stepWaitingPackets.Clear(); stepDonePackets.Clear();
-                            for (int i = 0; i < 100; i++)
-                            {
-                                stepDonePackets.Add(null);
-                                stepWaitingPackets.Add(null);
-                            }
+                            stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null); stepDonePackets.Add(null);
+                            stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null); stepWaitingPackets.Add(null);
                             incompletedPackets.Clear();
 
                             //新建的会话，或者会话还没建立，但P2P数据已经到达
-                            Server.UpdateSessionConnectionTable(this, oldSessionId, SessionId);
+                            localSiteServer.UpdateSessionConnectionTable(this, oldSessionId, SessionId);
 
                             //继续执行
                         }
@@ -381,7 +465,7 @@ namespace DistDBMS.Network
                     
                     bool modified = false;
 
-                    if (ssPacket is P2PPacket || (ssPacket as LocalSiteServerPacket).StepFromIndex == SessionStepPacket.StepIndexNone)
+                    if (ssPacket is P2PPacket || (ssPacket as LocalSitePacket).StepFromIndex == SessionStepPacket.StepIndexNone)
                     {
                         ProcessSessionStepPacket(ssPacket);
 
@@ -402,7 +486,7 @@ namespace DistDBMS.Network
                         modified = false;
                         for (int i = 0; i < stepWaitingPackets.Count; i++)
                         {
-                            if (stepWaitingPackets[i] != null && stepDonePackets[ (stepWaitingPackets[i] as LocalSiteServerPacket).StepFromIndex] != null)
+                            if (stepWaitingPackets[i] != null && stepDonePackets[ (stepWaitingPackets[i] as LocalSitePacket).StepFromIndex] != null)
                             {
                                 ProcessSessionStepPacket(stepWaitingPackets[i]);
                                 stepDonePackets[stepWaitingPackets[i].StepIndex] = stepWaitingPackets[i];
@@ -415,10 +499,17 @@ namespace DistDBMS.Network
             }
         }
 
+        void SendOKPacket()
+        {
+            LocalSiteOKPacket packet = new LocalSiteOKPacket();
+            packet.Encapsulate();
+            SendPacket(packet);
+        }
+
         override public void OnPacketArrived(NetworkPacket networkPacket)
         {
             LocalSiteServer localSiteServer = (LocalSiteServer)genericServer;
-            LocalSiteServerPacket lsPacket = LocalSiteServerPacket.NetworkPacketToLocalSitePacket(networkPacket);
+            LocalSitePacket lsPacket = LocalSitePacket.NetworkPacketToLocalSitePacket(networkPacket);
 
             lsPacket.FromHostName = localSiteServer.Name;
             Packets.Append(lsPacket);            
@@ -441,11 +532,6 @@ namespace DistDBMS.Network
             Name = name;
         }
 
-        public delegate void LocalSitePacketProcessorDelegate(LocalSiteServerConnection conn, LocalSiteServerPacket packet);
-        public LocalSitePacketProcessorDelegate LocalSitePacketProcessor { get; set; }
-
-        public delegate void P2PPacketProcessorDelegate(LocalSiteServerConnection conn, P2PPacket packet);
-        public P2PPacketProcessorDelegate P2PPacketProcessor { get; set; }
 
         public void UpdateSessionConnectionTable(LocalSiteServerConnection conn, Guid oldSessionId, Guid newSessionId)
         {
@@ -506,42 +592,13 @@ namespace DistDBMS.Network
 
     public class LocalSiteClient : GenericClientConnection
     {
-        public void SendStepTextPacket(Guid sessionId, int stepFrom, int step, string text)
-        {
-            LocalSiteServerTextPacket packet = new LocalSiteServerTextPacket();
-            packet.SessionId = sessionId;
-            packet.StepFromIndex = stepFrom;
-            packet.StepIndex = step;
-            packet.Text = text;
-            packet.Encapsulate();
-            SendPacket(packet);
-        }
-
-        public void SendStepTextObjectPacket(Guid sessionId, int stepFrom, int step, string text, object obj)
-        {
-            LocalSiteServerTextObjectPacket packet = new LocalSiteServerTextObjectPacket();
-            packet.SessionId = sessionId;
-            packet.StepFromIndex = stepFrom;
-            packet.StepIndex = step;
-            packet.Text = text;
-            packet.Object = obj;
-            packet.Encapsulate();
-            SendPacket(packet);
-        }
-
-        new public void SendServerClientTextObjectPacket(string text, object obj)
-        {
-            throw new Exception("Use SendStepTextObjectPacket instead");
-        }
-        new public void SendServerClientTextPacket(string text)
-        {
-            throw new Exception("Use SendServerClientTextPacket instead");
-        }
+        public PacketQueue Packets = new PacketQueue();
 
         override public void OnPacketArrived(NetworkPacket packet)
         {
-            Packets.Append(ServerClientPacket.NetworkPacketToServerClientPacket(packet));
+            Packets.Append(LocalSitePacket.NetworkPacketToLocalSitePacket(packet));
         }
+
     }
 
 }

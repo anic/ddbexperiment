@@ -6,7 +6,6 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.Common.Syntax
 {
-    [Serializable]
     public class Operand:ICloneable
     {
         static Exception InvalidValueConvertion = new Exception("InvalidValueConvertion");

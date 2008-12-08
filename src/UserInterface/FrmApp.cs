@@ -14,8 +14,6 @@ using DistDBMS.UserInterface.Properties;
 using DistDBMS.Common.Table;
 using DistDBMS.UserInterface.Handler;
 using DistDBMS.Common.RelationalAlgebra.Entity;
-using DistDBMS.Network;
-using DistDBMS.Common.Execution;
 
 namespace DistDBMS.UserInterface
 {
@@ -28,11 +26,11 @@ namespace DistDBMS.UserInterface
         {
             InitializeComponent();
 
-            imageList.Images.Add("magnifier", Resources.img_magnifier);
-            imageList.Images.Add("dictionary", Resources.img_dictionary);
-            imageList.Images.Add("site", Resources.img_site);
-            imageList.Images.Add("table", Resources.img_table);
-            imageList.Images.Add("hfragment", Resources.img_hfragment);
+            imageList.Images.Add("magnifier",Resources.img_magnifier);
+            imageList.Images.Add("dictionary",Resources.img_dictionary);
+            imageList.Images.Add("site",Resources.img_site);
+            imageList.Images.Add("table",Resources.img_table);
+            imageList.Images.Add("hfragment",Resources.img_hfragment);
             imageList.Images.Add("vfragment", Resources.img_vfragment);
 
             switcher = new MenuTreeSwitcher(tvwMenu, this);
@@ -41,31 +39,20 @@ namespace DistDBMS.UserInterface
             switcher.SetControl(uscSiteViewer);
 
             vInterface = new DistDBMS.ControlSite.VirtualInterface2();
-
-            NetworkInitiator initiator = new NetworkInitiator();
-            ClusterConfiguration clusterConfig = initiator.GetConfiguration("NetworkInitScript.txt");
-
-            FrmInit frmInit = new FrmInit();
-            frmInit.ShowDialog(FrmInit.Type.Init, clusterConfig);
-
-
             
+            //初始化脚本
+            string result;
+            vInterface.ImportScript("InitScript.txt",out gdd,out result);
+            uscExecuteQuery.AddCommandResult(result);
 
-            
-            
-            ////初始化脚本
-            //string result;
-            //vInterface.ImportScript("DbInitScript.txt", out gdd, out result);
-            //uscExecuteQuery.AddCommandResult(result);
-
-            ////本地设置gdd
-            //uscExecuteQuery.SetGlobalDirectory(gdd);
-            //switcher.SetGlobalDirectory(gdd);
+            //本地设置gdd
+            uscExecuteQuery.SetGlobalDirectory(gdd);
+            switcher.SetGlobalDirectory(gdd);
 
 
-            ////导入数据
-            //vInterface.ImportData("Data.txt", out result);
-            //uscExecuteQuery.AddCommandResult(result);
+            //导入数据
+            vInterface.ImportData("Data.txt", out result);
+            uscExecuteQuery.AddCommandResult(result);
 
             uscExecuteQuery.EnableTip = false;
         }
@@ -77,7 +64,7 @@ namespace DistDBMS.UserInterface
 
         void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
         {
-
+            
             Table data;
             string result;
             Relation queryTree;
@@ -93,8 +80,10 @@ namespace DistDBMS.UserInterface
                 LogWriter writer = new LogWriter();
                 writer.WriteLog(uscExecuteQuery.SQLText + "\r\n" + ex.StackTrace);
                 MessageBox.Show("执行出现异常，并已经记录到error.log中", "出错", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
 
+
+            }
+            
         }
 
         private void FrmApp_Shown(object sender, EventArgs e)
@@ -129,17 +118,11 @@ namespace DistDBMS.UserInterface
 
 
             uscExecuteQuery.EnableTip = true;
-
-        }
-
-        private void FrmApp_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            FrmInit frmDestroy = new FrmInit();
-            frmDestroy.ShowDialog(FrmInit.Type.Destroy, null);
+            
         }
 
 
-
-
+        
+        
     }
 }

@@ -8,7 +8,7 @@ using DistDBMS.Common.Dictionary;
 using System.Collections;
 using DistDBMS.Common.Syntax;
 
-namespace DistDBMS.LocalSite.Processor
+namespace DistDBMS.ControlSite.Processor
 {
 
     class QueryProcessor
@@ -54,7 +54,7 @@ namespace DistDBMS.LocalSite.Processor
         
         private Table HandleUnion()
         {
-            using (DataAccess.DataAccessor accessor = new DistDBMS.LocalSite.DataAccess.DataAccessor(dbname))
+            using (DataAccess.DataAccessor accessor = new DistDBMS.ControlSite.DataAccess.DataAccessor(dbname))
             {
 
                 string sql = GenerateQueryString(true);
@@ -86,7 +86,7 @@ namespace DistDBMS.LocalSite.Processor
 
         private Table HandleQuery()
         {
-            using (DataAccess.DataAccessor accessor = new DistDBMS.LocalSite.DataAccess.DataAccessor(dbname))
+            using (DataAccess.DataAccessor accessor = new DistDBMS.ControlSite.DataAccess.DataAccessor(dbname))
             {
 
                 //生成临时表格
