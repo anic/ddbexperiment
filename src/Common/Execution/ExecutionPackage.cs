@@ -5,6 +5,7 @@ using System.Text;
 
 namespace DistDBMS.Common.Execution
 {
+    [Serializable]
     public class ExecutionPackage 
     {
         public int ID { get; set; }
@@ -13,7 +14,7 @@ namespace DistDBMS.Common.Execution
         { 
             Plan = 0,
             Data,
-            GDDInit
+            Gdd
         }
 
         public PackageType Type { get; set; }

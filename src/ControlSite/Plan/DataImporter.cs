@@ -26,6 +26,15 @@ namespace DistDBMS.ControlSite.Plan
             tableList = new List<Table>();
         }
 
+        public bool ImportFromText(string[] lines)
+        {
+            tableList.Clear();
+            foreach (string line in lines)
+                HandleLine(line);
+
+            return true;
+        }
+
         public bool ImportFromFile(string filename)
         {
             tableList.Clear();
@@ -36,36 +45,41 @@ namespace DistDBMS.ControlSite.Plan
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
-                        if (IsTableDefinition(line)) //是定义
-                        {
-                            string tablename = GetTableName(line);
-                            if (tablename == null)
-                                return false;
-
-                            TableSchema schema = GetLogicTableSchema(tablename);
-                            if (schema == null)
-                                return false;
-
-                            currentSchema = schema; //currentSchema 逻辑表的Schema
-                        }
-                        else //数据
-                        {
-                            Tuple tuple = CreateTuple(currentSchema, line, '\t');
-                            if (tuple == null)
-                                return false;
-                            
-                            List<Fragment> fragments = GetFragmentByTuple(tuple, currentSchema);
-                            foreach (Fragment fragment in fragments)
-                            { 
-                                Table table = GetTableByFragment(fragment); //将数据插入到对应分片的对应表格中
-                                table.Tuples.Add(SplitTuple(tuple, fragment, currentSchema));
-                            }
-                        }
+                        HandleLine(line);
                     }
-
-                    
                 }
             }
+            return true;
+        }
+
+        private bool HandleLine(string line)
+        {
+            if (IsTableDefinition(line)) //是定义
+            {
+                string tablename = GetTableName(line);
+                if (tablename == null)
+                    return false;
+
+                TableSchema schema = GetLogicTableSchema(tablename);
+                if (schema == null)
+                    return false;
+
+                currentSchema = schema; //currentSchema 逻辑表的Schema
+            }
+            else //数据
+            {
+                Tuple tuple = CreateTuple(currentSchema, line, '\t');
+                if (tuple == null)
+                    return false;
+
+                List<Fragment> fragments = GetFragmentByTuple(tuple, currentSchema);
+                foreach (Fragment fragment in fragments)
+                {
+                    Table table = GetTableByFragment(fragment); //将数据插入到对应分片的对应表格中
+                    table.Tuples.Add(SplitTuple(tuple, fragment, currentSchema));
+                }
+            }
+
             return true;
         }
 

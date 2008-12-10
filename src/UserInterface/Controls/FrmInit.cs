@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using DistDBMS.Network;
 using DistDBMS.UserInterface.Handler;
+using DistDBMS.Common.Execution;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -23,6 +24,7 @@ namespace DistDBMS.UserInterface.Controls
         enum Stage
         {
             ClearNetwork = 0,
+            ClearDb,
             InitLocalSite,
             InitControlSite,
             InitDb,
@@ -45,14 +47,19 @@ namespace DistDBMS.UserInterface.Controls
             scripts.Add(Stage.InitLocalSite, "RunLocalSite.bat");
             scripts.Add(Stage.InitControlSite, "RunControlSite.bat");
             scripts.Add(Stage.ClearNetwork, "KillAllSites.bat");
+            scripts.Add(Stage.ClearDb, "DeleteDb.bat");
 
             description.Add(Stage.ClearNetwork, "清空所有网络平台");
             description.Add(Stage.InitLocalSite, "执行初始化LocalSite脚本");
             description.Add(Stage.InitControlSite, "执行初始化ControlSite脚本");
             description.Add(Stage.InitDb, "初始化数据库");
             description.Add(Stage.InitData, "导入数据");
+            description.Add(Stage.ClearDb, "删除所有数据库");
+            
+            //TODO:先从初始化开始，以后改成清空平台
+            //current = (Stage)0;
+            current = Stage.ClearNetwork;
 
-            current = (Stage)0;
             type = Type.Init;
 
             UpdateDescription();
@@ -75,6 +82,7 @@ namespace DistDBMS.UserInterface.Controls
                 switch (current)
                 {
                     case Stage.ClearNetwork:
+                    case Stage.ClearDb:
                     case Stage.InitLocalSite:
                     case Stage.InitControlSite:
                         {
@@ -90,14 +98,21 @@ namespace DistDBMS.UserInterface.Controls
                             controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
 
                             string[] gddScript = FileUploader.ReadFileToString("DbInitScript.txt");
-                            controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommon.GDDSCRIPT, gddScript);
+                            controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.GDDSCRIPT, gddScript);
                             controlSiteClient.Packets.WaitAndRead();
-   
+                            
                             break;
                         }
                     case Stage.InitData:
                         {
-                            
+                            ControlSiteClient controlSiteClient = new ControlSiteClient();
+                            controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
+
+                            string[] dataScript = FileUploader.ReadFileToString("Data.txt");
+                            controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.DATASCRIPT, dataScript);
+                            controlSiteClient.Packets.WaitAndRead();
+
+                            break;
                             break;
                         }
                 }

@@ -24,6 +24,7 @@ namespace DistDBMS.UserInterface
         ControlSite.VirtualInterface2 vInterface;
         GlobalDirectory gdd;
         MenuTreeSwitcher switcher;
+        ClusterConfiguration clusterConfig;
         public FrmApp()
         {
             InitializeComponent();
@@ -43,7 +44,7 @@ namespace DistDBMS.UserInterface
             vInterface = new DistDBMS.ControlSite.VirtualInterface2();
 
             NetworkInitiator initiator = new NetworkInitiator();
-            ClusterConfiguration clusterConfig = initiator.GetConfiguration("NetworkInitScript.txt");
+            clusterConfig = initiator.GetConfiguration("NetworkInitScript.txt");
 
             FrmInit frmInit = new FrmInit();
             frmInit.ShowDialog(FrmInit.Type.Init, clusterConfig);
@@ -83,10 +84,17 @@ namespace DistDBMS.UserInterface
             Relation queryTree;
             try
             {
-                vInterface.ExecuteSQL(uscExecuteQuery.SQLText, out data, out result, out queryTree);
+                /*vInterface.ExecuteSQL(uscExecuteQuery.SQLText, out data, out result, out queryTree);
                 uscExecuteQuery.AddCommandResult(result);
                 uscExecuteQuery.SetResultTable(data);
-                uscExecuteQuery.SetQueryTree(queryTree);
+                uscExecuteQuery.SetQueryTree(queryTree);*/
+
+                //TODO:设置选择ControlSite
+                ControlSiteClient controlSiteClient = new ControlSiteClient();
+                controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
+                controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.EXESQL, uscExecuteQuery.SQLText);
+                controlSiteClient.Packets.WaitAndRead();
+
             }
             catch (Exception ex)
             {

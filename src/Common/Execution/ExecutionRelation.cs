@@ -8,6 +8,7 @@ using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.Common.Execution
 {
+    [Serializable]
     public class ExecutionRelation:Relation
     {
         public int ResultID { get; set; }

@@ -6,6 +6,7 @@ using DistDBMS.Common.RelationalAlgebra.Entity;
 
 namespace DistDBMS.Common.Execution
 {
+    [Serializable]
     public class ExecutionStep
     {
         public enum ExecuteType
