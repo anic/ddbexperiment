@@ -43,7 +43,8 @@
     <None Include="NetworkInitScript.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Compile Include="NetworkCommon.cs" />
+    <Compile Include="Execution\ExecutionResult.cs" />
+    <Compile Include="NetworkCommand.cs" />
     <Compile Include="RelationalAlgebra\Entity\Common.cs" />
     <Compile Include="RelationalAlgebra\Entity\ConjunctiveNormalForm.cs" />
     <Compile Include="RelationalAlgebra\Entity\DisjunctiveNormalForm.cs" />
@@ -73,6 +74,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="BatchScript\DeleteDb.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbInitScript.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

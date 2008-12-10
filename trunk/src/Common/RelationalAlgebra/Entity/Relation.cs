@@ -8,6 +8,7 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.Common.RelationalAlgebra.Entity
 {
+    [Serializable]
     public class Relation
     {
         /// <summary>

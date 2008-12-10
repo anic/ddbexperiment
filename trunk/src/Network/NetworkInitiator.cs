@@ -12,6 +12,12 @@ namespace DistDBMS.Network
     /// </summary>
     public class NetworkInitiator
     {
+        public List<string> LocalSiteNames { get { return localSite; } }
+        List<string> localSite = new List<string>();
+
+        public List<string> ControlSiteNames { get { return controlSite; } }
+        List<string> controlSite = new List<string>();
+
         public ClusterConfiguration GetConfiguration(string filename)
         {
             if (!File.Exists(filename))
@@ -29,12 +35,14 @@ namespace DistDBMS.Network
                     {
                         clusterConfig.Hosts[param[1]]["Host"] = param[2];
                         clusterConfig.Hosts[param[1]]["Port"] = Int32.Parse(param[3]);
+                        controlSite.Add(param[1]);
                     }
                     else if (param[0] == "LocalSite" && param.Length == 5)
                     {
                         clusterConfig.Hosts[param[1]]["Host"] = param[2];
                         clusterConfig.Hosts[param[1]]["Port"] = Int32.Parse(param[3]);
                         clusterConfig.Hosts[param[1]]["P2PPort"] = Int32.Parse(param[4]);
+                        localSite.Add(param[1]);
                     }
                 }
                 catch

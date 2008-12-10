@@ -27,27 +27,7 @@ namespace DistDBMS.ControlSite
     {
         GlobalDirectory gdd;
 
-        //class PackageProcessor
-        //{
-        //    public void PackageProcess(ControlSiteServerConnection conn, ServerClientPacket packet)
-        //    {
-        //        //packet
-        //        if (packet is ServerClientPacket) //从Client来的包
-        //        { 
-        //            if (packet is ServerClientTextObjectPacket)
-        //            {
-        //                if ((packet as ServerClientTextObjectPacket).Text == Common.NetworkCommon.GDDSCRIPT)
-        //                {
-        //                    string[] gddScript = (packet as ServerClientTextObjectPacket).Object as string[];
-        //                }
-                        
-        //            }
-        //        }
-                
-                
-        //        int a = 0;
-        //    }
-        //}
+        
 
         static void Main(string[] args)
         {
@@ -58,21 +38,37 @@ namespace DistDBMS.ControlSite
             //a.TestExecutionPlan();
 
 
-            if (args == null || args.Length == 0)
-                return;
 
+            //第一个参数是初始化的脚本
+            string scriptFile = "NetworkInitScript.txt";
+
+            if (args.Length >= 1)
+                scriptFile = args[0];
+
+            //args.Length >= 1
             NetworkInitiator initiator = new NetworkInitiator();
-            ClusterConfiguration clusterConfig = initiator.GetConfiguration(args[0]);
+            ClusterConfiguration clusterConfig = initiator.GetConfiguration(scriptFile);
 
-            ControlSiteServer controlSiteServer = new ControlSiteServer(clusterConfig, args[1]);
-            
-            //设置处理函数
-            PackageProcessor processor = new PackageProcessor();
-            controlSiteServer.PacketProcessor = new ControlSiteServer.PacketProcessorDelegate(processor.PackageProcess);
 
-            controlSiteServer.Start();
+            //args.Length >=2 
+            List<string> controlSite = new List<string>();
+            if (args.Length >= 2)
+                for (int i = 1; i < args.Length; i++)
+                    controlSite.Add(args[i]);
+            else //没有参数，启动所有
+                controlSite.AddRange(initiator.ControlSiteNames);
 
-            System.Console.WriteLine("ControlSite " + args[1] + " started!");
+
+            foreach (string site in controlSite)
+            {
+                ControlSiteServer controlSiteServer = new ControlSiteServer(clusterConfig, site);
+
+                PackageProcessor processor = new PackageProcessor(site);
+                controlSiteServer.PacketProcessor = new ControlSiteServer.PacketProcessorDelegate(processor.PackageProcess);
+                controlSiteServer.Start();
+
+                System.Console.WriteLine("ControlSite " + site + " started!");
+            }
 
             Console.ReadLine();
         }

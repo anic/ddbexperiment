@@ -13,42 +13,46 @@ namespace DistDBMS.LocalSite
 {
     class Program
     {
-        class PackageProcessor
-        {
-            public void LocalSitePackageProcess(LocalSiteServerConnection conn, LocalSiteServerPacket packet)
-            {
-                System.Console.WriteLine("packet received");
-                int a = 0;
-            }
 
-            public void P2PPackageProcess(LocalSiteServerConnection conn, P2PPacket packet)
-            {
-                int b = 0;
-                System.Console.WriteLine("packet received");
-            }
-        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args">第一个参数是初始化的脚本,第二个参数是想运行的LocalSite名称（如果不填，则启动所有LocalSite）</param>
         static void Main(string[] args)
         {
-            if (args == null || args.Length == 0)
-                return;
+            //第一个参数是初始化的脚本
+            string scriptFile = "NetworkInitScript.txt";
 
+            if (args.Length >= 1)
+                scriptFile = args[0];
+
+            //args.Length >= 1
             NetworkInitiator initiator = new NetworkInitiator();
-            ClusterConfiguration clusterConfig = initiator.GetConfiguration(args[0]);
+            ClusterConfiguration clusterConfig = initiator.GetConfiguration(scriptFile);
 
-            LocalSiteServer localSiteServer = new LocalSiteServer(clusterConfig, args[1]);
-            PackageProcessor processor = new PackageProcessor();
-            localSiteServer.LocalSitePacketProcessor = new LocalSiteServer.LocalSitePacketProcessorDelegate(processor.LocalSitePackageProcess);
-            localSiteServer.P2PPacketProcessor = new LocalSiteServer.P2PPacketProcessorDelegate(processor.P2PPackageProcess);
+            
+            //args.Length >=2 
+            List<string> localSite = new List<string>();
+            if (args.Length >= 2)
+                for (int i = 1; i < args.Length; i++)
+                    localSite.Add(args[i]);
+            else //没有参数，启动所有
+                localSite.AddRange(initiator.LocalSiteNames);
 
-            localSiteServer.Start();
 
-            System.Console.WriteLine("LocalSite " + args[1] + " started!");
-            //while (true)
-            //{
-            //    try { Thread.Sleep(500); }
-            //    catch { }
-            //}
+            foreach (string site in localSite)
+            {
+                LocalSiteServer localSiteServer = new LocalSiteServer(clusterConfig, site);
+
+                PackageProcessor processor = new PackageProcessor(site);
+                localSiteServer.LocalSitePacketProcessor = new LocalSiteServer.LocalSitePacketProcessorDelegate(processor.LocalSitePackageProcess);
+                localSiteServer.P2PPacketProcessor = new LocalSiteServer.P2PPacketProcessorDelegate(processor.P2PPackageProcess);
+
+                localSiteServer.Start();
+
+                System.Console.WriteLine("LocalSite " + site + " started!");
+            }
 
             Console.ReadLine();
         }

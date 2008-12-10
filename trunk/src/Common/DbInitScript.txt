@@ -1,7 +1,7 @@
-﻿define site L1 127.0.0.1 10000
-define site L1 127.0.0.1 20000
-define site L1 127.0.0.1 30000
-define site L1 127.0.0.1 40000
+﻿define site S1 127.0.0.1 10000
+define site S2 127.0.0.1 20000
+define site S3 127.0.0.1 30000
+define site S4 127.0.0.1 40000
 create table Student (id int key, name char(25), sex char(1), age int, degree int)
 create table Teacher (id int key, name char(25), title int)
 create table Course (id int key, name char(80), location char(8), credit_hour int, teacher_id int)
