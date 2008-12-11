@@ -207,6 +207,10 @@ namespace DistDBMS.Network
             {
                 connTerm = true;
             }
+            catch(System.IO.IOException)
+            {
+                connTerm = true;
+            }
 
             if (connTerm)
             {
