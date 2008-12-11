@@ -308,7 +308,7 @@ namespace DistDBMS.Network
                 LocalSiteServerPacket packet = (LocalSiteServerPacket)ssPacket;
                 Server.LocalSitePacketProcessor(this, packet);
             }
-            else if (ssPacket is P2PTextPacket)
+            else if (ssPacket is P2PPacket)
             {
                 P2PPacket packet = (P2PPacket)ssPacket;
                 Server.P2PPacketProcessor(this, packet);

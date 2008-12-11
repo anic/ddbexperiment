@@ -76,6 +76,10 @@ namespace DistDBMS
                 }
 
             }
+            else if(packet is P2PTextObjectPacket)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
         }
 
         static private void LocalSitePacketProcessor(LocalSiteServerConnection conn, LocalSiteServerPacket packet)
@@ -97,6 +101,7 @@ namespace DistDBMS
                     {
                         string text = "Test:Set:" + (conn.State as LocalSiteState).TestValue.ToString();
                         conn.SendP2PStepTextPacket(args[2], packet.StepIndex, text);
+                        conn.SendP2PStepTextObjectPacket(args[2], P2PPacket.StepIndexNone, "test string", "test object");
                         Debug.WriteLine(conn.Server.Name + " send P2P " + text);
 
                     }
@@ -134,7 +139,7 @@ namespace DistDBMS
 
                     conn.GetLocalSiteClient("L2").SendStepTextPacket(conn.SessionId, 1, 2, "Test:Return");
                     
-                    Thread.Sleep(2000);
+                    //Thread.Sleep(2000);
 
 
                     conn.GetLocalSiteClient("L1").SendStepTextPacket(conn.SessionId, LocalSiteServerPacket.StepIndexNone, LocalSiteServerPacket.StepIndexNone, "Test:Set:11");
