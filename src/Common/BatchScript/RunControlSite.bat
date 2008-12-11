@@ -1,2 +1,2 @@
 ﻿@echo off
-start Control.exe NetworkInitScript.txt C1
+start ControlSite.exe NetworkInitScript.txt C1

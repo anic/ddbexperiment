@@ -73,9 +73,18 @@ namespace DistDBMS.UserInterface.Controls
         {
             this.type = type;
             this.clusterConfig = clusterConfig;
-            //this.ShowDialog();
+            this.ShowDialog();
+        }
 
-            int[] stepList = new int[] { 1, 4, 5 };
+        public void RunDefaultStage( ClusterConfiguration clusterConfig)
+        {
+            this.type = Type.Init;
+            this.clusterConfig = clusterConfig;
+            int[] stepList = new int[] { 
+                (int)Stage.ClearDb, 
+                (int)Stage.InitDb,
+                (int)Stage.InitData
+            };
             foreach (int step in stepList)
             {
                 current = (Stage)step;

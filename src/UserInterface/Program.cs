@@ -11,11 +11,13 @@ namespace DistDBMS.UserInterface
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FrmApp());
+            FrmApp frmApp = new FrmApp();
+            frmApp.NeedWizzard = !((args.Length > 0) && args[0] == "auto");
+            Application.Run(frmApp);
         }
     }
 }
