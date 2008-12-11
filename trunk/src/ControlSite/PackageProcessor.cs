@@ -11,6 +11,7 @@ using DistDBMS.ControlSite.SQLSyntax;
 using DistDBMS.ControlSite.RelationalAlgebraUtility;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.RelationalAlgebra;
+using DistDBMS.Common.Table;
 
 namespace DistDBMS.ControlSite
 {
@@ -55,8 +56,8 @@ namespace DistDBMS.ControlSite
 
                             foreach (Site site in gdd.Sites)
                             {
-                                conn.GetLocalSiteClient(site.Name).Packets.WaitAndRead();
-
+                                NetworkPacket returnPacket = conn.GetLocalSiteClient(site.Name).Packets.WaitAndRead();
+                                
                                 //TODO: 如何read?
                             }
                             conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, gdd);
@@ -166,13 +167,40 @@ namespace DistDBMS.ControlSite
 
                         foreach (ExecutionPlan p in plans)
                         {
-                            conn.GetLocalSiteClient(p.ExecutionSite.Name).Packets.WaitAndRead();
+                            NetworkPacket returnPackage = conn.GetLocalSiteClient(p.ExecutionSite.Name).Packets.WaitAndRead();
+                            System.Console.WriteLine(name + ": Package from " + p.ExecutionSite.Name);
+                            if (returnPackage is ServerClientTextObjectPacket
+                                && (returnPackage as ServerClientTextObjectPacket).Object != null)
+                            {
+                                if ((returnPackage as ServerClientTextObjectPacket).Object is ExecutionPackage)
+                                {
+                                    ExecutionPackage resultPackage = (returnPackage as ServerClientTextObjectPacket).Object
+                                        as ExecutionPackage;
+
+                                    //读取结果
+                                    if (resultPackage.Type == ExecutionPackage.PackageType.Data)
+                                    {
+                                        result.Data = resultPackage.Object as Table;
+                                        result.Description = "Command executed successfully.";
+                                        result.Description += "\r\n" + result.Data.Tuples.Count + " tuples selected";
+                                        result.RawQueryTree = relationalgebra;
+                                        if (result.Data.Tuples.Count > 0)
+                                        {
+                                            result.Description += ":\r\n";
+                                            foreach (Tuple tuple in result.Data.Tuples)
+                                                result.Description += tuple.ToString() + "\r\n";
+                                        }
+                                        else
+                                            result.Description += "\r\n";
+                                    }
+                                }
+                            }
                         }
 
-                        //TOOD:读取结果
+                        
                         //data = buffer.GetPackageById(gPlan.Steps[0].Operation.ResultID).Object as Table;
 
-                        result.Description = "Command executed successfully.";
+                        
                         //result.Description += "\r\n" + data.Tuples.Count + " tuples selected";
                         //result.RawQueryTree = relationalgebra;
                         //if (data.Tuples.Count > 0)

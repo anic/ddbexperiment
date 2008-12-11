@@ -51,6 +51,7 @@
             // 
             // uscSchemaViewer
             // 
+            this.uscSchemaViewer.BackColor = System.Drawing.SystemColors.Control;
             this.uscSchemaViewer.Condition = "label1";
             this.uscSchemaViewer.CurrentSite = null;
             this.uscSchemaViewer.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -62,6 +63,7 @@
             // 
             // uscFragmentShower
             // 
+            this.uscFragmentShower.BackColor = System.Drawing.SystemColors.ControlDark;
             this.uscFragmentShower.Dock = System.Windows.Forms.DockStyle.Fill;
             this.uscFragmentShower.Location = new System.Drawing.Point(414, 3);
             this.uscFragmentShower.Name = "uscFragmentShower";

@@ -50,8 +50,11 @@ namespace DistDBMS.UserInterface
             frmInit.ShowDialog(FrmInit.Type.Init, clusterConfig);
 
 
-            
-
+            if (frmInit.GDD != null)
+            {
+                uscExecuteQuery.SetGlobalDirectory(frmInit.GDD);
+                switcher.SetGlobalDirectory(frmInit.GDD);
+            }
             
             
             ////初始化脚本
@@ -79,11 +82,12 @@ namespace DistDBMS.UserInterface
         void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
         {
 
-            Table data;
-            string result;
-            Relation queryTree;
+            
             try
             {
+                //Table data;
+                //string result;
+                //Relation queryTree;
                 /*vInterface.ExecuteSQL(uscExecuteQuery.SQLText, out data, out result, out queryTree);
                 uscExecuteQuery.AddCommandResult(result);
                 uscExecuteQuery.SetResultTable(data);
@@ -93,7 +97,15 @@ namespace DistDBMS.UserInterface
                 ControlSiteClient controlSiteClient = new ControlSiteClient();
                 controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
                 controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.EXESQL, uscExecuteQuery.SQLText);
-                controlSiteClient.Packets.WaitAndRead();
+                NetworkPacket resultPacket = controlSiteClient.Packets.WaitAndRead();
+                if (resultPacket is ServerClientTextObjectPacket
+                    && (resultPacket as ServerClientTextObjectPacket).Object is ExecutionResult)
+                {
+                    ExecutionResult exResult = (resultPacket as ServerClientTextObjectPacket).Object as ExecutionResult;
+                    uscExecuteQuery.AddCommandResult(exResult.Description);
+                    uscExecuteQuery.SetResultTable(exResult.Data);
+                    uscExecuteQuery.SetQueryTree(exResult.RawQueryTree);
+                }
 
             }
             catch (Exception ex)
@@ -109,31 +121,31 @@ namespace DistDBMS.UserInterface
         {
             //测试执行sql
 
-            //uscExecuteQuery.SQLText = "select * from Student";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+            uscExecuteQuery.SQLText = "select * from Student";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
-            //uscExecuteQuery.SQLText = "select Course.name from Course";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+            uscExecuteQuery.SQLText = "select Course.name from Course";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
-            //uscExecuteQuery.SQLText = "select * from Course where credit_hour>2 and location='CB‐6'";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+            uscExecuteQuery.SQLText = "select * from Course where credit_hour>2 and location='CB‐6'";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
-            //uscExecuteQuery.SQLText = "select course_id, mark from Exam";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+            uscExecuteQuery.SQLText = "select course_id, mark from Exam";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
-            //uscExecuteQuery.SQLText = "select Course.name, Course.credit_hour, Teacher.name from Course, Teacher where Course.teacher_id=Teacher.id and Course.credit_hour>2 and Teacher.title=3";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-
-            //uscExecuteQuery.SQLText = "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+            uscExecuteQuery.SQLText = "select Course.name, Course.credit_hour, Teacher.name from Course, Teacher where Course.teacher_id=Teacher.id and Course.credit_hour>2 and Teacher.title=3";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
 
-            //uscExecuteQuery.SQLText = "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+            uscExecuteQuery.SQLText = "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
-            //uscExecuteQuery.SQLText = "select Student.name, Teacher.name from Student, Teacher,Course where Student.id = Teacher.id and Course.teacher_id = Teacher.id";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+
+            uscExecuteQuery.SQLText = "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+
+            uscExecuteQuery.SQLText = "select Student.name, Teacher.name from Student, Teacher,Course where Student.id = Teacher.id and Course.teacher_id = Teacher.id";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
 
             uscExecuteQuery.EnableTip = true;

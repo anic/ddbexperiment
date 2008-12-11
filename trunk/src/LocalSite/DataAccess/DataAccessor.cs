@@ -114,6 +114,7 @@ namespace DistDBMS.LocalSite.DataAccess
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debugger.Break();
                 transaction.Rollback();
                 lastEx = ex;
                 return -1;
@@ -174,6 +175,7 @@ namespace DistDBMS.LocalSite.DataAccess
             }
             catch(Exception ex)
             {
+                System.Diagnostics.Debugger.Break();
                 lastEx = ex;
                 return null;
             }

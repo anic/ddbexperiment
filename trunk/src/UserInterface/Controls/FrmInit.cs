@@ -10,6 +10,7 @@ using System.Diagnostics;
 using DistDBMS.Network;
 using DistDBMS.UserInterface.Handler;
 using DistDBMS.Common.Execution;
+using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -38,6 +39,7 @@ namespace DistDBMS.UserInterface.Controls
 
         private Stage current;
         private Type type;
+        GlobalDirectory gdd;
 
         public FrmInit()
         {
@@ -71,9 +73,20 @@ namespace DistDBMS.UserInterface.Controls
         {
             this.type = type;
             this.clusterConfig = clusterConfig;
-            this.ShowDialog();
-            
+            //this.ShowDialog();
+
+            int[] stepList = new int[] { 1, 4, 5 };
+            foreach (int step in stepList)
+            {
+                current = (Stage)step;
+                btnOk_Click(this, EventArgs.Empty);
+            }
         }
+
+        /// <summary>
+        /// 全局数据字典
+        /// </summary>
+        public GlobalDirectory GDD { get { return gdd; } }
 
         private void btnOk_Click(object sender, EventArgs e)
         {
@@ -99,7 +112,14 @@ namespace DistDBMS.UserInterface.Controls
 
                             string[] gddScript = FileUploader.ReadFileToString("DbInitScript.txt");
                             controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.GDDSCRIPT, gddScript);
-                            controlSiteClient.Packets.WaitAndRead();
+                            NetworkPacket returnPacket = controlSiteClient.Packets.WaitAndRead();
+                            if (returnPacket is ServerClientTextObjectPacket)
+                            {
+                                if ((returnPacket as ServerClientTextObjectPacket).Text == Common.NetworkCommand.RESULT_OK)
+                                    gdd = (returnPacket as ServerClientTextObjectPacket).Object as GlobalDirectory;
+                                else
+                                    gdd = null;
+                            }
                             
                             break;
                         }
@@ -112,7 +132,6 @@ namespace DistDBMS.UserInterface.Controls
                             controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.DATASCRIPT, dataScript);
                             controlSiteClient.Packets.WaitAndRead();
 
-                            break;
                             break;
                         }
                 }
