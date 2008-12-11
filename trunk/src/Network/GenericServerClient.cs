@@ -151,7 +151,10 @@ namespace DistDBMS.Network
             {
                 term = true;
             }
-
+            catch (System.IO.IOException e)
+            {
+                term = true;
+            }
             if(term)
                 tcpClient.Close();
 

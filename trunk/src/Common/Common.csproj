@@ -41,7 +41,7 @@
     <Compile Include="Execution\ExecutionPackage.cs" />
     <Compile Include="Execution\ExecutionRelation.cs" />
     <None Include="NetworkInitScript.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Compile Include="Execution\ExecutionResult.cs" />
     <Compile Include="NetworkCommand.cs" />
@@ -70,7 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Data.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -78,7 +78,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="DbInitScript.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="BatchScript\KillAllSites.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
