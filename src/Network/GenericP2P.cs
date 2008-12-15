@@ -349,6 +349,8 @@ namespace DistDBMS.Network
                                         peerConns[kv.Key].Dispose();
                                         peerConns.Remove(kv.Key);
                                     }
+
+                                    Thread.Sleep(2000);
                                 }
                             }
                         }
