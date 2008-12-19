@@ -8,7 +8,7 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.Common.RelationalAlgebra.Entity
 {
-    public class Relation
+    public class Relation:ICloneable
     {
         /// <summary>
         /// 关系代数的关系类型，如Selection,Projection
@@ -89,6 +89,12 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         /// </summary>
         public string ResultName { get; set; }
 
+        /// <summary>
+        /// 有效属性
+        /// 此节点的父节点至根结点所涉及的所有属性
+        /// </summary>
+        public List<Field> EffectiveAttributes;
+
         public Relation()
         {
 
@@ -127,5 +133,35 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             return result;
         }
 
+        public object Clone()
+        {
+            Relation r = new Relation();
+            r.Type = this.Type;
+            r.DirectTableSchema = this.DirectTableSchema.Clone() as TableSchema;
+            r.LeftRelation = this.LeftRelation.Clone() as Relation;
+            r.RightRelation = this.RightRelation.Clone() as Relation;
+            r.ResultName = this.ResultName.Clone() as String;
+            r.RelativeAttributes = this.RelativeAttributes.Clone() as TableSchema;
+            r.Predication = this.Predication.Clone() as Condition;
+
+            foreach (Relation child in r.Children)
+                r.Children.Add(child.Clone() as Relation);
+
+            return r;            
+        }
+
+        public void Copy(Relation r)
+        {
+            this.Type = r.Type;
+            this.DirectTableSchema = r.DirectTableSchema;
+            this.LeftRelation = r.LeftRelation;
+            this.RightRelation = r.RightRelation;
+            this.ResultName = r.ResultName;
+            this.RelativeAttributes = r.RelativeAttributes;
+            this.Predication = r.Predication;
+
+            foreach (Relation child in r.Children)
+                this.Children.Add(child);            
+        }
     }
 }
