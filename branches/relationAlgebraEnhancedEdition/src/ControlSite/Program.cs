@@ -32,7 +32,7 @@ namespace DistDBMS.ControlSite
             a.TestGDD();
             a.TestSQLSyntax();
             //a.TestRelationAlgebra();
-            a.TestExecutionPlan();
+            //a.TestExecutionPlan();
 
         }
 
@@ -46,8 +46,7 @@ namespace DistDBMS.ControlSite
             //Sample1
             //关系代数树，示范结构：select * from Course where credit_hour>2 and location='CB‐6'
             r = new Relation();
-            r.Type = RelationalType.Selection;
-            
+            r.Type = RelationalType.Selection;            
             
             r.DirectTableSchema.TableName = "Course";
             r.DirectTableSchema.IsAllFields = true; //因为*
@@ -344,7 +343,7 @@ namespace DistDBMS.ControlSite
             "select * from Course where credit_hour>2 and location='CB‐6'",
             "select course_id, mark from Exam",
             "select Course.name, Course.credit_hour, Teacher.name from Course, Teacher where Course.teacher_id=Teacher.id and Course.credit_hour>2 and Teacher.title=3",
-            "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id",
+           // "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id",
             "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'"
             };
 
@@ -363,11 +362,12 @@ namespace DistDBMS.ControlSite
                 SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
                 converter.SetQueryCalculus(s3);
                 Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
+                //QueryOptimizer optimizer = new QueryOptimizer(relationalgebra, gdd);
                 
-                /*
-                System.Console.WriteLine("\n\nTEST" + i.ToString() + ":");
-                System.Console.WriteLine("Raw: " + tests[i]);
-                System.Console.WriteLine("Parse:" + s3.ToString());*/
+                
+                //System.Console.WriteLine("\n\nTEST" + i.ToString() + ":");
+                //System.Console.WriteLine("Raw: " + tests[i]);
+                //System.Console.WriteLine("Parse:" + s3.ToString());
 
                 //QueryPlanCreator creator = new QueryPlanCreator(gdd);
                 //ExecutionPlan plan = creator.CreateGlobalPlan(relationalgebra, "PLAN");

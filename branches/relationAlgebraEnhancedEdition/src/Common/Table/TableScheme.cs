@@ -35,6 +35,11 @@ namespace DistDBMS.Common.Table
         public bool IsAllFields { get; set; }
 
         /// <summary>
+        /// 标签，优化时使用
+        /// </summary>
+        public int Tag { get; set; }
+
+        /// <summary>
         /// 返回是主键的属性域
         /// </summary>
         public Field PrimaryKeyField
@@ -82,6 +87,7 @@ namespace DistDBMS.Common.Table
             IsDbTable = false;
             Fields = new List<Field>();
             IsAllFields = false;
+            Tag = -1;
         }
 
         public new string ToString()
@@ -126,6 +132,7 @@ namespace DistDBMS.Common.Table
             result.TableName = TableName;
             result.NickName = NickName;
             result.IsDbTable = IsDbTable;
+            result.Tag = Tag;
             foreach (Field f in Fields)
                 result.Fields.Add(f.Clone() as Field);
             result.IsAllFields = IsAllFields;
