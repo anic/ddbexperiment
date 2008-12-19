@@ -48,6 +48,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             TableSchemaList singleRelations = new TableSchemaList();
             AnalyseRelationJoin(ref connectRelations, ref singleRelations);
 
+            /*
             System.Console.WriteLine("************Connect Group**************");
             for (int g = 0; g < connectRelations.Count; g++)
             {
@@ -65,6 +66,17 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 System.Console.Write(ts.Tag + "_" + ts.TableName + " ");
             }
             System.Console.WriteLine();
+             */
+
+            // 计算全局有效属性，确定单独Relation是否有用
+            // -有用则selection，Projection，最后和join后的结果Cart
+            // -无用则删去
+
+            // 对每个有用表，在一元谓词中查找所属谓词并挂在Selection上
+
+            // 根据GDD排序，然后Join
+
+            // 最上层Cart
 
         }
 
