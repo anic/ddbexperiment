@@ -343,7 +343,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             foreach (TableSchema ts in selectionCalculus.Sources)
                 ts.Tag = -1;
 
-            LocalQueryOptimizer optimizer = new LocalQueryOptimizer(result, selectionCalculus.Sources, dictionary);
+            LocalQueryOptimizer optimizer = new LocalQueryOptimizer(result, selectionCalculus, dictionary);
 
             return result;
         }
