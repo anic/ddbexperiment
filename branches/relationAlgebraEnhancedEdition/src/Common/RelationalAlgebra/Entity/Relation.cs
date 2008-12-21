@@ -163,5 +163,72 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             foreach (Relation child in r.Children)
                 this.Children.Add(child);            
         }
+
+        public string TypeName
+        {
+            get
+            {
+                string type = "";
+                switch (Type)
+                {
+                    case RelationalType.Selection:
+                        type = "Select";
+                        break;
+                    case RelationalType.Projection:
+                        type = "Project";
+                        break;
+                    case RelationalType.Join:
+                        type = "Join";
+                        break;
+                    case RelationalType.CartesianProduct:
+                        type = "Cart";
+                        break;
+                    case RelationalType.Union:
+                        type = "Union";
+                        break;
+                    case RelationalType.Semijoin:
+                        type = "SemiJoin";
+                        break;
+                }
+                return type;
+            }
+        }
+
+        private string toString(int indent)
+        {
+            string str = "";
+
+            for (int i = 0; i < indent; i++)
+                str += " ";
+
+
+            switch (Type)
+            {
+                case RelationalType.Projection:
+                    str = str + Type + "[";
+                    foreach (Field field in RelativeAttributes.Fields)
+                        str = str + " " + field.TableName + "." + field.AttributeName;
+                    str += "]\n";
+                    break;
+                case RelationalType.Selection:
+                    str = str + TypeName + "[" + this.Predication.ToString() + "]" + "\n";
+                    break;
+            }
+            
+
+            if (IsDirectTableSchema)
+                return str;
+
+            foreach (Relation child in Children)
+            {
+                str += child.toString(indent + 4);
+            }
+            return str;
+        }
+
+        public string toString()
+        {
+            return toString(0);
+        }
     }
 }

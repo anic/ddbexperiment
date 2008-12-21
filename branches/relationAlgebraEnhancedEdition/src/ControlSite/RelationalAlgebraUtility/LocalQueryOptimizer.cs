@@ -59,9 +59,9 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             TableSchemaList singleRelations = new TableSchemaList();
             AnalyseRelationJoin(ref connectRelations, ref singleRelations);
 
-            
-            /*
-            System.Console.WriteLine("************Connect Group**************");
+            System.Console.WriteLine("");
+            System.Console.WriteLine("************************************");
+            System.Console.WriteLine("-------Connected Relation----");
             for (int g = 0; g < connectRelations.Count; g++)
             {
                 System.Console.WriteLine("Connect gourp[" + g.ToString() + "]:");
@@ -71,25 +71,35 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 }
                 System.Console.WriteLine();
             }
-            System.Console.WriteLine("*********** Single Relation **********");
+            System.Console.WriteLine("");
+            System.Console.WriteLine("--------Single Relation------");
             foreach (TableSchema ts in singleRelations)
             {
                 System.Console.Write(ts.Tag + "_" + ts.TableName + " ");
             }
-            System.Console.WriteLine();
-            */
+            
+            
 
             // 对于非联通的Table，有效属性为：投影属性、一元谓词属性
+            List<Relation> singleTrees = new List<Relation>();
             if (singleRelations.Count > 0)
             {
-                List<Relation> singleTrees = new List<Relation>();
+                
                 TranslateSingleRelationCollection(singleRelations, ref singleTrees);
+
+                foreach (Relation r in singleTrees)
+                {
+                    System.Console.Write(r.toString());
+                }
             }
 
+            // System.Console.WriteLine("***********************************************");
+
             // 对于联通的Table，有效属性为：join条件、投影属性、一元谓词
+            List<Relation> connectedTrees = new List<Relation>();
             if (connectRelations.Count > 0)
             {
- 
+                TranslateConnectedRelationCollection(connectRelations, ref connectedTrees);
             }
 
             // 对每个有用表，在一元谓词中查找所属谓词并挂在Selection上
@@ -129,7 +139,31 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         /// <param name="tree"></param>
         private void GenConnectRelationTree(TableSchemaList connectedTables, ref Relation tree)
         {
+            List<Relation> joinElements = new List<Relation>();
 
+            foreach (TableSchema ts in connectedTables)
+            {
+                Relation r = new Relation();
+                GenSingleRelationTree(ts, true, ref r);
+                joinElements.Add(r);
+
+                System.Console.Write(r.toString());
+            }
+
+            // TODO: 将joinElements中的各个元素join起来
+            // 在做完Localization之后再评估各分支，然后join
+            //
+
+        }
+
+        /// <summary>
+        /// join一个联通集内的每个Relation子树
+        /// </summary>
+        /// <param name="joinElements">经过Selection和Projection的Relation的集合</param>
+        /// <param name="joinResult">join后的根结点</param>
+        private void JoinRelations(List<Relation> joinElements, ref Relation joinResult)
+        {
+ 
         }
 
 
@@ -217,7 +251,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             tableFields.AddRange(table.Fields);
 
             // 提取table中的投影属性
-            foreach (Field f in tableFields)
+            foreach (Field f in projectAttributes)
             {
                 if (tableFields[f] != null && projectFields[f] == null)
                     projectFields.Add(f.Clone() as Field);
@@ -346,14 +380,50 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         private void AnalyseRelationJoin(ref List<TableSchemaList> connectRelationCollections, ref TableSchemaList singleRelations)
         {
             // 联通集编号
-            int curTag = 0;
-            connectRelationCollections.Insert(curTag, new TableSchemaList());
-            
+            //int curTag = 0;
+            int curTag;
+            //connectRelationCollections.Insert(curTag, new TableSchemaList());
+
+            /**
+             * 将每个Table单独编号，作为一个联通集
+             */
+            for (curTag = 0; curTag < tables.Count; curTag++ )
+            {
+                TableSchemaList tsl = new TableSchemaList();
+                tables[curTag].Tag = curTag;
+                tsl.Add(tables[curTag].Clone() as TableSchema);
+                connectRelationCollections.Insert(curTag, tsl);
+            }
+
             foreach (AtomCondition atom in binaryPredictions)
             {
                 TableSchema leftTable = tables[atom.LeftOperand.Field.TableName.ToString()];
                 TableSchema rightTable = tables[atom.RightOperand.Field.TableName.ToString()];
 
+                if (leftTable.Tag > rightTable.Tag)
+                {
+                    int leftTag = leftTable.Tag;
+
+                    connectRelationCollections[rightTable.Tag].AddRange(connectRelationCollections[leftTag]);
+
+                    foreach (TableSchema t in connectRelationCollections[leftTag])
+                        t.Tag = rightTable.Tag;
+
+                    connectRelationCollections[leftTag].Clear();
+                }
+                else if (leftTable.Tag < rightTable.Tag)
+                {
+                    int rightTag = rightTable.Tag;
+
+                    connectRelationCollections[leftTable.Tag].AddRange(connectRelationCollections[rightTag]);
+
+                    foreach (TableSchema t in connectRelationCollections[rightTag])
+                        t.Tag = leftTable.Tag;
+
+                    connectRelationCollections[rightTag].Clear();
+                }
+
+                /*
                 if (leftTable.Tag < 0)
                 {
                     if (rightTable.Tag < 0)
@@ -378,6 +448,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                     }
 
                 }
+                 
                 else 
                 {
                     if (rightTable.Tag < 0) // 左边被标记过，右边没有标记，将右边Table加入左边集合中
@@ -411,7 +482,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                         }
                     }
                      
-                }
+                }*/
             }
         
             // 消去空联通集合，将单独Table加入到singleRelations列表中并同步更联通集合内Table的Tag编号
