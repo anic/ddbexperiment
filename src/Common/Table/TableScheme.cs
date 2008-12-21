@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DistDBMS.Common.Syntax;
 
-namespace DistDBMS.Common.Table
+namespace DistDBMS.Common
 {
     public class TableSchema : ICloneable
     {
@@ -38,6 +39,11 @@ namespace DistDBMS.Common.Table
         /// 标签，优化时使用
         /// </summary>
         public int Tag { get; set; }
+
+        /// <summary>
+        /// 与Table相关的一元谓词，优化时使用
+        /// </summary>
+        public List<AtomCondition> RelativeUnaryPredication { get; set; }
 
         /// <summary>
         /// 返回是主键的属性域
@@ -88,6 +94,7 @@ namespace DistDBMS.Common.Table
             Fields = new List<Field>();
             IsAllFields = false;
             Tag = -1;
+            RelativeUnaryPredication = new List<AtomCondition>();
         }
 
         public new string ToString()
@@ -136,6 +143,10 @@ namespace DistDBMS.Common.Table
             foreach (Field f in Fields)
                 result.Fields.Add(f.Clone() as Field);
             result.IsAllFields = IsAllFields;
+
+            foreach (AtomCondition atom in RelativeUnaryPredication)
+                result.RelativeUnaryPredication.Add(atom.Clone() as AtomCondition);
+
             return result;
         }
 
