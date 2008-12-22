@@ -274,6 +274,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 }
             }
 
+
             // 联通集合，提取二元谓词属性
             if (isConnected)
             {
@@ -335,6 +336,8 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             }
             active.DirectTableSchema = table.Clone() as TableSchema;
         }
+
+        // private void 
 
 
 
