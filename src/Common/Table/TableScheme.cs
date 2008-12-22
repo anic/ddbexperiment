@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DistDBMS.Common.Syntax;
 
-namespace DistDBMS.Common
+namespace DistDBMS.Common.Table
 {
     public class TableSchema : ICloneable
     {
