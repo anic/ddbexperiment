@@ -68,7 +68,7 @@ namespace DistDBMS.ControlSite.Plan
             }
             else //数据
             {
-                Tuple tuple = CreateTuple(currentSchema, line, '\t');
+                Tuple tuple = CreateTuple(currentSchema, line, ',');
                 if (tuple == null)
                     return false;
 
@@ -110,61 +110,61 @@ namespace DistDBMS.ControlSite.Plan
         /// <returns></returns>
         private List<Fragment> GetFragmentByTuple(Tuple tuple,TableSchema schema)
         {
-            //return gdd.Fragments.GetFragmentByName(schema.TableName);
+            //TODO:需要进行动态测试
             List<Fragment> results = new List<Fragment>();
-            if (schema.TableName == "Teacher")
+            if (schema.TableName == "Producer")
             {
-                if (Int32.Parse(tuple[0]) < 201000)
+                if (Int32.Parse(tuple[0]) < 200200)
                 {
-                    if (Int32.Parse(tuple[2]) != 3)
-                        results.Add(gdd.Fragments.GetFragmentByName("Teacher.1"));
+                    if (tuple[2] == "BJ")
+                        results.Add(gdd.Fragments.GetFragmentByName("Producer.1"));
                     else                                                                
-                        results.Add(gdd.Fragments.GetFragmentByName("Teacher.2"));
+                        results.Add(gdd.Fragments.GetFragmentByName("Producer.2"));
 
                 }
                 else
                 {
-                    if (Int32.Parse(tuple[2]) != 3)
-                        results.Add(gdd.Fragments.GetFragmentByName("Teacher.3"));
+                    if (tuple[2] == "BJ")
+                        results.Add(gdd.Fragments.GetFragmentByName("Producer.3"));
                     else
-                        results.Add(gdd.Fragments.GetFragmentByName("Teacher.4"));
+                        results.Add(gdd.Fragments.GetFragmentByName("Producer.4"));
                 }
             }
-            else if (schema.TableName == "Course")
+            else if (schema.TableName == "Product")
             {
-                results.Add(gdd.Fragments.GetFragmentByName("Course.1"));
-                if (Int32.Parse(tuple[3]) == 1)
-                    results.Add(gdd.Fragments.GetFragmentByName("Course.2.1"));
-                else if (Int32.Parse(tuple[3]) == 4)
-                    results.Add(gdd.Fragments.GetFragmentByName("Course.2.3"));
+                results.Add(gdd.Fragments.GetFragmentByName("Product.1"));
+                if (Int32.Parse(tuple[3]) < 2000)
+                    results.Add(gdd.Fragments.GetFragmentByName("Product.2.1"));
+                else if (Int32.Parse(tuple[3]) >= 4000)
+                    results.Add(gdd.Fragments.GetFragmentByName("Product.2.3"));
                 else
-                    results.Add(gdd.Fragments.GetFragmentByName("Course.2.2"));
+                    results.Add(gdd.Fragments.GetFragmentByName("Product.2.2"));
             }
-            else if (schema.TableName == "Exam")
+            else if (schema.TableName == "Purchase")
             {
                 if (Int32.Parse(tuple[0]) < 107000)
                 {
-                    if (Int32.Parse(tuple[1]) < 301200)
-                        results.Add(gdd.Fragments.GetFragmentByName("Exam.1"));
+                    if (Int32.Parse(tuple[1]) < 310000)
+                        results.Add(gdd.Fragments.GetFragmentByName("Purchase.1"));
                     else
-                        results.Add(gdd.Fragments.GetFragmentByName("Exam.2"));
+                        results.Add(gdd.Fragments.GetFragmentByName("Purchase.2"));
                 }
                 else
                 {
-                    if (Int32.Parse(tuple[1]) < 301200)
-                        results.Add(gdd.Fragments.GetFragmentByName("Exam.3"));
+                    if (Int32.Parse(tuple[1]) < 310000)
+                        results.Add(gdd.Fragments.GetFragmentByName("Purchase.3"));
                     else
-                        results.Add(gdd.Fragments.GetFragmentByName("Exam.4"));
+                        results.Add(gdd.Fragments.GetFragmentByName("Purchase.4"));
                 }
             }
-            else if (schema.TableName == "Student")
+            else if (schema.TableName == "Customer")
             {
-                if (Int32.Parse(tuple[0]) < 105000)
-                    results.Add(gdd.Fragments.GetFragmentByName("Student.1"));
-                else if (Int32.Parse(tuple[0]) >= 110000)
-                    results.Add(gdd.Fragments.GetFragmentByName("Student.3"));
+                if (Int32.Parse(tuple[0]) < 110000)
+                    results.Add(gdd.Fragments.GetFragmentByName("Customer.1"));
+                else if (Int32.Parse(tuple[0]) >= 110000 && Int32.Parse(tuple[0]) < 112500)
+                    results.Add(gdd.Fragments.GetFragmentByName("Customer.2"));
                 else
-                    results.Add(gdd.Fragments.GetFragmentByName("Student.2"));
+                    results.Add(gdd.Fragments.GetFragmentByName("Customer.3"));
             }
             else
                 results.Add(gdd.Fragments.GetFragmentByName(schema.TableName));

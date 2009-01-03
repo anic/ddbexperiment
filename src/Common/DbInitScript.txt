@@ -2,30 +2,30 @@
 define site S2 127.0.0.1 20000
 define site S3 127.0.0.1 30000
 define site S4 127.0.0.1 40000
-create table Student (id int key, name char(25), sex char(1), age int, degree int)
-create table Teacher (id int key, name char(25), title int)
-create table Course (id int key, name char(80), location char(8), credit_hour int, teacher_id int)
-create table Exam (student_id int, course_id int, mark int)
-fragment Student horizontally into id<105000, id>=105000 and id<110000, id>=110000
-fragment Teacher horizontally into id<201000 and title<>3, id<201000 and title=3, id>=201000 and title<>3, id>=201000 and title=3
-fragment Course vertically into (id, name), (id, location, credit_hour, teacher_id)
-fragment Course.2 horizontally into credit_hour=1, credit_hour>1 and credit_hour<4,credit_hour=4
-fragment Exam horizontally into student_id<107000 and course_id<301200, student_id<107000 and course_id>=301200, student_id>=107000 and course_id<301200, student_id>=107000 and course_id>=301200
-allocate Student.1 to S1
-allocate Student.2 to S2
-allocate Student.3 to S3
-allocate Teacher.1 to S1
-allocate Teacher.2 to S2
-allocate Teacher.3 to S3
-allocate Teacher.4 to S4
-allocate Course.1 to S1
-allocate Course.2.1 to S2
-allocate Course.2.2 to S3
-allocate Course.2.3 to S4
-allocate Exam.1 to S1
-allocate Exam.2 to S2
-allocate Exam.3 to S3
-allocate Exam.4 to S4
+create table Customer (id int key, name char(25), gender char(1), rank int)
+create table Producer (id int key, name char(50), location char(2))
+create table Product (id int key, name char(25), producer_id int, stocks int)
+create table Purchase(customer_id int, product_id int, number int)
+fragment Customer horizontally into id<110000, id>=110000 and id<112500, id>=112500 and id<=115000
+fragment Producer horizontally into id<200200 and location='BJ', id<200200 and location='SH', id>=200200 and location='BJ', id>=200200 and location='SH'
+fragment Product vertically into (id, name), (id, producer_id, stocks)
+fragment Product.2 horizontally into stocks<2000, stocks>=2000 and stocks<4000, stocks>=4000
+fragment Purchase horizontally into customer_id<107000 and product_id<310000, customer_id<107000 and product_id>=310000, customer_id>=107000 and product_id<310000, customer_id>= 107000 and product_id>=310000
+allocate Customer.1 to S1
+allocate Producer.1 to S1
+allocate Product.1 to S1
+allocate Purchase.1 to S1
+allocate Customer.2 to S2
+allocate Producer.2 to S2
+allocate Product.2.1 to S2
+allocate Purchase.2 to S2
+allocate Customer.3 to S3
+allocate Producer.3 to S3
+allocate Product.2.2 to S3
+allocate Purchase.3 to S3
+allocate Producer.4 to S4
+allocate Product.2.3 to S4
+allocate Purchase.4 to S4
 createdb ddb //create a database with name “ddb”
 drop table student
 drop the table dropdb ddb

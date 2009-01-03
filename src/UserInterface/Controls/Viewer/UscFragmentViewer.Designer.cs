@@ -63,7 +63,7 @@
             // 
             // uscFragmentShower
             // 
-            this.uscFragmentShower.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.uscFragmentShower.BackColor = System.Drawing.SystemColors.Control;
             this.uscFragmentShower.Dock = System.Windows.Forms.DockStyle.Fill;
             this.uscFragmentShower.Location = new System.Drawing.Point(414, 3);
             this.uscFragmentShower.Name = "uscFragmentShower";

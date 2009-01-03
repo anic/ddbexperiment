@@ -131,8 +131,8 @@ namespace DistDBMS.UserInterface
 
             //测试执行sql
 
-            //uscExecuteQuery.SQLText = "select * from Student";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+            uscExecuteQuery.SQLText = "select * from Student";
+            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
 
             //uscExecuteQuery.SQLText = "select Course.name from Course";
             //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
