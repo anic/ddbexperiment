@@ -27,8 +27,9 @@ namespace DistDBMS.UserInterface.Controls
         public void ShowFragment(Fragment f,GlobalDirectory gdd)
         {
             ShowFragment(f, true, true, true);
-            pnlLayout.ColumnStyles[1].Width = 30;
-            ShowFragmentView(f, gdd);
+            pnlLayout.ColumnStyles[1].Width = 0;
+            //pnlLayout.ColumnStyles[1].Width = 30;
+            //ShowFragmentView(f, gdd);
         }
 
         Fragment curFragment;
