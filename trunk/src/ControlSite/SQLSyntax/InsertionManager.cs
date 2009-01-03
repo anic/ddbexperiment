@@ -47,17 +47,6 @@ namespace DistDBMS.ControlSite.SQLSyntax
             return result;
         }
 
-        //private bool MatchFragment(Tuple t, Fragment f)
-        //{
-        //    if (f.Type == FragmentType.Vertical)
-        //        return true;
-        //    else if (f.Type == FragmentType.Horizontal)
-        //    { 
-        //        f.
-        //    }
-
-        //}
-
         private Tuple GenerateTuple(string data)
         {
             Tuple result = new Tuple();

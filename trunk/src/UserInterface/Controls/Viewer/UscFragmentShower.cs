@@ -39,6 +39,8 @@ namespace DistDBMS.UserInterface.Controls
         int HEIGHT_PER_LINE = 16;
         Fragment oldFragment;
         GlobalDirectory gdd;
+        bool ignore = false;
+
         public void ShowFragment(Fragment fragment,GlobalDirectory gdd)
         {
             oldFragment = fragment;
@@ -81,16 +83,20 @@ namespace DistDBMS.UserInterface.Controls
 
             schemaViewer.ClearItem();
             schemaViewer.SetEmptyItem(rows);
-            
-            Bitmap image = new Bitmap(schemaViewer.Width, schemaViewer.Height);
+
+            Bitmap image = new Bitmap(this.Width, this.Height);
             Rectangle rect = schemaViewer.ClientRectangle;
             rect.Width += 5;
             rect.Height +=5;
-            schemaViewer.DrawToBitmap(image, rect);
+            schemaViewer.DrawToBitmap(image, new Rectangle(0,0,image.Width,image.Height));
 
             DrawFragments(image, fragment, gdd, rows, rowIndex, columns, colunmIndex, schemaViewer.Width - 20);
+
+            ignore = true;
+            this.pcbImage.Width = image.Width;
+            this.pcbImage.Height = image.Height;
             this.pcbImage.Image = image;
-            
+            ignore = false;
 
             Invalidate();
         }
@@ -178,6 +184,9 @@ namespace DistDBMS.UserInterface.Controls
 
         private void pcbImage_Resize(object sender, EventArgs e)
         {
+            if (ignore)
+                return;
+
             if (oldFragment != null && gdd != null)
                 ShowFragment(this.oldFragment, gdd);
         }

@@ -38,9 +38,9 @@
             this.pcbImage.Location = new System.Drawing.Point(0, 0);
             this.pcbImage.Name = "pcbImage";
             this.pcbImage.Size = new System.Drawing.Size(206, 165);
+            this.pcbImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pcbImage.TabIndex = 0;
             this.pcbImage.TabStop = false;
-            this.pcbImage.Resize += new System.EventHandler(this.pcbImage_Resize);
             this.pcbImage.SizeChanged += new System.EventHandler(this.pcbImage_Resize);
             // 
             // UscFragmentShower
