@@ -65,6 +65,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
         RelationAlgebraConvertError SQL2RelationalAlgebraInterface.GetLastError()
         {
+            error = new RelationAlgebraConvertError();
             return error;
         }
 
