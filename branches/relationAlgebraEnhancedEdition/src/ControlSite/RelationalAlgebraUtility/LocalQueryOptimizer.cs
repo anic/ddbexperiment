@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 
 using DistDBMS.Common.Dictionary;
 using DistDBMS.Common.RelationalAlgebra.Entity;
@@ -37,8 +38,11 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             projectAttributes.AddRange(select.Fields.Fields);
 
 
-
+            ///////////////////////////////////////////////////////////////////////
             // 分类谓词
+            // 将Where子句中的谓词分类为一元谓词和二元谓词
+            // 分类结果保存unaryPredictions和binaryPredictions中
+            //
             DissectCondition(select.Condition);
 
             //ClassifyPrediction();
@@ -54,11 +58,18 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             System.Console.WriteLine("*********************************");
             */
 
+            //////////////////////////////////////////////////////////////////////
             // Join联通分析
+            // connectRelations为通过join关系联通的table
+            // singleRelations为没有与其他table联通的table
+            //
+
             List<TableSchemaList> connectRelations = new List<TableSchemaList>();
             TableSchemaList singleRelations = new TableSchemaList();
-            AnalyseRelationJoin(ref connectRelations, ref singleRelations);
 
+            AnalyseRelationJoin(ref connectRelations, ref singleRelations); 
+
+            
             System.Console.WriteLine("");
             System.Console.WriteLine("************************************");
             System.Console.WriteLine("-------Connected Relation----");
@@ -78,7 +89,6 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 System.Console.Write(ts.Tag + "_" + ts.TableName + " ");
             }
             
-            
 
             // 对于非联通的Table，有效属性为：投影属性、一元谓词属性
             List<Relation> singleTrees = new List<Relation>();
@@ -89,7 +99,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
                 foreach (Relation r in singleTrees)
                 {
-                    System.Console.Write(r.toString());
+                    //System.Console.Write(r.toString());
                 }
             }
 
@@ -147,7 +157,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 GenSingleRelationTree(ts, true, ref r);
                 joinElements.Add(r);
 
-                System.Console.Write(r.toString());
+                //System.Console.Write(r.toString());
             }
 
             // TODO: 将joinElements中的各个元素join起来
@@ -163,7 +173,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         /// <param name="joinResult">join后的根结点</param>
         private void JoinRelations(List<Relation> joinElements, ref Relation joinResult)
         {
- 
+            
         }
 
 
@@ -231,13 +241,19 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         /// 
         /// 
         /// 计算全局有效属性，确定单独Relation是否有用
-        /// -selection，Projection，最后和join后的结果Cart
+        /// - Selection，Projection，最后和join后的结果Cart
         /// </summary>
         /// <param name="table"></param>
         /// <param name="tree"></param>
         private void GenSingleRelationTree(TableSchema table, bool isConnected, ref Relation tree)
         {
+            // 没有分片构建的关系代数树，以Project为根结点，后跟若干Selection，最后一个Selection的isDirectTableSchema为table
+            Relation projectNode = new Relation();
+
+            // table中含有最终投影属性的集合
             FieldList projectFields = new FieldList();
+
+            // table中含有的与谓词相关的属性
             FieldList selectField = new FieldList();
             FieldList joinField = new FieldList();
 
@@ -257,7 +273,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                     projectFields.Add(f.Clone() as Field);
             }
 
-            // 提取相关一元谓词属性
+            // 提取table相关一元谓词属性
             foreach (AtomCondition atom in unaryPredictions)
             {
                 if (atom.LeftOperand.IsField && tableFields[atom.LeftOperand.Field] != null && selectField[atom.LeftOperand.Field] == null)
@@ -294,33 +310,33 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             }
 
             // 构建投影节点
-            tree.Type = RelationalType.Projection;
-            tree.ResultName = table.TableName.Clone() as string;
+            projectNode.Type = RelationalType.Projection;
+            projectNode.ResultName = table.TableName.Clone() as string;
 
             if (!isConnected) // 非联通Table，Project主键或投影属性
             {
                 if (projectFields.Count == 0)   // 无任何有效属性，投影主键
-                    tree.RelativeAttributes.Fields.Add(table.PrimaryKeyField);
+                    projectNode.RelativeAttributes.Fields.Add(table.PrimaryKeyField);
                 else  // 投影属性
-                    tree.RelativeAttributes.Fields.AddRange(projectFields);
+                    projectNode.RelativeAttributes.Fields.AddRange(projectFields);
             }
             else // 联通Table，Project投影属性和join属性
             {
-                tree.RelativeAttributes.Fields.AddRange(joinField);
-                tree.RelativeAttributes.Fields.AddRange(projectFields);
+                projectNode.RelativeAttributes.Fields.AddRange(joinField);
+                projectNode.RelativeAttributes.Fields.AddRange(projectFields);
             }
 
             // 如没有Select谓词，直接在Project上挂TableSchema
             if (selectField.Count == 0)
             {
-                tree.DirectTableSchema = table.Clone() as TableSchema;
+                projectNode.DirectTableSchema = table.Clone() as TableSchema;
                 return;
             }
 
             /**
              * 存在select谓词，构建Select节点
              */
-            Relation active = tree;
+            Relation active = projectNode;
 
             // Selection
             foreach (AtomCondition atom in predictions)
@@ -334,11 +350,115 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 active.Children.Add(r);
                 active = r;
             }
+
             active.DirectTableSchema = table.Clone() as TableSchema;
+
+            System.Console.Write(projectNode.toString());
+
+            ////////////////////////////////////////////////////////////////////////////////
+            // active下开始做Localization，做完后修改active.DirectTableSchema = null;
+            Relation fragmentTree = new Relation();
+            LocalizeTable(table.TableName, gdd, ref fragmentTree);
+            //System.Console.Write(fragmentTree.toString());
+
+            // 遍历FragmentTree，遇到分片节点就检查tree上的Project和Select与Fragment的相容性，并将可用节点复制到FragmentTree中
+
+            
+
         }
 
-        // private void 
+        /// <summary>
+        /// 将非分片的关系代数树嵌入分片树的各个分支中
+        /// </summary>
+        /// <param name="fragmentTree">分片树</param>
+        /// <param name="centralConditionTree">不考虑分片形成的关系代数树</param>
+        /// <param name="joinAttributes">与fragment的逻辑表相关二元谓词的属性</param>
+        /// <param name="selectAttributes">与fragment的逻辑表相关的一元谓词的属性</param>
+        private bool AttachConditionToFragments(Relation fragmentTree, Relation centralConditionTreeRoot, FieldList joinAttributes, FieldList selectAttributes)
+        {
+            // 中间结点
+            if (fragmentTree.Children.Count > 0)
+            {
+                foreach (Relation r in fragmentTree.Children)
+                {
+                    if (!AttachConditionToFragments(r, centralConditionTreeRoot, joinAttributes, selectAttributes))
+                        return false;
+                }
 
+                return true;
+            }
+
+            ////////////////////////////////////////////////////////////////
+            // 分片结点
+            //
+
+            // 分片的划分条件
+            List<AtomCondition> fragmentCondition = new List<AtomCondition>();
+
+            // 本fragmentTree结点对应的分片对象
+            Fragment fragment = gdd.Fragments.GetFragmentByName(fragmentTree.DirectTableSchema.TableName);
+
+            // 分片的必要属性（不知是否有用）
+            FieldList fragmentNecessaryAttributes = new FieldList();
+            foreach (Field f in fragment.Schema.Fields)
+            {
+                if ((joinAttributes[f] != null || selectAttributes[f] != null ) && fragmentNecessaryAttributes[f] == null)
+                    fragmentNecessaryAttributes.Add(f);
+            }
+
+            Debug.Assert(fragmentNecessaryAttributes.Count > 0);
+
+            // 收集分片的所有分片条件
+            Fragment traveller = fragment;
+            while ( traveller != null)
+            {
+                if (traveller.Condition != null)
+                {
+                    ConditionConverter conditionConverter = new ConditionConverter();
+                    conditionConverter.Convert(traveller.Condition, NormalFormType.Conjunction);
+                    ConjunctiveNormalForm normalForm = conditionConverter.ConjunctionNormalForm;
+
+                    foreach (AtomCondition atom in normalForm.PredicationItems)
+                        fragmentCondition.Add(atom.Clone() as AtomCondition);
+                }
+
+                traveller = traveller.Parent;
+            }
+
+            // 合并叶节点和分支
+            Relation centralTreeNode = centralConditionTreeRoot;
+            Relation growPoint = fragmentTree;
+            while (centralTreeNode != null)
+            {
+
+                if (centralTreeNode.Type == RelationalType.Projection)  // 根据fragment的必要属性创建Project结点
+                {
+                    Relation projection = new Relation();
+                    projection.Type = RelationalType.Projection;
+
+                    projection.RelativeAttributes.Fields.AddRange(fragmentNecessaryAttributes);
+
+                    growPoint.LeftRelation = projection;
+                }
+                else if (centralTreeNode.Type == RelationalType.Selection)  // 检查Selet条件
+                {
+                    // 检查Select条件与分片条件是否冲突
+                    // 冲突：本分支返回false 
+                    
+
+                    // 不冲突：继续生长
+
+                }
+                else
+                {
+                    Debug.Assert(false);                 
+                }
+
+                
+            }
+
+            return true;
+        }
 
 
         /// <summary>
@@ -523,6 +643,109 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             return true;
         }
         */
+
+        /// <summary>
+        /// 将Decomposition后的关系代数树的叶节点（Selection）转换为Fragment组成的关系代数子树
+        /// </summary>
+        /// <param name="selection">经Decomposition操作后的关系代数树的叶节点</param>
+        /// <param name="gdd">GDD</param>
+        /// <returns>Error code</returns>
+        private int LocalizeTable(string tableName, GlobalDirectory gdd, ref Relation root)
+        {
+
+            // 在gdd中查找与逻辑表对应的分片
+            Fragment fragments = null;
+            foreach (Fragment f in gdd.Fragments)
+            {
+                if (f.LogicSchema.TableName == tableName)
+                {
+                    fragments = f;
+                    break;
+                }
+            }
+
+            if (fragments == null)
+                return -1;
+
+            // 根据分片构造关系代数树
+            ReconstructFragment(fragments, ref root);
+
+            return 0;
+        }
+
+        /// <summary>
+        /// 根据分片构造关系代数树
+        /// </summary>
+        /// <param name="f">一个分片模式</param>
+        /// <param name="parent"></param>
+        private void ReconstructFragment(Fragment f, ref Relation root)
+        {
+            if (f.Children.Count == 0)
+                return;
+
+            //parent.DirectTableSchema = null;
+
+            // 水平划分，Union连接
+            if (f.Children[0].Type == FragmentType.Horizontal)
+            {
+                Relation union = new Relation();
+                union.Type = RelationalType.Union;
+                root.LeftRelation = union;
+
+                foreach (Fragment subf in f.Children)
+                {
+                    Relation selection = new Relation();
+                    selection.Type = RelationalType.Selection;
+                    selection.DirectTableSchema = subf.Schema.Clone() as TableSchema;
+                    selection.DirectTableSchema.ReplaceTableName(subf.Name);
+                    selection.DirectTableSchema.IsAllFields = true;
+
+                    union.Children.Add(selection);
+
+                    ReconstructFragment(subf, ref selection);
+                }
+            }
+            else if (f.Children[0].Type == FragmentType.Vertical) // 垂直划分, join连接
+            {
+                Relation activeRelation = null;
+                foreach (Fragment subf in f.Children)
+                {
+                    Relation selection = new Relation();
+                    selection.Type = RelationalType.Selection;
+                    selection.DirectTableSchema = subf.Schema.Clone() as TableSchema;
+                    selection.DirectTableSchema.ReplaceTableName(subf.Name);
+                    //selection.RelativeAttributes = subf.Schema; 
+
+                    if (activeRelation == null)
+                    {
+                        activeRelation = selection;
+                    }
+                    else
+                    {
+                        Relation join = new Relation();
+                        join.Type = RelationalType.Join;
+                        join.LeftRelation = activeRelation;
+                        join.RightRelation = selection;
+
+                        // join条件
+                        Field field1 = join.LeftRelation.DirectTableSchema.PrimaryKeyField.Clone() as Field;
+                        field1.TableName = join.LeftRelation.DirectTableSchema.TableName;
+
+                        join.RelativeAttributes.Fields.Add(field1);
+
+                        Field field2 = join.RightRelation.DirectTableSchema.PrimaryKeyField.Clone() as Field;
+                        field2.TableName = join.RightRelation.DirectTableSchema.TableName;
+
+                        join.RelativeAttributes.Fields.Add(field2);
+
+                        activeRelation = join;
+                    }
+
+                    ReconstructFragment(subf, ref selection);
+                }
+                root.LeftRelation = activeRelation;
+            }
+        }
 
 
     }
