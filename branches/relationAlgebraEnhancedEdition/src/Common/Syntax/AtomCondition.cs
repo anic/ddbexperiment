@@ -60,47 +60,63 @@ namespace DistDBMS.Common.Syntax
                     if (LeftOperand.ValueType != RightOperand.ValueType)
                         return AtomConditionType.Error;
                         
-                    bool value;
+                    bool value = false;
                     if (LeftOperand.ValueType == AttributeType.Int)
                     {
-                        int left = LeftOperand.Value as int;
-                        int right = RightOperand.Value as int;
+                        int left = LeftOperand.ToIntValue();
+                        int right = RightOperand.ToIntValue();
 
                         switch (Operator)
                         {
                             case LogicOperator.Equal:
                                 value = (left == right);
+                                break;
                             case LogicOperator.NotEqual:
                                 value = (left != right);
+                                break;
                             case LogicOperator.Greater:
                                 value = (left > right);
+                                break;
                             case LogicOperator.GreaterOrEqual:
                                 value = (left >= right);
+                                break;
                             case LogicOperator.Less:
                                 value = (left < right);
+                                break;
                             case LogicOperator.LessOrEqual:
                                 value = (left <= right);
+                                break;
                         }
+                        if (value)
+                            return AtomConditionType.Invariable_True;
+                        else
+                            return AtomConditionType.Invariable_False;
                     }
                     else if (LeftOperand.ValueType == AttributeType.Double)
                     {
-                        double left = LeftOperand.Value as double;
-                        double right = RightOperand.Value as double;
+                        double left = LeftOperand.ToDoubleValue();
+                        double right = RightOperand.ToDoubleValue();
 
                         switch (Operator)
                         {
                             case LogicOperator.Equal:
                                 value = (left == right);
+                                break;
                             case LogicOperator.NotEqual:
                                 value = (left != right);
+                                break;
                             case LogicOperator.Greater:
                                 value = (left > right);
+                                break;
                             case LogicOperator.GreaterOrEqual:
                                 value = (left >= right);
+                                break;
                             case LogicOperator.Less:
                                 value = (left < right);
+                                break;
                             case LogicOperator.LessOrEqual:
                                 value = (left <= right);
+                                break;
                         }
                         
                         if (value)
@@ -110,15 +126,17 @@ namespace DistDBMS.Common.Syntax
                     }
                     else if (LeftOperand.ValueType == AttributeType.String)
                     {
-                        string left = LeftOperand.Value as string;
-                        string right = RightOperand.Value as string;
+                        string left = LeftOperand.ToStringValue();
+                        string right = RightOperand.ToStringValue();
 
                         switch (Operator)
                         {
                             case LogicOperator.Equal:
                                 value = left.Equals(right);
+                                break;
                             case LogicOperator.NotEqual:
                                 value = !(left.Equals(right));
+                                break;
                             default:
                                 return AtomConditionType.Error;
                         }
@@ -204,15 +222,65 @@ namespace DistDBMS.Common.Syntax
                 case LogicOperator.LessOrEqual:
                     return LogicOperator.GreaterOrEqual;
             }
+
+            Debug.Assert(false, "Undefined Operator");
+            return LogicOperator.Equal;
         }
 
         /// <summary>
-        /// 与另外一个AtomCondition作逻辑‘与’操作
+        /// 检测是否与另一个AtomCodition冲突
+        /// 
+        /// 实际上是两个谓词作逻辑‘与’操作，当两个谓词都是非二元谓词且具有可比性时，才检查冲突。
+        /// 
+        /// 可比性是指两个谓词均为非二元谓词，且当两个谓词都为一元谓词时，其两个谓词中的属性（表名、属性名）相同
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool And(AtomCondition other)
+        public bool ConflictWith(AtomCondition other)
         {
+            if (Type == AtomConditionType.Invariable_False || other.Type == AtomConditionType.Invariable_False)
+            {
+                return true;
+            }
+            else if (Type == AtomConditionType.Invariable_True)
+            {
+                if (other.Type == AtomConditionType.Invariable_False)
+                    return true;
+
+                return false;
+            }
+            else if (Type == AtomConditionType.Unary && other.Type == AtomConditionType.Unary)
+            {
+                // 正规化一元谓词
+                Normalize();
+                other.Normalize();
+
+                // 可比的两个一元谓词
+                if (LeftOperand.Field.Equals(other.RightOperand.Field, true))
+                {
+                    // 两个相同的一元谓词是否冲突
+                    // TODO
+                    return UnaryConditionConflict(other);
+
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                Debug.Assert(false, "Undefined AtomCondition in Conflict");
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 比较两个一元谓词是否冲突
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        private bool UnaryConditionConflict(AtomCondition other)
+        {
+            // TODO: 锻炼回来继续写
             return true;
         }
         
