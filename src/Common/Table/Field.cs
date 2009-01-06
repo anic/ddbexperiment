@@ -20,6 +20,28 @@ namespace DistDBMS.Common.Table
         public string TableName { get; set; }
 
         /// <summary>
+        /// 屏蔽掉分片名称的表名
+        /// </summary>
+        public string LogicTableName
+        {
+            get
+            {
+                return TableName.Substring(0, TableName.IndexOf('.'));
+            }
+        }
+
+        /// <summary>
+        /// 屏蔽掉分片名称的属性名
+        /// </summary>
+        public string LogicAttributeName
+        {
+            get
+            {
+                return TableName.Substring(TableName.LastIndexOf('.'));
+            }
+        }
+
+        /// <summary>
         /// 属性字段的类型
         /// </summary>
         public AttributeType AttributeType { get; set; }
@@ -56,6 +78,19 @@ namespace DistDBMS.Common.Table
             return TableName + "." + AttributeName;
         }
 
+        /// <summary>
+        /// 比较两个属性是否相同
+        /// </summary>
+        /// <param name="other"></param>
+        /// <param name="isLogic">是否按逻辑表名和属性名进行比较</param>
+        /// <returns></returns>
+        public bool Equals(Field other, bool isLogic)
+        {
+            if (isLogic)
+                return LogicTableName.Equals(other.LogicTableName) && LogicAttributeName.Equals(other.LogicAttributeName);
+            else
+                return TableName.Equals(other.TableName) && AttributeName.Equals(other.AttributeName);
+        }
 
 
         #region ICloneable Members
