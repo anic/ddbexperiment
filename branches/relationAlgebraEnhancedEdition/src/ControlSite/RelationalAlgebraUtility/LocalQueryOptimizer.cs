@@ -361,9 +361,8 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             LocalizeTable(table.TableName, gdd, ref fragmentTree);
             //System.Console.Write(fragmentTree.toString());
 
+            AttachConditionToFragments(fragmentTree, projectNode, joinField, selectField);
             // 遍历FragmentTree，遇到分片节点就检查tree上的Project和Select与Fragment的相容性，并将可用节点复制到FragmentTree中
-
-            
 
         }
 
@@ -376,13 +375,45 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         /// <param name="selectAttributes">与fragment的逻辑表相关的一元谓词的属性</param>
         private bool AttachConditionToFragments(Relation fragmentTree, Relation centralConditionTreeRoot, FieldList joinAttributes, FieldList selectAttributes)
         {
+            ///////////////////////////////////////////////////
+            //
             // 中间结点
+            //
             if (fragmentTree.Children.Count > 0)
             {
+                List<Relation> toBeDeleted = new List<Relation>();
                 foreach (Relation r in fragmentTree.Children)
                 {
                     if (!AttachConditionToFragments(r, centralConditionTreeRoot, joinAttributes, selectAttributes))
-                        return false;
+                        toBeDeleted.Add(r);
+                }
+
+                // 子节点均有效，不需要删除
+                if (toBeDeleted.Count == 0)
+                    return true;
+
+                /**
+                 * 需要删除当前结点下的至少一个结点
+                 */
+
+                if (toBeDeleted.Count == fragmentTree.Children.Count)   //当前结点的所有子节点都被删除，则当前结点也将被上层结点删除
+                    return false;
+
+                // 至少剩余一个子节点
+                switch (fragmentTree.Type)
+                {
+                    case RelationalType.Union:                      
+                        //还剩至少一个分片结点,当前结点不用删除
+                        foreach (Relation r in toBeDeleted)    
+                            fragmentTree.Children.Remove(r);
+                        break;
+                    case RelationalType.Join:
+                        //join的一个子结点将被删除，则剩余结点代替join结点
+                        if (toBeDeleted[0] == fragmentTree.Children[0])
+                            fragmentTree.Copy(fragmentTree.Children[1]);
+                        else
+                            fragmentTree.Copy(fragmentTree.Children[0]);
+                        break;
                 }
 
                 return true;
@@ -425,7 +456,10 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 traveller = traveller.Parent;
             }
 
-            // 合并叶节点和分支
+            /** ------------------------------
+             * 合并叶节点和分支
+             */
+
             Relation centralTreeNode = centralConditionTreeRoot;
             Relation growPoint = fragmentTree;
             while (centralTreeNode != null)
@@ -440,23 +474,34 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
                     growPoint.LeftRelation = projection;
                 }
-                else if (centralTreeNode.Type == RelationalType.Selection)  // 检查Selet条件
+                else if (centralTreeNode.Type == RelationalType.Selection)  // 检查Select条件
                 {
                     // 检查Select条件与分片条件是否冲突
-                    // 冲突：本分支返回false 
-                    
+                    foreach (AtomCondition atom in fragmentCondition)
+                    {
+                        Debug.Assert(centralTreeNode.Predication != null, "Empty Predication in Selection Node!");
+                        Debug.Assert(centralTreeNode.Predication.IsAtomCondition, "Not AtomCondition in Selection Node!");
 
+                        List<AtomCondition> reducedConditon = null;
+                        if (centralTreeNode.Predication.AtomCondition.ConflictWith(atom, ref reducedConditon))  // 冲突，消除分片
+                            return false;
+                    }
                     // 不冲突：继续生长
-
+                    Relation selection = centralTreeNode.Clone() as Relation;
+                    growPoint.LeftRelation = selection;
                 }
                 else
                 {
                     Debug.Assert(false);                 
                 }
 
+                growPoint = growPoint.LeftRelation;
                 
             }
 
+            // 更改DirectSchema
+            growPoint.DirectTableSchema = fragment.Schema.Clone() as TableSchema;
+            growPoint.DirectTableSchema.ReplaceTableName(fragment.Name);
             return true;
         }
 
@@ -483,7 +528,6 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                         //一元谓词
                         unaryPredictions.Add(r.Predication.AtomCondition);
                     }
-
                 }
                 else
                 {
