@@ -102,6 +102,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PreBuildEvent>BatchScript/KillAllSites.bat</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

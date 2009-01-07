@@ -37,7 +37,7 @@ namespace DistDBMS.LocalSite
                 if ((packet as LocalSiteServerTextObjectPacket).Text == Common.NetworkCommand.PLAN)
                 {
                     ExecutionPackage package = (packet as LocalSiteServerTextObjectPacket).Object as ExecutionPackage;
-                    
+                    System.Console.WriteLine(name + " package ID:" + package.ID);
                     if (package.Type == ExecutionPackage.PackageType.Gdd)//gdd
                     {
                         bool result = true;
@@ -80,6 +80,7 @@ namespace DistDBMS.LocalSite
             { 
                 if ((packet as P2PTextObjectPacket).Object is ExecutionPackage)
                 {
+                    System.Console.WriteLine(name + " package ID:" + ((packet as P2PTextObjectPacket).Object as ExecutionPackage).ID);
                     lock (buffer)
                         buffer.Add((packet as P2PTextObjectPacket).Object as ExecutionPackage);
 
@@ -138,7 +139,11 @@ namespace DistDBMS.LocalSite
                                     newPackage);                                
                             }
                             else if (step.Index == 0) //返回ControlSite
+                            {
+                                System.Diagnostics.Debug.WriteLine(name + " finish the plan");
+                                System.Console.WriteLine(name + " finish the plan");
                                 conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, newPackage);
+                            }
                             else
                                 buffer.Add(newPackage);
 
@@ -160,6 +165,8 @@ namespace DistDBMS.LocalSite
 
             if (allDone)
             {
+                System.Diagnostics.Debug.WriteLine(name + " finish the plan");
+                System.Console.WriteLine(name + " finish the plan");
                 conn.SendServerClientTextPacket(Common.NetworkCommand.RESULT_OK);
                 currentPlan = null;
                 lock (buffer)

@@ -60,6 +60,33 @@ namespace DistDBMS.UserInterface.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Data.txt.
+        /// </summary>
+        internal static string FILE_DATA {
+            get {
+                return ResourceManager.GetString("FILE_DATA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DbInitScript.txt.
+        /// </summary>
+        internal static string FILE_DBSCRIPT {
+            get {
+                return ResourceManager.GetString("FILE_DBSCRIPT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NetworkInitScript.
+        /// </summary>
+        internal static string FILE_NETWORKSCRIPT {
+            get {
+                return ResourceManager.GetString("FILE_NETWORKSCRIPT", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap img_colortable {
             get {
                 object obj = ResourceManager.GetObject("img_colortable", resourceCulture);

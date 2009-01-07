@@ -11,6 +11,7 @@ using DistDBMS.Network;
 using DistDBMS.UserInterface.Handler;
 using DistDBMS.Common.Execution;
 using DistDBMS.Common.Dictionary;
+using DistDBMS.UserInterface.Properties;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -54,9 +55,9 @@ namespace DistDBMS.UserInterface.Controls
             description.Add(Stage.ClearNetwork, "清空所有网络平台");
             description.Add(Stage.InitLocalSite, "执行初始化LocalSite脚本");
             description.Add(Stage.InitControlSite, "执行初始化ControlSite脚本");
-            description.Add(Stage.InitDb, "初始化数据库");
-            description.Add(Stage.InitData, "导入数据");
-            description.Add(Stage.ClearDb, "删除所有数据库");
+            description.Add(Stage.InitDb, "执行初始化数据库脚本 "+Resources.FILE_DBSCRIPT);
+            description.Add(Stage.InitData, "导入数据文件 " + Resources.FILE_DATA);
+            description.Add(Stage.ClearDb, "删除当前计算机上的所有数据库");
             
             //TODO:先从初始化开始，以后改成清空平台
             //current = (Stage)0;
@@ -80,11 +81,18 @@ namespace DistDBMS.UserInterface.Controls
         {
             this.type = Type.Init;
             this.clusterConfig = clusterConfig;
-            int[] stepList = new int[] { 
+            /*int[] stepList = new int[] { 
                 (int)Stage.ClearDb, 
                 (int)Stage.InitDb,
                 (int)Stage.InitData
+            };*/
+
+            int[] stepList = new int[] { 
+                (int)Stage.InitDb
             };
+
+
+
             foreach (int step in stepList)
             {
                 current = (Stage)step;
@@ -119,7 +127,7 @@ namespace DistDBMS.UserInterface.Controls
                             ControlSiteClient controlSiteClient = new ControlSiteClient();
                             controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
 
-                            string[] gddScript = FileUploader.ReadFileToString("DbInitScript.txt");
+                            string[] gddScript = FileUploader.ReadFileToString(Resources.FILE_DBSCRIPT);
                             controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.GDDSCRIPT, gddScript);
                             NetworkPacket returnPacket = controlSiteClient.Packets.WaitAndRead();
                             if (returnPacket is ServerClientTextObjectPacket)
@@ -137,7 +145,7 @@ namespace DistDBMS.UserInterface.Controls
                             ControlSiteClient controlSiteClient = new ControlSiteClient();
                             controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
 
-                            string[] dataScript = FileUploader.ReadFileToString("Data.txt");
+                            string[] dataScript = FileUploader.ReadFileToString(Resources.FILE_DATA);
                             controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.DATASCRIPT, dataScript);
                             controlSiteClient.Packets.WaitAndRead();
 
@@ -146,7 +154,9 @@ namespace DistDBMS.UserInterface.Controls
                 }
 
             }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
+            catch (Exception ex) {
+                MessageBox.Show(ex.ToString(), "异常警告");
+            }
 
             NextStage();
         }
