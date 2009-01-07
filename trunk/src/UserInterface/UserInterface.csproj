@@ -198,10 +198,6 @@
       <Project>{6732C2FA-0941-4ED3-9DD1-E8B3783A2869}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ControlSite\ControlSite.csproj">
-      <Project>{1EDEE97A-4E3B-4F00-9A29-A8C246F49FEC}</Project>
-      <Name>ControlSite</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Network\Network.csproj">
       <Project>{3D729BA4-7360-4CEF-8676-BC1E686B1F12}</Project>
       <Name>Network</Name>

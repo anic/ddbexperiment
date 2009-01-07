@@ -38,6 +38,8 @@ namespace DistDBMS.UserInterface.Controls
             if (table == null)
                 return;
 
+            lvwTable.BeginUpdate();
+
             foreach (Field f in table.Schema.Fields)
             {
                 ColumnHeader header = new ColumnHeader();
@@ -63,10 +65,11 @@ namespace DistDBMS.UserInterface.Controls
                 }
             }
 
-            TableUtility util = new TableUtility();
-            util.PaintCrossColor(lvwTable, Color.White, Color.LightGray);
-            util.FitSize(lvwTable, lvwTable.Size);
+            //TableUtility util = new TableUtility();
+            //util.PaintCrossColor(lvwTable, Color.White, Color.LightGray);
+            //util.FitSize(lvwTable, lvwTable.Size);
 
+            lvwTable.EndUpdate();
         }
 
 

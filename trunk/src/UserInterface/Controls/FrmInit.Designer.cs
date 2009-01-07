@@ -40,7 +40,7 @@
             // 
             // btnYes
             // 
-            this.btnYes.Location = new System.Drawing.Point(12, 77);
+            this.btnYes.Location = new System.Drawing.Point(77, 77);
             this.btnYes.Name = "btnYes";
             this.btnYes.Size = new System.Drawing.Size(92, 23);
             this.btnYes.TabIndex = 0;
@@ -50,7 +50,7 @@
             // 
             // btnNo
             // 
-            this.btnNo.Location = new System.Drawing.Point(110, 77);
+            this.btnNo.Location = new System.Drawing.Point(175, 77);
             this.btnNo.Name = "btnNo";
             this.btnNo.Size = new System.Drawing.Size(92, 23);
             this.btnNo.TabIndex = 1;
@@ -69,7 +69,7 @@
             // 
             // btnAll
             // 
-            this.btnAll.Location = new System.Drawing.Point(12, 106);
+            this.btnAll.Location = new System.Drawing.Point(77, 106);
             this.btnAll.Name = "btnAll";
             this.btnAll.Size = new System.Drawing.Size(92, 23);
             this.btnAll.TabIndex = 2;
@@ -79,7 +79,7 @@
             // 
             // btnIgnore
             // 
-            this.btnIgnore.Location = new System.Drawing.Point(110, 106);
+            this.btnIgnore.Location = new System.Drawing.Point(175, 106);
             this.btnIgnore.Name = "btnIgnore";
             this.btnIgnore.Size = new System.Drawing.Size(92, 23);
             this.btnIgnore.TabIndex = 3;
@@ -110,7 +110,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(209, 135);
+            this.ClientSize = new System.Drawing.Size(273, 134);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lblStep);
             this.Controls.Add(this.btnIgnore);

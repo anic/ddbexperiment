@@ -45,7 +45,11 @@ namespace DistDBMS.UserInterface
             this.pnlControl = new System.Windows.Forms.Panel();
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsWizzard = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsImportScript = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsImportData = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemImportScript = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemImportData = new System.Windows.Forms.ToolStripMenuItem();
@@ -125,16 +129,47 @@ namespace DistDBMS.UserInterface
             // 文件ToolStripMenuItem
             // 
             this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.退出ToolStripMenuItem});
+            this.tsWizzard,
+            this.tsImportScript,
+            this.tsImportData,
+            this.toolStripSeparator1,
+            this.tsExit});
             this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
             this.文件ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
             this.文件ToolStripMenuItem.Text = "文件";
             // 
-            // 退出ToolStripMenuItem
+            // tsWizzard
             // 
-            this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
-            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
-            this.退出ToolStripMenuItem.Text = "退出";
+            this.tsWizzard.Name = "tsWizzard";
+            this.tsWizzard.Size = new System.Drawing.Size(160, 22);
+            this.tsWizzard.Text = "运行向导";
+            this.tsWizzard.Click += new System.EventHandler(this.tsWizzard_Click);
+            // 
+            // tsImportScript
+            // 
+            this.tsImportScript.Name = "tsImportScript";
+            this.tsImportScript.Size = new System.Drawing.Size(160, 22);
+            this.tsImportScript.Text = "导入初始化脚本";
+            this.tsImportScript.Click += new System.EventHandler(this.tsImportScript_Click);
+            // 
+            // tsImportData
+            // 
+            this.tsImportData.Name = "tsImportData";
+            this.tsImportData.Size = new System.Drawing.Size(160, 22);
+            this.tsImportData.Text = "导入数据";
+            this.tsImportData.Click += new System.EventHandler(this.tsImportData_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(157, 6);
+            // 
+            // tsExit
+            // 
+            this.tsExit.Name = "tsExit";
+            this.tsExit.Size = new System.Drawing.Size(160, 22);
+            this.tsExit.Text = "退出";
+            this.tsExit.Click += new System.EventHandler(this.tsExit_Click);
             // 
             // menuFile
             // 
@@ -272,10 +307,14 @@ namespace DistDBMS.UserInterface
         private System.Windows.Forms.ToolStripMenuItem menuItemImportData;
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsExit;
         private System.Windows.Forms.Timer timer;
         private DistDBMS.UserInterface.Controls.UscSiteViewer uscSiteViewer;
         private DistDBMS.UserInterface.Controls.UscFragmentViewer uscFragmentViewer;
+        private System.Windows.Forms.ToolStripMenuItem tsWizzard;
+        private System.Windows.Forms.ToolStripMenuItem tsImportScript;
+        private System.Windows.Forms.ToolStripMenuItem tsImportData;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         
     }
 }

@@ -30,6 +30,7 @@ namespace DistDBMS.ControlSite.Plan
 
             string output = (new RelationDebugger()).GetDebugString(exR);
             System.Diagnostics.Debug.WriteLine(output);
+            System.Console.WriteLine(output);
             
             ////////////////生成执行计划//////////////////////////
             ExecutionPlan plan = new ExecutionPlan();

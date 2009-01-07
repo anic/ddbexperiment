@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using DistDBMS.ControlSite;
 using System.IO;
 using DistDBMS.Common.Dictionary;
 using DistDBMS.UserInterface.Controls;
@@ -21,7 +20,6 @@ namespace DistDBMS.UserInterface
 {
     public partial class FrmApp : Form
     {
-        ControlSite.VirtualInterface2 vInterface;
         GlobalDirectory gdd;
         MenuTreeSwitcher switcher;
         ClusterConfiguration clusterConfig;
@@ -44,28 +42,10 @@ namespace DistDBMS.UserInterface
             switcher.SetControl(uscFragmentViewer);
             switcher.SetControl(uscSiteViewer);
 
-            //vInterface = new DistDBMS.ControlSite.VirtualInterface2();
             NeedWizzard = true;
 
             NetworkInitiator initiator = new NetworkInitiator();
             clusterConfig = initiator.GetConfiguration("NetworkInitScript.txt");
-
-            
-            
-            
-            ////初始化脚本
-            //string result;
-            //vInterface.ImportScript("DbInitScript.txt", out gdd, out result);
-            //uscExecuteQuery.AddCommandResult(result);
-
-            ////本地设置gdd
-            //uscExecuteQuery.SetGlobalDirectory(gdd);
-            //switcher.SetGlobalDirectory(gdd);
-
-
-            ////导入数据
-            //vInterface.ImportData("Data.txt", out result);
-            //uscExecuteQuery.AddCommandResult(result);
 
             uscExecuteQuery.EnableTip = false;
         }
@@ -81,14 +61,6 @@ namespace DistDBMS.UserInterface
             
             try
             {
-                //Table data;
-                //string result;
-                //Relation queryTree;
-                /*vInterface.ExecuteSQL(uscExecuteQuery.SQLText, out data, out result, out queryTree);
-                uscExecuteQuery.AddCommandResult(result);
-                uscExecuteQuery.SetResultTable(data);
-                uscExecuteQuery.SetQueryTree(queryTree);*/
-
                 //TODO:设置选择ControlSite
                 ControlSiteClient controlSiteClient = new ControlSiteClient();
                 controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
@@ -164,8 +136,39 @@ namespace DistDBMS.UserInterface
 
         private void FrmApp_FormClosed(object sender, FormClosedEventArgs e)
         {
-            FrmInit frmDestroy = new FrmInit();
-            frmDestroy.ShowDialog(FrmInit.Type.Destroy, null);
+            if (NeedWizzard)
+            {
+                FrmInit frmDestroy = new FrmInit();
+                frmDestroy.ShowDialog(FrmInit.Type.Destroy, null);
+            }
+        }
+
+        private void tsWizzard_Click(object sender, EventArgs e)
+        {
+            FrmInit frmInit = new FrmInit();
+            frmInit.ShowDialog(FrmInit.Type.Init, clusterConfig);
+            
+            if (frmInit.GDD != null)
+            {
+                uscExecuteQuery.SetGlobalDirectory(frmInit.GDD);
+                switcher.SetGlobalDirectory(frmInit.GDD);
+            }
+
+        }
+
+        private void tsImportScript_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tsImportData_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tsExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
 
 

@@ -95,7 +95,8 @@ namespace DistDBMS.UserInterface.Controls
 
         public void AddCommandResult(string result)
         {
-            txtResult.Text += result + "\r\n";
+            
+            txtResult.Text = result + "\r\n";
             
             txtResult.Select(txtResult.Text.Length, 0);
             txtResult.ScrollToCaret();

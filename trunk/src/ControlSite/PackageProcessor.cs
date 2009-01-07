@@ -141,12 +141,12 @@ namespace DistDBMS.ControlSite
                         string output = (new RelationDebugger()).GetDebugString(relationalgebra);
                         System.Diagnostics.Debug.WriteLine(output);
 
-                        List<ExecutionPlan> plans = new List<ExecutionPlan>();
-
                         QueryPlanCreator creator = new QueryPlanCreator(gdd);
                         ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, 0);
-                        plans = creator.SplitPlan(gPlan);
 
+                        
+
+                        List<ExecutionPlan> plans = creator.SplitPlan(gPlan);
                         foreach (ExecutionPlan p in plans)
                         {
                             ExecutionPackage package = new ExecutionPackage();
@@ -184,34 +184,20 @@ namespace DistDBMS.ControlSite
                                         result.Description = "Command executed successfully.";
                                         result.Description += "\r\n" + result.Data.Tuples.Count + " tuples selected";
                                         result.RawQueryTree = relationalgebra;
-                                        if (result.Data.Tuples.Count > 0)
-                                        {
-                                            result.Description += ":\r\n";
-                                            foreach (Tuple tuple in result.Data.Tuples)
-                                                result.Description += tuple.ToString() + "\r\n";
-                                        }
-                                        else
-                                            result.Description += "\r\n";
+                                        //if (result.Data.Tuples.Count > 0)
+                                        //{
+                                        //    result.Description += ":\r\n";
+                                        //    foreach (Tuple tuple in result.Data.Tuples)
+                                        //        result.Description += tuple.ToString() + "\r\n";
+                                        //}
+                                        //else
+                                        //    result.Description += "\r\n";
+                                        result.Description += "\r\n";
                                     }
                                 }
                             }
                         }
-
-                        
-                        //data = buffer.GetPackageById(gPlan.Steps[0].Operation.ResultID).Object as Table;
-
-                        
-                        //result.Description += "\r\n" + data.Tuples.Count + " tuples selected";
-                        //result.RawQueryTree = relationalgebra;
-                        //if (data.Tuples.Count > 0)
-                        //{
-                        //    result += ":\r\n";
-                        //    foreach (Tuple tuple in data.Tuples)
-                        //        result += tuple.ToString() + "\r\n";
-                        //}
-                        //else
-                        //    result += "\r\n";
-                        //return true;
+                        System.Console.WriteLine("ALL plans done!");
                         conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
                         return;
                     }
