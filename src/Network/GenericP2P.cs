@@ -266,8 +266,7 @@ namespace DistDBMS.Network
 
 #if DEBUG
                 int sleepTime = 50;
-#endif
-#if RELEASE
+#else
                 int sleepTime = 5000;
 #endif                // 作为主机监听，处理连接请求
                 List<Socket> checkReadSockets, checkErrorSockets;
