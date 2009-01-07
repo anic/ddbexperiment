@@ -4,10 +4,11 @@ using System.Text;
 using DistDBMS.Common.Table;
 using System.Data.SQLite;
 using DistDBMS.Common;
+using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.LocalSite.DataAccess
 {
-    class DataAccessor:IDisposable
+    public class DataAccessor:IDisposable
     {
         
         /// <summary>
@@ -114,8 +115,24 @@ namespace DistDBMS.LocalSite.DataAccess
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debugger.Break();
+                //System.Diagnostics.Debugger.Break();
                 transaction.Rollback();
+                lastEx = ex;
+                return -1;
+            }
+        }
+
+
+        public int DeleteValue(TableSchema source,Condition condition)
+        {
+            SQLiteCommand cmd = new SQLiteCommand(conn);
+            try
+            {
+                cmd.CommandText = "delete from " + source.TableName + " where " + condition.ToString();
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
                 lastEx = ex;
                 return -1;
             }
@@ -175,11 +192,42 @@ namespace DistDBMS.LocalSite.DataAccess
             }
             catch(Exception ex)
             {
-                System.Diagnostics.Debugger.Break();
+                //System.Diagnostics.Debugger.Break();
                 lastEx = ex;
                 return null;
             }
         }
+
+        public Table Query(string cmd)
+        {
+            SQLiteCommand sqlCmd = new SQLiteCommand(conn);
+            sqlCmd.CommandText = cmd;
+            try
+            {
+                SQLiteDataReader reader = sqlCmd.ExecuteReader();
+                
+                {
+                    Table result = new Table();
+                    //填充数据
+                     
+                    while(reader.Read())
+                    {
+                        Tuple t = new Tuple();
+                        for (int i = 0; i < reader.FieldCount; i++)
+                            t.Data.Add(reader[i].ToString()); //按照string填充
+                        result.Tuples.Add(t);
+                    }
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                //System.Diagnostics.Debugger.Break();
+                lastEx = ex;
+                return null;
+            }
+        }
+
 
         #region IDisposable Members
 

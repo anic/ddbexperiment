@@ -159,6 +159,10 @@ namespace DistDBMS.UserInterface.Handler
         GlobalDirectory gdd;
         public void SetGlobalDirectory(GlobalDirectory gdd)
         {
+            sitesNode.Nodes.Clear();
+            fragmentsNode.Nodes.Clear();
+            tablesNode.Nodes.Clear();
+
             if (gdd == null)
                 return;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using DistDBMS.ControlSite.SQLSyntax.Object;
+using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.ControlSite.SQLSyntax.Parser
 {
@@ -30,7 +31,9 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
         /// 就这个结构，填写一致性信息
         /// </summary>
         /// <returns>如果解析正确,返回true</returns>
-        public abstract bool FillLocalConsistency();
+        public virtual bool FillLocalConsistency(){ return true; }
+
+        public virtual bool FillGlobalConsisitency(GlobalDirectory gdd) { return true; }
         
         public AbstractParser() 
         {

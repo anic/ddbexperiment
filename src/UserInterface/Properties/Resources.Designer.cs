@@ -79,7 +79,7 @@ namespace DistDBMS.UserInterface.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NetworkInitScript.
+        ///   Looks up a localized string similar to NetworkInitScript.txt.
         /// </summary>
         internal static string FILE_NETWORKSCRIPT {
             get {

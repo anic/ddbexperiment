@@ -1,0 +1,8 @@
+﻿define site S1 127.0.0.1 10000
+define site S2 127.0.0.1 20000
+define site S3 127.0.0.1 30000
+define site S4 127.0.0.1 40000
+create table Customer (id int key, name char(25), gender char(1), rank int)
+create table Producer (id int key, name char(50), location char(2))
+create table Product (id int key, name char(25), producer_id int, stocks int)
+create table Purchase(customer_id int, product_id int, number int)

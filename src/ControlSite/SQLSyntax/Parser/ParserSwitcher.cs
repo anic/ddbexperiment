@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using DistDBMS.ControlSite.SQLSyntax.Operation;
+using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.ControlSite.SQLSyntax.Parser
 {
@@ -20,7 +21,7 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
         public string LastError { get { return error; } }
         string error;
 
-        public bool Parse(string sql)
+        public bool Parse(string sql,GlobalDirectory gdd)
         {
             sql = sql.Trim();
             AbstractParser parser = null;
@@ -55,6 +56,11 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
                 {
                     //本地语意检查
                     parseResult |= parser.FillLocalConsistency();
+
+                    //全局语意检查
+                    if (parseResult && gdd != null)
+                        parseResult |= parser.FillGlobalConsisitency(gdd);
+
                     if (parseResult)
                         result = parser.LastResult;
                     else

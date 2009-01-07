@@ -90,9 +90,5 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
             return true;
         }
 
-        public override bool FillLocalConsistency()
-        {
-            return true;
-        }
     }
 }

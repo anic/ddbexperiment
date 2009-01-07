@@ -13,7 +13,7 @@ namespace DistDBMS.UserInterface.Controls.SqlInput
     class SqlTextBox:RichTextBox
     {
         FrmTip frmTip;
-        string[] keywords = new string[] { "select", "from", "where" };
+        string[] keywords = new string[] { "select", "from", "where", "delete", "insert" };
         string[] symbol = new string[] { " ", ",", ";" };
 
         List<string> table = new List<string>();

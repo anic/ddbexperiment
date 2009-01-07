@@ -5,6 +5,7 @@ using DistDBMS.ControlSite.SQLSyntax.Operation;
 using System.Text.RegularExpressions;
 using DistDBMS.ControlSite.SQLSyntax.Object;
 using DistDBMS.Common.Syntax;
+using DistDBMS.Common.Table;
 
 
 namespace DistDBMS.ControlSite.SQLSyntax.Parser
@@ -46,9 +47,20 @@ namespace DistDBMS.ControlSite.SQLSyntax.Parser
             //delete from Teacher where id>=290000 and title=2,
         }
 
-        public override bool FillLocalConsistency()
+        public override bool FillGlobalConsisitency(DistDBMS.Common.Dictionary.GlobalDirectory gdd)
         {
-            return true;
+            try
+            {
+                result.Source = gdd.Schemas[result.Source.TableName].Clone() as TableSchema;
+                return true;
+            }
+            catch {
+                LastError.Description = "没有匹配的表";
+                return false;
+            }
+            
         }
+
+       
     }
 }

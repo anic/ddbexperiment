@@ -30,11 +30,13 @@ namespace DistDBMS.UserInterface.Controls
             item.Text = site.Name;
 
             ListViewItem.ListViewSubItem sub = new ListViewItem.ListViewSubItem();
-            sub.Text = site.IP;
+            //TODO:站点地址
+            //sub.Text = site.IP;
             item.SubItems.Add(sub);
 
             sub = new ListViewItem.ListViewSubItem();
-            sub.Text = site.Port.ToString();
+            //TODO:站点地址
+            //sub.Text = site.Port.ToString();
             item.SubItems.Add(sub);
 
             lvwSite.Items.Add(item);

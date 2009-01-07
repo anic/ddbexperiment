@@ -17,7 +17,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Network", "Network\Network.
 		{6732C2FA-0941-4ED3-9DD1-E8B3783A2869} = {6732C2FA-0941-4ED3-9DD1-E8B3783A2869}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestResult", "TestResult\TestResult.csproj", "{A4937C8C-78E3-4126-B178-B71DC6824293}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D9FFD54A-4A70-4DED-8768-1D1768CE513B}"
+	ProjectSection(SolutionItems) = preProject
+		DistDBMS.vsmdi = DistDBMS.vsmdi
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = DistDBMS.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -43,6 +54,10 @@ Global
 		{3D729BA4-7360-4CEF-8676-BC1E686B1F12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D729BA4-7360-4CEF-8676-BC1E686B1F12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D729BA4-7360-4CEF-8676-BC1E686B1F12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4937C8C-78E3-4126-B178-B71DC6824293}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4937C8C-78E3-4126-B178-B71DC6824293}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4937C8C-78E3-4126-B178-B71DC6824293}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4937C8C-78E3-4126-B178-B71DC6824293}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

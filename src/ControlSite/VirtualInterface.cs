@@ -31,7 +31,7 @@ namespace DistDBMS.ControlSite
             buffer.Clear();
 
             ParserSwitcher ps = new ParserSwitcher();
-            bool bParse = ps.Parse(sql.Trim());
+            bool bParse = ps.Parse(sql.Trim(), null);
 
             if (!bParse)
             {
