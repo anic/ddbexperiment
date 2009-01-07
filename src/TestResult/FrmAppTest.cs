@@ -146,8 +146,7 @@ namespace DistDBMS.TestResult
 
         private bool IsSame(Table r1, Table r2)
         {
-            return (r1.Tuples.Count == r2.Tuples.Count);
-
+           
             if (r1.Tuples.Count != r2.Tuples.Count)
                 return false;
 

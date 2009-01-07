@@ -83,7 +83,7 @@ namespace DistDBMS.UserInterface
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debugger.Break();
+                //System.Diagnostics.Debugger.Break();
                 LogWriter writer = new LogWriter();
                 writer.WriteLog(uscExecuteQuery.SQLText + "\r\n" + ex.StackTrace);
                 MessageBox.Show("执行出现异常，并已经记录到error.log中", "出错", MessageBoxButtons.OK, MessageBoxIcon.Error);
