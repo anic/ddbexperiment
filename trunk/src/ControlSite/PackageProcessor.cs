@@ -168,7 +168,7 @@ namespace DistDBMS.ControlSite
                         foreach (ExecutionPlan p in plans)
                         {
                             NetworkPacket returnPackage = conn.GetLocalSiteClient(p.ExecutionSite.Name).Packets.WaitAndRead();
-                            System.Console.WriteLine(name + ": Package from " + p.ExecutionSite.Name);
+                            DistDBMS.Common.Debug.WriteLine(name + ": Package from " + p.ExecutionSite.Name);
                             if (returnPackage is ServerClientTextObjectPacket
                                 && (returnPackage as ServerClientTextObjectPacket).Object != null)
                             {
@@ -197,7 +197,7 @@ namespace DistDBMS.ControlSite
                                 }
                             }
                         }
-                        System.Console.WriteLine("ALL plans done!");
+                        DistDBMS.Common.Debug.WriteLine("ALL plans done!");
                         conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
                         return;
                     }

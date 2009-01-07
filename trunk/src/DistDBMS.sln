@@ -13,6 +13,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalSite", "LocalSite\LocalSite.csproj", "{7281B7B1-BC54-4D6D-B745-9C950B1BE110}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Network", "Network\Network.csproj", "{3D729BA4-7360-4CEF-8676-BC1E686B1F12}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6732C2FA-0941-4ED3-9DD1-E8B3783A2869} = {6732C2FA-0941-4ED3-9DD1-E8B3783A2869}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

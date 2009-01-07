@@ -67,7 +67,7 @@ namespace DistDBMS.ControlSite
                 controlSiteServer.PacketProcessor = new ControlSiteServer.PacketProcessorDelegate(processor.PackageProcess);
                 controlSiteServer.Start();
 
-                System.Console.WriteLine("ControlSite " + site + " started!");
+                DistDBMS.Common.Debug.WriteLine("ControlSite " + site + " started!");
             }
 
             Console.ReadLine();
@@ -93,8 +93,8 @@ namespace DistDBMS.ControlSite
             //r.Predication.Content = "credit_hour>2 and location=\'CB‐6\'";
 
             string output = (new RelationDebugger()).GetDebugString(r);
-            System.Console.WriteLine("\n\nSample1 Relation:");
-            System.Console.WriteLine(output);
+            DistDBMS.Common.Debug.WriteLine("\n\nSample1 Relation:");
+            DistDBMS.Common.Debug.WriteLine(output);
 
             //Sample2
             /*
@@ -219,8 +219,8 @@ namespace DistDBMS.ControlSite
 
 
             output = (new RelationDebugger()).GetDebugString(r);
-            System.Console.WriteLine("\n\nSample2 Relation:");
-            System.Console.WriteLine(output);
+            DistDBMS.Common.Debug.WriteLine("\n\nSample2 Relation:");
+            DistDBMS.Common.Debug.WriteLine(output);
 
         }
 
@@ -229,8 +229,8 @@ namespace DistDBMS.ControlSite
             int index = 0;
             ExecutionRelation exR = new ExecutionRelation(r, ref index, -1);
             string output = (new RelationDebugger()).GetDebugString(exR);
-            System.Console.WriteLine("\n\nSample2 Relation:");
-            System.Console.WriteLine(output);
+            DistDBMS.Common.Debug.WriteLine("\n\nSample2 Relation:");
+            DistDBMS.Common.Debug.WriteLine(output);
 
             ////////////////生成执行计划//////////////////////////
 
@@ -253,11 +253,11 @@ namespace DistDBMS.ControlSite
 
             QueryPlanCreator creator = new QueryPlanCreator(gdd);
             ExecutionPlan plan = creator.CreateGlobalPlan(r, 0);
-            System.Console.WriteLine("\n\n\n*****\n" + plan.ToString() + "\n*****\n");
+            DistDBMS.Common.Debug.WriteLine("\n\n\n*****\n" + plan.ToString() + "\n*****\n");
             plans = creator.SplitPlan(plan);
 
             foreach (ExecutionPlan p in plans)
-                System.Console.WriteLine(p.ToString());
+                DistDBMS.Common.Debug.WriteLine(p.ToString());
 
             #region output
             /*
@@ -331,7 +331,7 @@ namespace DistDBMS.ControlSite
             //insertStep.Table.Tuples.Add(tuple);
 
 
-            //System.Console.WriteLine("\n\n" + insertPlan.ToString() + "\n\n");
+            //DistDBMS.Common.Debug.WriteLine("\n\n" + insertPlan.ToString() + "\n\n");
             //ExecutionPlan testPlan = plans[3];
             #endregion
 
@@ -402,9 +402,9 @@ namespace DistDBMS.ControlSite
                 Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
                 
                 /*
-                System.Console.WriteLine("\n\nTEST" + i.ToString() + ":");
-                System.Console.WriteLine("Raw: " + tests[i]);
-                System.Console.WriteLine("Parse:" + s3.ToString());*/
+                DistDBMS.Common.Debug.WriteLine("\n\nTEST" + i.ToString() + ":");
+                DistDBMS.Common.Debug.WriteLine("Raw: " + tests[i]);
+                DistDBMS.Common.Debug.WriteLine("Parse:" + s3.ToString());*/
 
                 //QueryPlanCreator creator = new QueryPlanCreator(gdd);
                 //ExecutionPlan plan = creator.CreateGlobalPlan(relationalgebra, "PLAN");
@@ -412,12 +412,12 @@ namespace DistDBMS.ControlSite
                 {
                     //string output = (new RelationDebugger()).GetDebugString(relationalgebra);
                     
-                    //System.Console.WriteLine("relationalgebra Parse:\n" + output);
-                    //System.Console.WriteLine("***PLAN**************************\n" + plan.ToString());
-                    //System.Console.WriteLine("***PLAN**************************");
+                    //DistDBMS.Common.Debug.WriteLine("relationalgebra Parse:\n" + output);
+                    //DistDBMS.Common.Debug.WriteLine("***PLAN**************************\n" + plan.ToString());
+                    //DistDBMS.Common.Debug.WriteLine("***PLAN**************************");
                     //plans = creator.SplitPlan(plan);
                     //foreach (ExecutionPlan p in plans)
-                    //    System.Console.WriteLine(p.ToString());
+                    //    DistDBMS.Common.Debug.WriteLine(p.ToString());
 
                     r = relationalgebra;
                 }
