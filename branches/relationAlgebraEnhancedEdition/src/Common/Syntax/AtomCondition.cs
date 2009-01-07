@@ -259,9 +259,7 @@ namespace DistDBMS.Common.Syntax
                 if (LeftOperand.Field.Equals(other.RightOperand.Field, true))
                 {
                     // 两个相同的一元谓词是否冲突
-                    // TODO
                     return UnaryConditionConflict(other);
-
                 }
                 else
                     return false;
@@ -278,9 +276,258 @@ namespace DistDBMS.Common.Syntax
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        private bool UnaryConditionConflict(AtomCondition other)
+        private bool UnaryConditionConflict(AtomCondition other, ref List<AtomCondition> result)
         {
-            // TODO: 锻炼回来继续写
+            //////////////////////////////////////////////////////
+            //
+            // 前提条件:
+            //
+            //    两个一元谓词已经过正规化
+            //    且两个一元谓词的中的属性为相同属性
+            //
+
+            // 字符串类型
+            if (RightOperand.ValueType == AttributeType.String)
+            {
+                Debug.Assert(Operator == LogicOperator.Equal || Operator == LogicOperator.NotEqual, "Error String operator!");
+                Debug.Assert(other.Operator == LogicOperator.Equal || other.Operator == LogicOperator.NotEqual, "Error String operator!");
+                
+                if (RightOperand.ToStringValue().Equals(other.RightOperand.ToStringValue()))
+                {
+                    if (Operator == other.Operator)
+                    {
+                        result.Add(Clone() as AtomCondition);
+                        
+                        return false;
+                    }
+                    else
+                    {
+                        result.Add(Clone() as AtomCondition);
+                        result.Add(other.Clone() as AtomCondition);
+                        return true;
+                    }
+                }
+            }
+            else if (RightOperand.ValueType == AttributeType.Int || RightOperand.ValueType == AttributeType.Double)
+            {
+                double value1 = RightOperand.ToDoubleValue();
+                double value2 = other.RightOperand.ToDoubleValue();
+
+                switch (Operator)
+                {
+                    case LogicOperator.Greater:
+                        switch (other.Operator)
+                        {
+                            case LogicOperator.Greater:
+                                AtomCondition atom = Clone() as AtomCondition;
+                                atom.RightOperand.Value = Math.Max(value1, value2);
+                                result.Add(atom);
+                                return false;
+                                break;
+                            case LogicOperator.GreaterOrEqual:
+                                if (value1 > value2)
+                                    result.Add(Clone() as AtomCondition);
+                                else
+                                    result.Add(other.Clone() as AtomCondition);
+                                
+                                return false;
+                                break;
+                            case LogicOperator.Less:
+                            case LogicOperator.LessOrEqual:
+                                if (value1 >= value2)
+                                    return true;
+                                else
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    result.Add(other.Clone()  as AtomCondition);
+                                    return false;
+                                }
+                                break;
+                            case LogicOperator.NotEqual:
+                                if (value1 > value2)
+                                {
+                                    result.Add(other.Clone() as AtomCondition);    
+                                }
+                                result.Add(this.Clone() as AtomCondition);
+                                return false;
+                                break;
+                            case LogicOperator.Equal:
+                                if (value1 >= value2)
+                                    return true;
+                                else
+                                {
+                                    result.Add(this.Clone() as AtomCondition);
+                                    result.Add(other.Clone() as AtomCondition);
+                                    return false;
+                                }
+                                break;
+                        }
+                        break;
+                    case LogicOperator.GreaterOrEqual:
+                        switch (other.Operator)
+                        {
+                            case LogicOperator.Greater:
+                                if (value1 > value2)
+                                    result.Add(this.Clone() as AtomCondition);
+                                else
+                                    result.Add(other.Clone() as AtomCondition);
+                                return false;
+                                break;
+                            case LogicOperator.GreaterOrEqual:
+                                AtomCondition atom = Clone() as AtomCondition;
+                                atom.RightOperand.Value = Math.Max(value1, value2);
+                                result.Add(atom);
+                                return false;
+                                break;
+                            case LogicOperator.Less:
+                                if (value1 >= value2)
+                                    return true;
+                                result.Add(this.Clone() as AtomCondition);
+                                result.Add(other.Clone() as AtomCondition);
+                                return false;
+                                break;
+                            case LogicOperator.LessOrEqual:
+                                if (value1 > value2)
+                                    return true;
+                                else if (value1 == value2)
+                                {
+                                    AtomCondition atom = Clone() as AtomCondition;
+                                    atom.Operator = LogicOperator.Equal;
+                                    result.Add(atom);
+                                    return false;
+                                }
+                                else
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    result.Add(other.Clone() as AtomCondition);
+                                    return false;
+                                }
+                                break;
+                            case LogicOperator.NotEqual:
+                                if (value1 > value2)
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                }
+                                else
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    result.Add(other.Clone() as AtomCondition);
+                                }
+                                return false;
+                                break;
+                            case LogicOperator.Equal:
+                                if (value1 > value2)
+                                    return true;
+
+                                result.Add(other.Clone() as AtomCondition);
+                                return false;
+                                break;
+                        }
+                        break;
+                    case LogicOperator.Less:
+                        switch (other.Operator)
+                        {
+                            case LogicOperator.Greater:
+                            case LogicOperator.GreaterOrEqual:
+                                if (value1 <= value2)
+                                    return true;
+
+                                result.Add(Clone() as AtomCondition);
+                                result.Add(other.Clone() as AtomCondition);
+                                return false;
+                                break;
+                            case LogicOperator.Less:
+                                AtomCondition atom = Clone() as AtomCondition;
+                                atom.RightOperand.Value = Math.Max(value1, value2);
+                                result.Add(atom);
+                                return false;
+                                break;
+                            case LogicOperator.LessOrEqual:
+                                if (value1 <= value2)
+                                    result.Add(Clone() as AtomCondition);
+                                else
+                                    result.Add(other.Clone() as AtomCondition);
+
+                                return false;
+                                break;
+                            case LogicOperator.NotEqual:
+                                if (value1 > value2)
+                                {
+                                    result.Add(other.Clone() as AtomCondition);
+                                }
+                                result.Add(Clone() as AtomCondition);
+
+                                return false;
+                                break;
+                            case LogicOperator.Equal:
+                                if (value1 > value2)
+                                {
+                                    result.Add(other.Clone() as AtomCondition);
+                                    return false;
+                                }
+
+                                return false;
+                                break;
+                        }
+                        break;
+                    case LogicOperator.LessOrEqual:
+                        switch (other.Operator)
+                        {
+                            case LogicOperator.Greater:
+                                break;
+                            case LogicOperator.GreaterOrEqual:
+                                break;
+                            case LogicOperator.Less:
+                                break;
+                            case LogicOperator.LessOrEqual:
+                                break;
+                            case LogicOperator.NotEqual:
+                                break;
+                            case LogicOperator.Equal:
+                                break;
+                        }
+                        break;
+                    case LogicOperator.NotEqual:
+                        switch (other.Operator)
+                        {
+                            case LogicOperator.Greater:
+                                break;
+                            case LogicOperator.GreaterOrEqual:
+                                break;
+                            case LogicOperator.Less:
+                                break;
+                            case LogicOperator.LessOrEqual:
+                                break;
+                            case LogicOperator.NotEqual:
+                                break;
+                            case LogicOperator.Equal:
+                                break;
+                        }
+                        break;
+                    case LogicOperator.Equal:
+                        switch (other.Operator)
+                        {
+                            case LogicOperator.Greater:
+                                break;
+                            case LogicOperator.GreaterOrEqual:
+                                break;
+                            case LogicOperator.Less:
+                                break;
+                            case LogicOperator.LessOrEqual:
+                                break;
+                            case LogicOperator.NotEqual:
+                                break;
+                            case LogicOperator.Equal:
+                                break;
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                Debug.Assert(false, "Can not handle the ValueType in UnaryConditionConflict");
+            }
+
             return true;
         }
         
