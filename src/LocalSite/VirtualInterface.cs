@@ -29,7 +29,7 @@ namespace DistDBMS.LocalSite
                 File.Delete(siteName);
             }
             catch (Exception ex) {
-                System.Console.WriteLine(ex);
+                DistDBMS.Common.Debug.WriteLine(ex.ToString());
             }
 
 

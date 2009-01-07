@@ -30,14 +30,14 @@ namespace DistDBMS.LocalSite
 
         public void LocalSitePackageProcess(LocalSiteServerConnection conn, LocalSiteServerPacket packet)
         {
-            System.Console.WriteLine(name + ":Packet received");
+            DistDBMS.Common.Debug.WriteLine(name + ":Packet received");
 
             if (packet is LocalSiteServerTextObjectPacket)
             {
                 if ((packet as LocalSiteServerTextObjectPacket).Text == Common.NetworkCommand.PLAN)
                 {
                     ExecutionPackage package = (packet as LocalSiteServerTextObjectPacket).Object as ExecutionPackage;
-                    System.Console.WriteLine(name + " package ID:" + package.ID);
+                    DistDBMS.Common.Debug.WriteLine(name + " package ID:" + package.ID);
                     if (package.Type == ExecutionPackage.PackageType.Gdd)//gdd
                     {
                         bool result = true;
@@ -75,12 +75,12 @@ namespace DistDBMS.LocalSite
 
         public void P2PPackageProcess(LocalSiteServerConnection conn, P2PPacket packet)
         {
-            System.Console.WriteLine(name + ":P2P Packet received");
+            DistDBMS.Common.Debug.WriteLine(name + ":P2P Packet received");
             if (packet is P2PTextObjectPacket)
             { 
                 if ((packet as P2PTextObjectPacket).Object is ExecutionPackage)
                 {
-                    System.Console.WriteLine(name + " package ID:" + ((packet as P2PTextObjectPacket).Object as ExecutionPackage).ID);
+                    DistDBMS.Common.Debug.WriteLine(name + " package ID:" + ((packet as P2PTextObjectPacket).Object as ExecutionPackage).ID);
                     lock (buffer)
                         buffer.Add((packet as P2PTextObjectPacket).Object as ExecutionPackage);
 
@@ -141,7 +141,7 @@ namespace DistDBMS.LocalSite
                             else if (step.Index == 0) //返回ControlSite
                             {
                                 System.Diagnostics.Debug.WriteLine(name + " finish the plan");
-                                System.Console.WriteLine(name + " finish the plan");
+                                DistDBMS.Common.Debug.WriteLine(name + " finish the plan");
                                 conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, newPackage);
                             }
                             else
@@ -166,7 +166,7 @@ namespace DistDBMS.LocalSite
             if (allDone)
             {
                 System.Diagnostics.Debug.WriteLine(name + " finish the plan");
-                System.Console.WriteLine(name + " finish the plan");
+                DistDBMS.Common.Debug.WriteLine(name + " finish the plan");
                 conn.SendServerClientTextPacket(Common.NetworkCommand.RESULT_OK);
                 currentPlan = null;
                 lock (buffer)

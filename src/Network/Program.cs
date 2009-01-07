@@ -51,7 +51,7 @@ namespace DistDBMS
         }
         static private void LocalSiteConnectionStart(GenericServerConnection conn)
         {
-            Debug.WriteLine("New LocalSiteServer Connection");
+            DistDBMS.Common.Debug.WriteLine("New LocalSiteServer Connection");
             conn.State = new LocalSiteState();
         }
 
@@ -60,7 +60,7 @@ namespace DistDBMS
             if(packet is P2PTextPacket)
             {
                 P2PTextPacket textPacket = (packet as P2PTextPacket);
-                Debug.WriteLine(conn.Server.Name + " P2P " + textPacket.Text);
+                DistDBMS.Common.Debug.WriteLine(conn.Server.Name + " P2P " + textPacket.Text);
 
                 string[] args = textPacket.Text.Split(":".ToCharArray());
                 if (args[0] == "Test")
@@ -87,7 +87,7 @@ namespace DistDBMS
             if (packet is LocalSiteServerTextPacket)
             {
                 LocalSiteServerTextPacket textPacket = (packet as LocalSiteServerTextPacket);
-                Debug.WriteLine(conn.Server.Name + " LCL " + textPacket.Text);
+                DistDBMS.Common.Debug.WriteLine(conn.Server.Name + " LCL " + textPacket.Text);
 
                 string[] args = textPacket.Text.Split(":".ToCharArray());
                 if (args[0] == "Test")
@@ -102,7 +102,7 @@ namespace DistDBMS
                         string text = "Test:Set:" + (conn.State as LocalSiteState).TestValue.ToString();
                         conn.SendP2PStepTextPacket(args[2], packet.StepIndex, text);
                         conn.SendP2PStepTextObjectPacket(args[2], P2PPacket.StepIndexNone, "test string", "test object");
-                        Debug.WriteLine(conn.Server.Name + " send P2P " + text);
+                        DistDBMS.Common.Debug.WriteLine(conn.Server.Name + " send P2P " + text);
 
                     }
                     else if (args[1] == "Sub")
@@ -111,7 +111,7 @@ namespace DistDBMS
                     }
                     else if (args[1] == "Return")
                     {
-                        Debug.WriteLine(conn.Server.Name + " Return " + (conn.State as LocalSiteState).TestValue.ToString());
+                        DistDBMS.Common.Debug.WriteLine(conn.Server.Name + " Return " + (conn.State as LocalSiteState).TestValue.ToString());
                         conn.SendServerClientTextPacket((conn.State as LocalSiteState).TestValue.ToString());
                     }
                     else
@@ -133,7 +133,7 @@ namespace DistDBMS
                     //测试乱序到达：先给L2发后续步骤，再向L1发前期步骤
                     conn.GetLocalSiteClient("L2").SendStepTextPacket(conn.SessionId, LocalSiteServerPacket.StepIndexNone, LocalSiteServerPacket.StepIndexNone, "Test:Set:20");
                     conn.GetLocalSiteClient("L2").Packets.WaitAndRead();
-                    Debug.WriteLine("recv reply for L2");
+                    DistDBMS.Common.Debug.WriteLine("recv reply for L2");
 
                     conn.GetLocalSiteClient("L2").SendStepTextPacket(conn.SessionId, 0, 1, "Test:Sub");
 
@@ -144,14 +144,14 @@ namespace DistDBMS
 
                     conn.GetLocalSiteClient("L1").SendStepTextPacket(conn.SessionId, LocalSiteServerPacket.StepIndexNone, LocalSiteServerPacket.StepIndexNone, "Test:Set:11");
                     conn.GetLocalSiteClient("L1").Packets.WaitAndRead();
-                    Debug.WriteLine("recv reply for L1");
+                    DistDBMS.Common.Debug.WriteLine("recv reply for L1");
 
                     conn.GetLocalSiteClient("L1").SendStepTextPacket(conn.SessionId, LocalSiteServerPacket.StepIndexNone, 0, "Test:Send:L2");
                     
 
                     
                     ServerClientTextPacket returnPacket = (ServerClientTextPacket)conn.GetLocalSiteClient("L2").Packets.WaitAndRead();
-                    Debug.WriteLine("recv return for L2");
+                    DistDBMS.Common.Debug.WriteLine("recv return for L2");
 
                     conn.SendServerClientTextObjectPacket(returnPacket.Text, "string object Hello From ControlServer");
                 }
@@ -209,9 +209,9 @@ namespace DistDBMS
                 {
                     ServerClientTextObjectPacket packet = (csPacket as ServerClientTextObjectPacket);
 
-                    Debug.WriteLine("Text:"+ packet.Text + ", Object:" + packet.Object.ToString());
+                    DistDBMS.Common.Debug.WriteLine("Text:"+ packet.Text + ", Object:" + packet.Object.ToString());
 
-                    Debug.WriteLine("Test Over.");
+                    DistDBMS.Common.Debug.WriteLine("Test Over.");
                 }
             }
 

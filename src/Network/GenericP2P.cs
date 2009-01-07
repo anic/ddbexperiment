@@ -115,7 +115,7 @@ namespace DistDBMS.Network
                     peerConns[name] = peerConn;
                     peerConn.Name = name;
 
-                    Debug.WriteLine(oldname + " => " + name);
+                    DistDBMS.Common.Debug.WriteLine(oldname + " => " + name);
                 }
             }
         }
@@ -134,7 +134,7 @@ namespace DistDBMS.Network
                 }
                 else
                 {
-                    Debug.WriteLine("Unknown command: " + pair[0]);
+                    DistDBMS.Common.Debug.WriteLine("Unknown command: " + pair[0]);
                 }
             }
             
@@ -341,7 +341,7 @@ namespace DistDBMS.Network
                                 }
                                 catch (System.Net.Sockets.SocketException)
                                 {
-                                    Debug.WriteLine("GenericP2PNetwork: can not connect to " + kv.Key);
+                                    DistDBMS.Common.Debug.WriteLine("GenericP2PNetwork: can not connect to " + kv.Key);
 
                                     if (peerConns.ContainsKey(kv.Key))
                                     {

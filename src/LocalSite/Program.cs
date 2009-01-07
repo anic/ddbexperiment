@@ -51,7 +51,7 @@ namespace DistDBMS.LocalSite
 
                 localSiteServer.Start();
 
-                System.Console.WriteLine("LocalSite " + site + " started!");
+                DistDBMS.Common.Debug.WriteLine("LocalSite " + site + " started!");
             }
 
             Console.ReadLine();
