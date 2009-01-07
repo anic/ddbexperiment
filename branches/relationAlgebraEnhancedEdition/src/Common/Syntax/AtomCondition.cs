@@ -259,7 +259,9 @@ namespace DistDBMS.Common.Syntax
                 if (LeftOperand.Field.Equals(other.RightOperand.Field, true))
                 {
                     // 两个相同的一元谓词是否冲突
-                    return UnaryConditionConflict(other);
+                    // TODO: Liuzhang
+                    List<AtomCondition> resultCondition = new List<AtomCondition>();
+                    bool isConflict = UnaryConditionConflict(other, ref resultCondition);
                 }
                 else
                     return false;
