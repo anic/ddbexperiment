@@ -227,6 +227,7 @@ namespace DistDBMS.Common.Syntax
             return LogicOperator.Equal;
         }
 
+        
         /// <summary>
         /// 检测是否与另一个AtomCodition冲突
         /// 
@@ -235,8 +236,24 @@ namespace DistDBMS.Common.Syntax
         /// 可比性是指两个谓词均为非二元谓词，且当两个谓词都为一元谓词时，其两个谓词中的属性（表名、属性名）相同
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>是否冲突，冲突则返回true，否则返回false</returns>
         public bool ConflictWith(AtomCondition other)
+        {
+            List<AtomCondition> blankRef = null;
+            return ConflictWith(other, ref blankRef);
+        }
+        
+        /// <summary>
+        /// 检测是否与另一个AtomCodition冲突
+        /// 
+        /// 实际上是两个谓词作逻辑‘与’操作，当两个谓词都是非二元谓词且具有可比性时，才检查冲突。
+        /// 
+        /// 可比性是指两个谓词均为非二元谓词，且当两个谓词都为一元谓词时，其两个谓词中的属性（表名、属性名）相同
+        /// </summary>
+        /// <param name="other"></param>
+        /// <param name="result">若没有冲突则返回化简后的结果</param>
+        /// <returns>是否冲突，冲突则返回true，否则返回false</returns>
+        public bool ConflictWith(AtomCondition other, ref List<AtomCondition> reducedCondition)
         {
             if (Type == AtomConditionType.Invariable_False || other.Type == AtomConditionType.Invariable_False)
             {
@@ -259,9 +276,8 @@ namespace DistDBMS.Common.Syntax
                 if (LeftOperand.Field.Equals(other.RightOperand.Field, true))
                 {
                     // 两个相同的一元谓词是否冲突
-                    // TODO: Liuzhang
-                    List<AtomCondition> resultCondition = new List<AtomCondition>();
-                    bool isConflict = UnaryConditionConflict(other, ref resultCondition);
+                    reducedCondition = new List<AtomCondition>();
+                    return UnaryConditionConflict(other, ref reducedCondition);
                 }
                 else
                     return false;
@@ -276,16 +292,16 @@ namespace DistDBMS.Common.Syntax
         /// <summary>
         /// 比较两个一元谓词是否冲突
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <param name="other">另一个一元谓词</param>
+        /// <param name="result">若没有冲突则返回化简后的结果</param>
+        /// <returns>是否冲突，若存在冲突则返回true, 否则返回false</returns>
         private bool UnaryConditionConflict(AtomCondition other, ref List<AtomCondition> result)
         {
             //////////////////////////////////////////////////////
             //
-            // 前提条件:
+            // 函数正确运行条件:
             //
-            //    两个一元谓词已经过正规化
-            //    且两个一元谓词的中的属性为相同属性
+            //    两个一元谓词已经过正规化且两个一元谓词的中的属性为相同属性
             //
 
             // 字符串类型
@@ -325,7 +341,6 @@ namespace DistDBMS.Common.Syntax
                                 atom.RightOperand.Value = Math.Max(value1, value2);
                                 result.Add(atom);
                                 return false;
-                                break;
                             case LogicOperator.GreaterOrEqual:
                                 if (value1 > value2)
                                     result.Add(Clone() as AtomCondition);
@@ -333,7 +348,6 @@ namespace DistDBMS.Common.Syntax
                                     result.Add(other.Clone() as AtomCondition);
                                 
                                 return false;
-                                break;
                             case LogicOperator.Less:
                             case LogicOperator.LessOrEqual:
                                 if (value1 >= value2)
@@ -344,7 +358,6 @@ namespace DistDBMS.Common.Syntax
                                     result.Add(other.Clone()  as AtomCondition);
                                     return false;
                                 }
-                                break;
                             case LogicOperator.NotEqual:
                                 if (value1 > value2)
                                 {
@@ -352,7 +365,6 @@ namespace DistDBMS.Common.Syntax
                                 }
                                 result.Add(this.Clone() as AtomCondition);
                                 return false;
-                                break;
                             case LogicOperator.Equal:
                                 if (value1 >= value2)
                                     return true;
@@ -362,7 +374,6 @@ namespace DistDBMS.Common.Syntax
                                     result.Add(other.Clone() as AtomCondition);
                                     return false;
                                 }
-                                break;
                         }
                         break;
                     case LogicOperator.GreaterOrEqual:
@@ -374,20 +385,19 @@ namespace DistDBMS.Common.Syntax
                                 else
                                     result.Add(other.Clone() as AtomCondition);
                                 return false;
-                                break;
                             case LogicOperator.GreaterOrEqual:
-                                AtomCondition atom = Clone() as AtomCondition;
-                                atom.RightOperand.Value = Math.Max(value1, value2);
-                                result.Add(atom);
-                                return false;
-                                break;
+                                {
+                                    AtomCondition atom = Clone() as AtomCondition;
+                                    atom.RightOperand.Value = Math.Max(value1, value2);
+                                    result.Add(atom);
+                                    return false;
+                                }
                             case LogicOperator.Less:
                                 if (value1 >= value2)
                                     return true;
                                 result.Add(this.Clone() as AtomCondition);
                                 result.Add(other.Clone() as AtomCondition);
                                 return false;
-                                break;
                             case LogicOperator.LessOrEqual:
                                 if (value1 > value2)
                                     return true;
@@ -404,7 +414,6 @@ namespace DistDBMS.Common.Syntax
                                     result.Add(other.Clone() as AtomCondition);
                                     return false;
                                 }
-                                break;
                             case LogicOperator.NotEqual:
                                 if (value1 > value2)
                                 {
@@ -416,14 +425,12 @@ namespace DistDBMS.Common.Syntax
                                     result.Add(other.Clone() as AtomCondition);
                                 }
                                 return false;
-                                break;
                             case LogicOperator.Equal:
                                 if (value1 > value2)
                                     return true;
 
                                 result.Add(other.Clone() as AtomCondition);
                                 return false;
-                                break;
                         }
                         break;
                     case LogicOperator.Less:
@@ -437,13 +444,11 @@ namespace DistDBMS.Common.Syntax
                                 result.Add(Clone() as AtomCondition);
                                 result.Add(other.Clone() as AtomCondition);
                                 return false;
-                                break;
                             case LogicOperator.Less:
                                 AtomCondition atom = Clone() as AtomCondition;
                                 atom.RightOperand.Value = Math.Max(value1, value2);
                                 result.Add(atom);
                                 return false;
-                                break;
                             case LogicOperator.LessOrEqual:
                                 if (value1 <= value2)
                                     result.Add(Clone() as AtomCondition);
@@ -451,16 +456,13 @@ namespace DistDBMS.Common.Syntax
                                     result.Add(other.Clone() as AtomCondition);
 
                                 return false;
-                                break;
                             case LogicOperator.NotEqual:
                                 if (value1 > value2)
-                                {
                                     result.Add(other.Clone() as AtomCondition);
-                                }
+                                
                                 result.Add(Clone() as AtomCondition);
 
                                 return false;
-                                break;
                             case LogicOperator.Equal:
                                 if (value1 > value2)
                                 {
@@ -469,58 +471,161 @@ namespace DistDBMS.Common.Syntax
                                 }
 
                                 return false;
-                                break;
                         }
                         break;
                     case LogicOperator.LessOrEqual:
                         switch (other.Operator)
                         {
                             case LogicOperator.Greater:
-                                break;
+                                if (value1 <= value2)
+                                    return true;
+
+                                result.Add(Clone() as AtomCondition);
+                                result.Add(other.Clone() as AtomCondition);
+                                return false;
                             case LogicOperator.GreaterOrEqual:
-                                break;
+                                if (value1 < value2)
+                                    return true;
+                                
+                                if (value1 > value2)
+                                    result.Add(other.Clone() as AtomCondition);
+                                
+                                result.Add(Clone() as AtomCondition);
+                                return false;
                             case LogicOperator.Less:
-                                break;
+                                if (value1 < value2)
+                                    result.Add(Clone() as AtomCondition);
+                                else
+                                    result.Add(other.Clone() as AtomCondition);
+                                return false;
                             case LogicOperator.LessOrEqual:
-                                break;
+                                AtomCondition atom = Clone() as AtomCondition;
+                                atom.RightOperand.Value = Math.Min(value1, value2);
+                                result.Add(atom);
+                                return false;
                             case LogicOperator.NotEqual:
-                                break;
+                                if (value1 >= value2)
+                                    result.Add(other.Clone() as AtomCondition);
+
+                                result.Add(Clone() as AtomCondition);
+                                return false;
                             case LogicOperator.Equal:
-                                break;
+                                if (value1 >= value2)
+                                {
+                                    result.Add(other.Clone() as AtomCondition);
+                                    return false;
+                                }
+
+                                return true;
                         }
                         break;
                     case LogicOperator.NotEqual:
                         switch (other.Operator)
                         {
                             case LogicOperator.Greater:
-                                break;
+                                if (value1 > value2)
+                                    result.Add(Clone() as AtomCondition);
+                                result.Add(other.Clone() as AtomCondition);
+                                return false;
                             case LogicOperator.GreaterOrEqual:
-                                break;
+                                if (value1 < value2)
+                                    return true;
+
+                                if (value1 > value2)
+                                {
+                                    AtomCondition atom = other.Clone() as AtomCondition;
+                                    atom.Operator = LogicOperator.Greater;
+                                    result.Add(atom);
+                                }
+                                else
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    result.Add(other.Clone() as AtomCondition);
+                                }                                
+                                return false;
                             case LogicOperator.Less:
-                                break;
+                                if (value1 < value2)
+                                    result.Add(Clone() as AtomCondition);
+                                result.Add(other.Clone() as AtomCondition);
+                                return false;
                             case LogicOperator.LessOrEqual:
-                                break;
+                                if (value1 > value2)
+                                    return true;
+
+                                if (value1 == value2)
+                                {
+                                    AtomCondition atom = other.Clone() as AtomCondition;
+                                    atom.Operator = LogicOperator.Less;
+                                    result.Add(atom);
+                                }
+                                else
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    result.Add(other.Clone() as AtomCondition);
+                                }
+                                return false;
                             case LogicOperator.NotEqual:
-                                break;
+                                if (value1 != value2)
+                                    result.Add(Clone() as AtomCondition);
+                                result.Add(other.Clone() as AtomCondition);
+                                return false;
                             case LogicOperator.Equal:
-                                break;
+                                if (value1 == value2)
+                                    return true;
+
+                                result.Add(other.Clone() as AtomCondition);
+                                return false;
                         }
                         break;
                     case LogicOperator.Equal:
                         switch (other.Operator)
                         {
                             case LogicOperator.Greater:
-                                break;
+                                if (value1 > value2)
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    return false;
+                                }
+                                else
+                                    return true;
                             case LogicOperator.GreaterOrEqual:
-                                break;
+                                if (value1 >= value2)
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    return false;
+                                }
+                                else
+                                    return true;
                             case LogicOperator.Less:
-                                break;
+                                if (value1 < value2)
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    return false;
+                                }
+                                else
+                                    return true;
                             case LogicOperator.LessOrEqual:
-                                break;
+                                if (value1 <= value2)
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    return false;
+                                }
+                                else
+                                    return true;
                             case LogicOperator.NotEqual:
-                                break;
+                                if (value1 == value2)
+                                    return false;
+
+                                result.Add(Clone() as AtomCondition);
+                                return false;
                             case LogicOperator.Equal:
-                                break;
+                                if (value1 == value2)
+                                {
+                                    result.Add(Clone() as AtomCondition);
+                                    return false;
+                                }
+                                else
+                                    return true;
                         }
                         break;
                 }
