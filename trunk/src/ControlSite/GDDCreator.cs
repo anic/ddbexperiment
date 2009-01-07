@@ -38,8 +38,8 @@ namespace DistDBMS.ControlSite
 
         public void InsertCommand(string cmd)
         {
-            
-            bool r = ps.Parse(cmd);
+
+            bool r = ps.Parse(cmd, null);
             if (r)
             {
                 if (ps.LastResult is SiteDefinition)

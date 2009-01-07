@@ -54,7 +54,10 @@ namespace DistDBMS.Common.Table
 
         public new string ToString()
         {
-            return TableName + "." + AttributeName;
+            if (TableName != "")
+                return TableName + "." + AttributeName;
+            else
+                return AttributeName;
         }
 
 

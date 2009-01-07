@@ -43,6 +43,7 @@
     <Compile Include="Finder\FragmentFinder.cs" />
     <Compile Include="GDDCreator.cs" />
     <Compile Include="PackageProcessor.cs" />
+    <Compile Include="Plan\DataDeletor.cs" />
     <Compile Include="Plan\DataImporter.cs" />
     <Compile Include="Plan\ImportPlanCreator.cs" />
     <Compile Include="Plan\QueryPlanCreator.cs" />

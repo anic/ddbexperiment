@@ -117,50 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FILE_DATA" xml:space="preserve">
-    <value>Data.txt</value>
-    <comment>默认数据文件</comment>
-  </data>
-  <data name="FILE_DBSCRIPT" xml:space="preserve">
-    <value>DbInitScript.txt</value>
-    <comment>默认的数据库初始化脚本文件</comment>
-  </data>
-  <data name="FILE_NETWORKSCRIPT" xml:space="preserve">
-    <value>NetworkInitScript.txt</value>
-    <comment>默认的网络初始化文件</comment>
-  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="img_colortable" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img_colortable.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_column" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\img_column.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_dictionary" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\img_dictionary.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_exesql" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img_exesql.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_hfragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\img_hfragment.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_keyword" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img_keyword.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_magnifier" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img_magnifier.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_site" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\img_site.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_table" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img_table.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_tool" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img_tool.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="img_vfragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\img_vfragment.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="DbInitScriptTest" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\DbInitScriptTest.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

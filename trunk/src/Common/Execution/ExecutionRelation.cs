@@ -143,6 +143,13 @@ namespace DistDBMS.Common.Execution
             }
         }
 
+        //提供给Deletion
+        public ExecutionRelation()
+        {
+            ResultID = 0;
+            InLocalSite = false;
+        }
+
         public ExecutionRelation(Relation r,ref int initID,int createLevel)
         {
             ResultID = initID++;

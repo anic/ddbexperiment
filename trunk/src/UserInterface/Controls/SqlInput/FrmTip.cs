@@ -38,6 +38,8 @@ namespace DistDBMS.UserInterface.Controls.SqlInput
 
         public void InitTips(GlobalDirectory gdd)
         {
+            lsbTip.Items.Clear();
+
             if (gdd == null)
                 return;
             foreach (TableSchema t in gdd.Schemas)

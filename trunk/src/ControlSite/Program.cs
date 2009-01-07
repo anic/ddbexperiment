@@ -389,7 +389,7 @@ namespace DistDBMS.ControlSite
             ParserSwitcher ps = new ParserSwitcher();
             for (int i = 0; i < tests.Length; i++)
             {
-                bool result = ps.Parse(tests[i]);
+                bool result = ps.Parse(tests[i], gdd);
                 Selection s3 = ps.LastResult as Selection;
                 GlobalConsitencyFiller filler = new GlobalConsitencyFiller();
                 //这一步很重要，通过gdd来填写selection的完整信息

@@ -5,6 +5,7 @@ using DistDBMS.Common.Table;
 using System.Text.RegularExpressions;
 using DistDBMS.Common.Dictionary;
 using System.IO;
+using DistDBMS.ControlSite.SQLSyntax.Operation;
 
 namespace DistDBMS.ControlSite.Plan
 {
@@ -32,6 +33,18 @@ namespace DistDBMS.ControlSite.Plan
             foreach (string line in lines)
                 HandleLine(line);
 
+            return true;
+        }
+
+        public bool ImportFromSql(Insertion ins)
+        {
+            tableList.Clear();
+            List<Fragment> fragments = GetFragmentByTuple(ins.Data, ins.Target);
+            foreach (Fragment fragment in fragments)
+            {
+                Table table = GetTableByFragment(fragment); //将数据插入到对应分片的对应表格中
+                table.Tuples.Add(SplitTuple(ins.Data, fragment, ins.Target));
+            }
             return true;
         }
 

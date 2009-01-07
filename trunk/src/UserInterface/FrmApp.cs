@@ -45,36 +45,41 @@ namespace DistDBMS.UserInterface
             NeedWizzard = true;
 
             NetworkInitiator initiator = new NetworkInitiator();
-            clusterConfig = initiator.GetConfiguration("NetworkInitScript.txt");
+            clusterConfig = initiator.GetConfiguration(Resources.FILE_NETWORKSCRIPT);
 
             uscExecuteQuery.EnableTip = false;
         }
 
-        public void ExecuteSQL()
+        /// <summary>
+        /// 执行查询
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public ExecutionResult ExecuteSQL(string sql)
         {
-            uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
+
+            //TODO:设置选择ControlSite
+            ControlSiteClient controlSiteClient = new ControlSiteClient();
+            controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
+            controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.EXESQL, sql);
+
+            NetworkPacket resultPacket = controlSiteClient.Packets.WaitAndRead();
+            if (resultPacket is ServerClientTextObjectPacket
+                && (resultPacket as ServerClientTextObjectPacket).Object is ExecutionResult)
+            {
+                return (resultPacket as ServerClientTextObjectPacket).Object as ExecutionResult;
+            }
+            return null;
         }
 
         void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
         {
-
-            
             try
             {
-                //TODO:设置选择ControlSite
-                ControlSiteClient controlSiteClient = new ControlSiteClient();
-                controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
-                controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.EXESQL, uscExecuteQuery.SQLText);
-                NetworkPacket resultPacket = controlSiteClient.Packets.WaitAndRead();
-                if (resultPacket is ServerClientTextObjectPacket
-                    && (resultPacket as ServerClientTextObjectPacket).Object is ExecutionResult)
-                {
-                    ExecutionResult exResult = (resultPacket as ServerClientTextObjectPacket).Object as ExecutionResult;
-                    uscExecuteQuery.AddCommandResult(exResult.Description);
-                    uscExecuteQuery.SetResultTable(exResult.Data);
-                    uscExecuteQuery.SetQueryTree(exResult.RawQueryTree);
-                }
-
+                ExecutionResult exResult = ExecuteSQL(uscExecuteQuery.SQLText);
+                uscExecuteQuery.AddCommandResult(exResult.Description);
+                uscExecuteQuery.SetResultTable(exResult.Data);
+                uscExecuteQuery.SetQueryTree(exResult.RawQueryTree);
             }
             catch (Exception ex)
             {
@@ -83,6 +88,19 @@ namespace DistDBMS.UserInterface
                 writer.WriteLog(uscExecuteQuery.SQLText + "\r\n" + ex.StackTrace);
                 MessageBox.Show("执行出现异常，并已经记录到error.log中", "出错", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        public void RunDefaultWizzard()
+        {
+            FrmInit frmInit = new FrmInit();
+            frmInit.RunDefaultStage(clusterConfig);
+
+            if (frmInit.GDD != null)
+            {
+                uscExecuteQuery.SetGlobalDirectory(frmInit.GDD);
+                switcher.SetGlobalDirectory(frmInit.GDD);
+            }
+
 
         }
 
@@ -147,7 +165,7 @@ namespace DistDBMS.UserInterface
         {
             FrmInit frmInit = new FrmInit();
             frmInit.ShowDialog(FrmInit.Type.Init, clusterConfig);
-            
+
             if (frmInit.GDD != null)
             {
                 uscExecuteQuery.SetGlobalDirectory(frmInit.GDD);

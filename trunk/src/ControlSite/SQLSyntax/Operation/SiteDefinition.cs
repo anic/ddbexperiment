@@ -24,7 +24,8 @@ namespace DistDBMS.ControlSite.SQLSyntax.Operation
         public new string ToString()
         { 
             //define site S1 127.0.0.1:2001
-            return "define site " + Site.Name + " " + Site.IP + ":" + Site.Port.ToString();
+            //return "define site " + Site.Name + " " + Site.IP + ":" + Site.Port.ToString();
+            return "define site " + Site.Name;
         }
 
     }

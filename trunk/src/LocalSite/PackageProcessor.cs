@@ -42,6 +42,7 @@ namespace DistDBMS.LocalSite
                     {
                         bool result = true;
                         ldd = new LocalDirectory(package.Object as GlobalDirectory, name);
+                        string error = string.Empty;
                         using (DataAccess.DataAccessor da = new DistDBMS.LocalSite.DataAccess.DataAccessor(name))
                         {
                             foreach (Fragment f in ldd.Fragments)
@@ -50,12 +51,15 @@ namespace DistDBMS.LocalSite
                                 localTable.TableName = f.LogicSchema.TableName;
                                 result &= da.CreateTable(localTable);
                             }
+
+                            if (!result)
+                                error = da.LastException.Message;
                         }
 
                         if (result)
                             conn.SendServerClientTextPacket(Common.NetworkCommand.RESULT_OK);
                         else
-                            conn.SendServerClientTextPacket(Common.NetworkCommand.RESULT_ERROR);
+                            conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, error);
                     }
                     else if (package.Type == ExecutionPackage.PackageType.Plan)//执行计划
                     {
@@ -159,6 +163,38 @@ namespace DistDBMS.LocalSite
                         TableSchema logicSchema = ldd.Fragments.GetFragmentByName(step.Table.Name).LogicSchema;
                         step.Table.Schema.ReplaceTableName(logicSchema.TableName);
                         int result = da.InsertValues(step.Table);
+
+                        if (result == -1)
+                        {
+                            DistDBMS.Common.Debug.WriteLine(name + " fail the insert");
+                            conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, da.LastException.Message);
+                        }
+                        else
+                        {
+                            DistDBMS.Common.Debug.WriteLine(name + " finish the insert");
+                            conn.SendServerClientTextPacket(Common.NetworkCommand.RESULT_OK);
+                        }
+                            
+                    }
+                }
+                else if (step.Type == ExecutionStep.ExecuteType.Delete)
+                {
+                    using (DataAccess.DataAccessor da = new DistDBMS.LocalSite.DataAccess.DataAccessor(name))
+                    {
+                        TableSchema logicSchema = ldd.Fragments.GetFragmentByName(step.Operation.DirectTableSchema.TableName).LogicSchema;
+                        step.Operation.DirectTableSchema.ReplaceTableName(logicSchema.TableName);
+                        int result = da.DeleteValue(step.Operation.DirectTableSchema, step.Operation.Predication);
+                        if (result == -1)
+                        {
+                            DistDBMS.Common.Debug.WriteLine(name + " fail the delete");
+                            conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, da.LastException.Message);
+                        }
+                        else
+                        {
+                            DistDBMS.Common.Debug.WriteLine(name + " finish the delete");
+                            conn.SendServerClientTextPacket(Common.NetworkCommand.RESULT_OK);
+                        }
+
                     }
                 }
             }
