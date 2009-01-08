@@ -76,7 +76,12 @@ namespace DistDBMS.UserInterface
         {
             try
             {
+                DateTime start = DateTime.Now;
                 ExecutionResult exResult = ExecuteSQL(uscExecuteQuery.SQLText);
+                DateTime end = DateTime.Now;
+                TimeSpan span = end - start;
+                exResult.Description += "Executes " + span.TotalMilliseconds + "ms";
+
                 uscExecuteQuery.AddCommandResult(exResult.Description);
                 uscExecuteQuery.SetResultTable(exResult.Data);
                 uscExecuteQuery.SetQueryTree(exResult.RawQueryTree);
