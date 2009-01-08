@@ -355,7 +355,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 // 左结点
                 growPoint = root;
                 createPos = rootPos - 1;
-                while (createPos > 0) 
+                while (createPos >= 0) 
                 {
                     Relation join = new Relation();
                     join.Type = RelationalType.Join;
@@ -379,6 +379,8 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                     join.RelativeAttributes.Fields.Add(orderedJoinCondition[createPos].LeftOperand.Field.Clone() as Field);
                     join.RelativeAttributes.Fields.Add(orderedJoinCondition[createPos].RightOperand.Field.Clone() as Field);
 
+                    if (growPoint.LeftRelation == null)
+                        growPoint.LeftRelation = null;
                     growPoint.RightRelation = join;
                     growPoint = join;
                     createPos++;
