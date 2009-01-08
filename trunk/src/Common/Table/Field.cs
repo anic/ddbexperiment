@@ -112,7 +112,15 @@ namespace DistDBMS.Common.Table
 
         public object Clone()
         {
-            return this.MemberwiseClone();
+            //return this.MemberwiseClone();
+            Field result = new Field();
+            result.AttributeName = AttributeName;
+            result.TableName = TableName;
+            result.Addition = Addition;
+            result.Indexed = Indexed;
+            result.IsPrimaryKey = IsPrimaryKey;
+            result.AttributeType = AttributeType;
+            return result;
         }
 
         #endregion

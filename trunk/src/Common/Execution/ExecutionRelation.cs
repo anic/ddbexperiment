@@ -31,7 +31,7 @@ namespace DistDBMS.Common.Execution
             {
                 TableSchema result = null;
                 if (IsDirectTableSchema && DirectTableSchema.Fields.Count > 0)
-                    result = DirectTableSchema;
+                    result = DirectTableSchema.Clone() as TableSchema;
                 else
                 {
                     switch (Type)
@@ -48,7 +48,7 @@ namespace DistDBMS.Common.Execution
                                 for (int i = 0; i < RelativeAttributes.Fields.Count; i++)
                                 {
                                     if (i % 2 == 0)
-                                        result.Fields.Add(RelativeAttributes.Fields[i]);
+                                        result.Fields.Add(RelativeAttributes.Fields[i].Clone() as Field);
                                 }
 
                                 foreach (ExecutionRelation r in Children)
@@ -102,7 +102,7 @@ namespace DistDBMS.Common.Execution
                             {
 
                                 if (IsDirectTableSchema)
-                                    return DirectTableSchema;
+                                    return DirectTableSchema.Clone() as TableSchema;
                                 else if (Children.Count > 0)
                                     return (Children[0] as ExecutionRelation).ResultSchema;
 
@@ -178,6 +178,7 @@ namespace DistDBMS.Common.Execution
                     
                 }
             }
+            TableSchema a = this.ResultSchema;
 
          
         }
@@ -186,9 +187,10 @@ namespace DistDBMS.Common.Execution
         {
             if (r.DirectTableSchema != null)
                 this.DirectTableSchema = r.DirectTableSchema.Clone() as TableSchema;
-            if (DirectTableSchema != null)
-                for (int i = 0; i < DirectTableSchema.Fields.Count; i++)
-                    DirectTableSchema.Fields[i] = DirectTableSchema.Fields[i].Clone() as Field;
+
+            //if (DirectTableSchema != null)
+            //    for (int i = 0; i < DirectTableSchema.Fields.Count; i++)
+            //        DirectTableSchema.Fields[i] = DirectTableSchema.Fields[i].Clone() as Field;
 
             if (r.Predication != null)
                 this.Predication = r.Predication.Clone() as Condition;
