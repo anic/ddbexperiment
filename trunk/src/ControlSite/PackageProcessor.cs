@@ -17,7 +17,7 @@ namespace DistDBMS.ControlSite
 {
     class PackageProcessor
     {
-        int DEFALUT_TIMEOUT_MINISEC = 8000;
+        int DEFALUT_TIMEOUT_MINISEC = 30000;
 
         GlobalDirectory gdd;
         string name;
