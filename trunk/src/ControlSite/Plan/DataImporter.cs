@@ -6,6 +6,10 @@ using System.Text.RegularExpressions;
 using DistDBMS.Common.Dictionary;
 using System.IO;
 using DistDBMS.ControlSite.SQLSyntax.Operation;
+using DistDBMS.Common.Syntax;
+using DistDBMS.Common.RelationalAlgebra.Entity;
+using DistDBMS.Common.Table;
+using DistDBMS.ControlSite.RelationalAlgebraUtility;
 
 namespace DistDBMS.ControlSite.Plan
 {
@@ -116,6 +120,59 @@ namespace DistDBMS.ControlSite.Plan
         }
 
         /// <summary>
+        /// 获取分片的所有约束条件谓词
+        /// </summary>
+        /// <param name="fragment"></param>
+        /// <returns></returns>
+        private List<AtomCondition> GetFragmentConditions(Fragment fragment)
+        {
+            List<AtomCondition> results = new List<AtomCondition>();
+
+            if (fragment == null || fragment.Condition == null || fragment.Condition.IsEmpty)
+                return results;
+
+            ConditionConverter conditionConverter = new ConditionConverter();
+            conditionConverter.Convert(fragment.Condition, NormalFormType.Conjunction);
+            ConjunctiveNormalForm normalForm = conditionConverter.ConjunctionNormalForm;
+            results.AddRange(normalForm.PredicationItems);
+
+            results.AddRange(GetFragmentConditions(fragment.Parent));
+
+            return results;
+        }
+
+        /// <summary>
+        /// 在GDD中查找所有与tuple不冲突的Fragment
+        /// </summary>
+        /// <param name="fragment"></param>
+        /// <param name="tupleAttributeConditions"></param>
+        /// <param name="result"></param>
+        private void GetUnconflictFragments(Fragment fragment, List<AtomCondition> tupleAttributeConditions, ref List<Fragment> result)
+        {
+            // 叶子结点
+            if (fragment.Children.Count == 0)
+            {
+                List<AtomCondition> fragmentConditions = GetFragmentConditions(fragment);
+                foreach (AtomCondition fragmentAtom in fragmentConditions)
+                {
+                    foreach (AtomCondition tupleAtom in tupleAttributeConditions)
+                    {
+                        if (fragmentAtom.ConflictWith(tupleAtom))
+                            return;
+                    }
+                }
+
+                result.Add(fragment);
+            }
+            else // 中间分片结点
+            {
+                foreach (Fragment f in fragment.Children)
+                    GetUnconflictFragments(f, tupleAttributeConditions, ref result);
+            }
+            
+        }
+
+        /// <summary>
         /// 根据数据类型，获得对应分片
         /// </summary>
         /// <param name="tuple"></param>
@@ -123,8 +180,76 @@ namespace DistDBMS.ControlSite.Plan
         /// <returns></returns>
         private List<Fragment> GetFragmentByTuple(Tuple tuple,TableSchema schema)
         {
+
             //TODO:需要进行动态测试
             List<Fragment> results = new List<Fragment>();
+
+            List<AtomCondition> tupleAttributeCondition = new List<AtomCondition>();
+
+            int pos;
+            for (pos = 0; pos < schema.Fields.Count; pos++)
+            {
+                AtomCondition atom = new AtomCondition();
+                atom.Operator = DistDBMS.Common.LogicOperator.Equal;
+                switch (schema.Fields[pos].AttributeType)
+                {
+                    case DistDBMS.Common.AttributeType.Int:
+                        atom.LeftOperand.Field = schema.Fields[pos].Clone() as Field;
+                        atom.LeftOperand.IsField = true;
+                        atom.RightOperand.ValueType = DistDBMS.Common.AttributeType.Int;
+                        atom.RightOperand.Value = Convert.ToInt32(tuple.Data[pos]);
+                        break;
+                    case DistDBMS.Common.AttributeType.String:
+                        atom.LeftOperand.Field = schema.Fields[pos].Clone() as Field;
+                        atom.LeftOperand.IsField = true;
+                        atom.RightOperand.ValueType = DistDBMS.Common.AttributeType.String;
+                        atom.RightOperand.Value = tuple.Data[pos];
+                        break;
+                }
+
+                tupleAttributeCondition.Add(atom);
+            }
+
+            ////////////////////////////////////////////////////////////////////
+            //
+            // 检查每一个tuple中的键值对是否与一个分片的所有约束存在冲突
+            // 若存在，本tuple不属于该分片，否则将分片加入results中
+            // 
+
+            List<Fragment> candidateFragments = new List<Fragment>();
+
+            // 先检查分片Condition冲突
+            foreach (Fragment f in gdd.Fragments)
+            {
+                List<Fragment> accept = new List<Fragment>();
+                GetUnconflictFragments(f, tupleAttributeCondition, ref accept);
+                candidateFragments.AddRange(accept);
+            }
+
+            
+            // 检查属性冲突，如果分片中没有属性属于schema，则该分片不是所需分片
+            bool acceptFragment;
+            foreach (Fragment frag in candidateFragments)
+            {
+                acceptFragment = false;
+                foreach (Field field in frag.Schema.Fields)
+                {
+                    foreach (Field tupleAttr in schema.Fields)
+                    {
+                        if (field.Equals(tupleAttr, true))
+                        {
+                            results.Add(frag);
+                            acceptFragment = true;
+                            break;
+                        }
+                    }
+                    if (acceptFragment)
+                        break;
+                }
+            }
+            
+            /*
+            
             if (schema.TableName == "Producer")
             {
                 if (Int32.Parse(tuple[0]) < 200200)
@@ -181,7 +306,7 @@ namespace DistDBMS.ControlSite.Plan
             }
             else
                 results.Add(gdd.Fragments.GetFragmentByName(schema.TableName));
-            
+            */
             return results;
         }
 
