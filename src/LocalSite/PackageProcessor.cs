@@ -127,6 +127,8 @@ namespace DistDBMS.LocalSite
 
                             step.Status.EndTime = DateTime.Now;
                             step.Status.Done = true;
+                            TimeSpan ts = step.Status.EndTime - step.Status.StartTime;
+                            Common.Debug.WriteLine("step" + step.Index + " :" + ts.TotalMilliseconds + " ms");
 
                             //产生一个新的Data的包
                             ExecutionPackage newPackage = new ExecutionPackage();
