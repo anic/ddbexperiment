@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Execution;
+using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -17,6 +18,9 @@ namespace DistDBMS.UserInterface.Controls
         {
             InitializeComponent();
         }
+
+        Color[] colors = new Color[] { Color.Red, Color.Blue, Color.Green, Color.Orange };
+        SiteList sites = new SiteList();
 
         private TreeNode CreateNode(string text,Color color)
         {
@@ -29,26 +33,50 @@ namespace DistDBMS.UserInterface.Controls
 
         public void ShowExecutionRelation(ExecutionRelation relation)
         {
+            sites.Clear();
+
             tvwRelation.Nodes.Clear();
 
             if (relation == null)
                 return;
 
-            string strSite = (relation.ExecutionSite != null) ? relation.ExecutionSite.Name : "";
-            TreeNode n = CreateNode(relation.ToString() + " " + strSite, Color.Red);
-            tvwRelation.Nodes.Add(n);
+            TreeNode n;
+            if (relation.ExecutionSite != null)
+            {
+                string strSite = relation.ExecutionSite.Name;
+                if (sites[relation.ExecutionSite.Name] == null)
+                    sites.Add(relation.ExecutionSite);
 
+                n = CreateNode(relation.ToSimpleString() + " " + strSite, colors[sites.GetIndexOf(relation.ExecutionSite) % colors.Length]);
+                
+            }
+            else
+            { 
+                n = CreateNode(relation.ToSimpleString(),Color.Empty);
+            }
+            tvwRelation.Nodes.Add(n);
             foreach (ExecutionRelation child in relation.Children)
                 Visit(n, child);
         }
 
         private void Visit(TreeNode node, ExecutionRelation relation)
         {
-            string strSite = (relation.ExecutionSite != null) ? relation.ExecutionSite.Name : "";
-            TreeNode n = CreateNode(relation.ToString() + " " + strSite, Color.Red);
+            TreeNode n;
+            if (relation.ExecutionSite != null)
+            {
+                string strSite = relation.ExecutionSite.Name;
+                if (sites[relation.ExecutionSite.Name] == null)
+                    sites.Add(relation.ExecutionSite);
+
+                n = CreateNode(relation.ToSimpleString() + " " + strSite, colors[sites.GetIndexOf(relation.ExecutionSite) % colors.Length]);
+            }
+            else
+            {
+                n = CreateNode(relation.ToSimpleString(), Color.Empty);
+            } 
             node.Nodes.Add(n);
 
-            foreach (Relation child in relation.Children)
+            foreach (ExecutionRelation child in relation.Children)
                 Visit(n, child);
         }
 

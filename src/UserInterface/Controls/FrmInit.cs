@@ -128,7 +128,16 @@ namespace DistDBMS.UserInterface.Controls
                             controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
 
                             string[] gddScript = FileUploader.ReadFileToString(Resources.FILE_DBSCRIPT);
-                            controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.GDDSCRIPT, gddScript);
+                            NetworkPacket packet = controlSiteClient.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.GDDSCRIPT, 0);
+                            packet.EnsureSize(10 * 1024 * 1024);
+
+                            packet.WriteInt(gddScript.Length);
+                            int size = gddScript.Length;
+                            for (int i = 0; i < size; ++i)
+                                packet.WriteString(gddScript[i]);
+                            controlSiteClient.SendPacket(packet);
+
+                            //controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.GDDSCRIPT, gddScript);
                             NetworkPacket returnPacket = controlSiteClient.Packets.WaitAndRead();
                             if (returnPacket is ServerClientTextObjectPacket)
                             {
@@ -146,7 +155,17 @@ namespace DistDBMS.UserInterface.Controls
                             controlSiteClient.Connect((string)clusterConfig.Hosts["C1"]["Host"], (int)clusterConfig.Hosts["C1"]["Port"]);
 
                             string[] dataScript = FileUploader.ReadFileToString(Resources.FILE_DATA);
-                            controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.DATASCRIPT, dataScript);
+
+                            NetworkPacket packet = controlSiteClient.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.DATASCRIPT, 0);
+                            packet.EnsureSize(10 * 1024 * 1024);
+
+                            packet.WriteInt(dataScript.Length);
+                            int size = dataScript.Length;
+                            for (int i = 0; i < size; ++i)
+                                packet.WriteString(dataScript[i]);
+                            controlSiteClient.SendPacket(packet);
+
+                            //controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.DATASCRIPT, dataScript);
                             controlSiteClient.Packets.WaitAndRead();
 
                             break;

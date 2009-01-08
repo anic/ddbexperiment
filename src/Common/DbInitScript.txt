@@ -26,6 +26,3 @@ allocate Purchase.3 to S3
 allocate Producer.4 to S4
 allocate Product.2.3 to S4
 allocate Purchase.4 to S4
-createdb ddb //create a database with name “ddb”
-drop table student
-drop the table dropdb ddb

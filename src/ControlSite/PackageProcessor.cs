@@ -18,19 +18,20 @@ namespace DistDBMS.ControlSite
 {
     class PackageProcessor
     {
-        int DEFALUT_TIMEOUT_MINISEC = 20000;
+        int DEFALUT_TIMEOUT_MINISEC = 60000;
 
         GlobalDirectory gdd;
         string name;
         internal class LocalSiteFailException : Exception
         {
-            public enum ExceptionType{ 
+            public enum ExceptionType
+            {
                 ConnectionFail,
                 Timeout
             }
             public string site;
             public ExceptionType type;
-            public LocalSiteFailException(string site,ExceptionType type)
+            public LocalSiteFailException(string site, ExceptionType type)
             {
                 this.site = site;
                 this.type = type;
@@ -41,10 +42,10 @@ namespace DistDBMS.ControlSite
         {
             this.name = name;
         }
-        
+
         public bool IsReady { get { return gdd != null; } }
 
-        private LocalSiteClient GetLocalSiteClient(ControlSiteServerConnection conn,string localSiteName)
+        private LocalSiteClient GetLocalSiteClient(ControlSiteServerConnection conn, string localSiteName)
         {
             LocalSiteClient result = conn.GetLocalSiteClient(localSiteName);
             if (result == null)
@@ -67,7 +68,12 @@ namespace DistDBMS.ControlSite
                     {
                         if ((packet as ServerClientTextObjectPacket).Text == Common.NetworkCommand.GDDSCRIPT)
                         {
-                            string[] gddScript = (packet as ServerClientTextObjectPacket).Object as string[];
+                            //string[] gddScript = (packet as ServerClientTextObjectPacket).Object as string[];
+                            int size = packet.ReadInt();
+                            string[] gddScript = new string[size];
+                            for (int i = 0; i < size; ++i)
+                                gddScript[i] = packet.ReadString();
+                            
                             if (ImportScript(gddScript))
                             {
                                 ExecutionPackage package = new ExecutionPackage();
@@ -78,7 +84,7 @@ namespace DistDBMS.ControlSite
                                 //初始化每个二级接口
                                 foreach (Site site in gdd.Sites)
                                 {
-                                    GetLocalSiteClient(conn,site.Name).SendStepTextObjectPacket(newSessionId,
+                                    GetLocalSiteClient(conn, site.Name).SendStepTextObjectPacket(newSessionId,
                                         Network.SessionStepPacket.StepIndexNone,
                                         Network.SessionStepPacket.StepIndexNone,
                                         Common.NetworkCommand.PLAN, package);
@@ -88,7 +94,7 @@ namespace DistDBMS.ControlSite
                                 {
                                     NetworkPacket returnPacket = GetLocalSiteClient(conn, site.Name).Packets.WaitAndRead(DEFALUT_TIMEOUT_MINISEC);
                                     if (returnPacket == null)
-                                        throw new LocalSiteFailException(site.Name,LocalSiteFailException.ExceptionType.Timeout);
+                                        throw new LocalSiteFailException(site.Name, LocalSiteFailException.ExceptionType.Timeout);
 
                                     //TODO: 如何read?
                                 }
@@ -102,37 +108,73 @@ namespace DistDBMS.ControlSite
                         #region 导入数据
                         else if ((packet as ServerClientTextObjectPacket).Text == Common.NetworkCommand.DATASCRIPT)
                         {
-                            string[] dataScript = (packet as ServerClientTextObjectPacket).Object as string[];
+                            //string[] dataScript = (packet as ServerClientTextObjectPacket).Object as string[];
+                            Common.Debug.WriteLine("收到数据: " + DateTime.Now.ToLongTimeString());
+                            int size = packet.ReadInt();
+                            string[] dataScript = new string[size];
+                            for (int i = 0; i < size; ++i)
+                                dataScript[i] = packet.ReadString();
+
+                            Common.Debug.WriteLine("转成string[]: " + DateTime.Now.ToLongTimeString());
+
                             DataImporter importer = new DataImporter(gdd);
                             importer.ImportFromText(dataScript);
 
                             ImportPlanCreator importPlanCreator = new ImportPlanCreator(gdd);
                             List<ExecutionPlan> plans = importPlanCreator.CreatePlans(importer);
 
+                            Common.Debug.WriteLine("生成计划: " + DateTime.Now.ToLongTimeString());
+                            List<Table> tables = new List<Table>();
                             foreach (ExecutionPlan p in plans)
                             {
+                                tables.Clear();
                                 //设置不同的站点
                                 ExecutionPackage package = new ExecutionPackage();
-                                package.Type = ExecutionPackage.PackageType.Plan;
+                                package.Type = ExecutionPackage.PackageType.PlanData; //plandata
                                 package.Object = p;
                                 package.ID = 0;
                                 //同步执行
-                                //(virInterfaces[p.ExecutionSite.Name] as VirtualInterface).ReceiveExecutionPackage(package);
-                                GetLocalSiteClient(conn,p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
+                                foreach (ExecutionStep step in p.Steps)
+                                {
+                                    Table oldTable = step.Table;
+                                    tables.Add(oldTable);
+                                    step.Table = new Table();
+                                    step.Table.Schema = oldTable.Schema; 
+                                }
+
+                                NetworkPacket packet2 = GetLocalSiteClient(conn, p.ExecutionSite.Name).EncapsulateStepTextObjectPacket(newSessionId,
                                         Network.SessionStepPacket.StepIndexNone,
                                         Network.SessionStepPacket.StepIndexNone,
                                         Common.NetworkCommand.PLAN, package);
+
+                                StringBuilder sb = new StringBuilder(10*1024*1024);
+                                packet2.WriteInt(tables.Count);
+                                foreach (Table t in tables)
+                                {
+                                    packet2.WriteInt(t.Tuples.Count);
+
+                                    foreach (Tuple tuple in t.Tuples)
+                                        packet2.WriteString(tuple.GenerateLineString(sb));
+                                }
+                                GetLocalSiteClient(conn, p.ExecutionSite.Name).SendPacket(packet2);
+
+                                //GetLocalSiteClient(conn, p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
+                                //        Network.SessionStepPacket.StepIndexNone,
+                                //        Network.SessionStepPacket.StepIndexNone,
+                                //        Common.NetworkCommand.PLAN, package);
                             }
+
+                            
 
                             foreach (ExecutionPlan p in plans)
                             {
                                 NetworkPacket returnPacket = GetLocalSiteClient(conn, p.ExecutionSite.Name).Packets.WaitAndRead(DEFALUT_TIMEOUT_MINISEC);
                                 if (returnPacket == null)
-                                        throw new LocalSiteFailException(p.ExecutionSite.Name,LocalSiteFailException.ExceptionType.Timeout);
+                                    throw new LocalSiteFailException(p.ExecutionSite.Name, LocalSiteFailException.ExceptionType.Timeout);
                                 //TODO:导入期间出错
 
                             }
-
+                            Common.Debug.WriteLine("执行完成: " + DateTime.Now.ToLongTimeString());
                             string result = "Data imported successful";
                             conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
                         }
@@ -185,7 +227,7 @@ namespace DistDBMS.ControlSite
                                 SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
                                 converter.SetQueryCalculus(s3);
                                 Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd, true);
-                                
+
 
                                 //原始的查询树
                                 SQL2RelationalAlgebraInterface converter2 = new NaiveSQL2RelationalAlgebraConverter();
@@ -204,17 +246,19 @@ namespace DistDBMS.ControlSite
 
                                 QueryPlanCreator creator = new QueryPlanCreator(gdd);
                                 ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, 0);
-                                
-                                
+
+
                                 ExecutionRelation exR = creator.LastResult;
                                 output = (new RelationDebugger()).GetDebugString(exR);
                                 DistDBMS.Common.Debug.WriteLine(output);
+
                                 result.OptimizedQueryTree = exR;
 
                                 Debug.WriteLine("-------------F");
 
-
                                 List<ExecutionPlan> plans = creator.SplitPlan(gPlan);
+                                creator.FillSite(exR, plans);
+
                                 foreach (ExecutionPlan p in plans)
                                 {
                                     ExecutionPackage package = new ExecutionPackage();
@@ -222,7 +266,7 @@ namespace DistDBMS.ControlSite
                                     package.Object = p;
                                     package.Type = ExecutionPackage.PackageType.Plan;
 
-                                    GetLocalSiteClient(conn,p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
+                                    GetLocalSiteClient(conn, p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
                                             Network.SessionStepPacket.StepIndexNone,
                                             Network.SessionStepPacket.StepIndexNone,
                                             Common.NetworkCommand.PLAN, package);
@@ -231,7 +275,7 @@ namespace DistDBMS.ControlSite
                                 Debug.WriteLine("-------------G");
 
                                 NetworkPacket lastPackage = null; //表示数据的那个
-                                 
+
                                 foreach (ExecutionPlan p in plans)
                                 {
                                     NetworkPacket returnPackage = GetLocalSiteClient(conn, p.ExecutionSite.Name).Packets.WaitAndRead(DEFALUT_TIMEOUT_MINISEC);
@@ -257,15 +301,24 @@ namespace DistDBMS.ControlSite
                                     result.Description = "Command executed successfully.\r\n";
                                     result.Description += size + " tuples selected\r\n";
                                     result.Type = ExecutionResult.ResultType.Data;
-                                    okPacket = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result,10*1024*1024);
+                                    okPacket = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result, 10 * 1024 * 1024);
                                     okPacket.WriteInt(size);
                                     okPacket.CopyFrom(lastPackage, lastPackage.Pos, lastPackage.Size - lastPackage.Pos);
+                                }
+                                else if (plans.Count == 0)//不需要执行，所以没有结果
+                                {
+                                    result.Description = "Command executed successfully.\r\n";
+                                    result.Description += "0 tuples selected\r\n";
+                                    result.Type = ExecutionResult.ResultType.Data;
+                                    okPacket = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
+                                    okPacket.WriteInt(0);
+                                    //okPacket.CopyFrom(lastPackage, lastPackage.Pos, lastPackage.Size - lastPackage.Pos);
                                 }
                                 else
                                     okPacket = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
 
                                 conn.SendPacket(okPacket);
-                                
+
                                 //conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
                             }
                             #endregion
@@ -290,7 +343,7 @@ namespace DistDBMS.ControlSite
                                     package.Object = p;
                                     package.ID = 0;
                                     //同步执行
-                                    GetLocalSiteClient(conn,p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
+                                    GetLocalSiteClient(conn, p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
                                             Network.SessionStepPacket.StepIndexNone,
                                             Network.SessionStepPacket.StepIndexNone,
                                             Common.NetworkCommand.PLAN, package);
@@ -339,7 +392,7 @@ namespace DistDBMS.ControlSite
                                     package.Object = p;
                                     package.ID = 0;
                                     //同步执行
-                                    GetLocalSiteClient(conn,p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
+                                    GetLocalSiteClient(conn, p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
                                             Network.SessionStepPacket.StepIndexNone,
                                             Network.SessionStepPacket.StepIndexNone,
                                             Common.NetworkCommand.PLAN, package);
@@ -393,7 +446,7 @@ namespace DistDBMS.ControlSite
             //    Common.Debug.WriteLine(result.Description);
             //}
 
-            
+
         }
 
         private bool ImportScript(string[] file)
@@ -407,5 +460,7 @@ namespace DistDBMS.ControlSite
             return gdd != null;
 
         }
+
+
     }
 }

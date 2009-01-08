@@ -341,7 +341,33 @@ namespace DistDBMS.ControlSite.Plan
                 return null;
         }
 
-        
+        public void FillSite(ExecutionRelation r, List<ExecutionPlan> plans)
+        {
+            foreach (ExecutionPlan plan in plans)
+            {
+                foreach (ExecutionStep step in plan.Steps)
+                {
+                    if (step.Operation is ExecutionRelation)
+                        VisitRelation(step.Operation as ExecutionRelation, r, plan.ExecutionSite);
+                }
+            }
+        }
+
+        private void VisitRelation(ExecutionRelation r,ExecutionRelation target,Site site)
+        {
+            ExecutionRelation result = target.FindRelationById(r.ResultID);
+            if (result != null)
+            {
+                if (r.InLocalSite)
+                    result.ExecutionSite = site;
+                else if (result.ExecutionSite == null)
+                    result.ExecutionSite = site; //先填写一个上去
+            }
+
+            foreach (ExecutionRelation child in r.Children)
+                VisitRelation(child, target,site);
+
+        }
 
     }
 }

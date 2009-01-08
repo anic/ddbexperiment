@@ -142,6 +142,8 @@ namespace DistDBMS.TestResult
             
             actual = target.ExecuteSQL(sql);
             Assert.AreEqual(expected.Tuples.Count, actual.Data.Tuples.Count, "fail in " + sql);
+            if (expected.Tuples.Count > 0)
+                Assert.AreEqual(expected.Tuples[0].Data.Count, actual.Data.Tuples[0].Data.Count, "Field diff;");
         
         }
 

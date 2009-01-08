@@ -227,6 +227,11 @@ namespace DistDBMS.Common.Execution
                 return ResultID + "*\t" + base.ToString();
         }
 
+        public string ToSimpleString()
+        {
+            return base.ToString();
+        }
+
 
         internal class RelationPair
         {
@@ -257,6 +262,20 @@ namespace DistDBMS.Common.Execution
                     foreach (Relation child in pair.relation.Children)
                         queue.Enqueue(new RelationPair(child, pair.level + 1));
                 }
+            }
+            return null;
+        }
+
+        public ExecutionRelation FindRelationById(int resultId)
+        {
+            if (this.ResultID == resultId)
+                return this;
+
+            foreach (ExecutionRelation child in Children)
+            {
+                ExecutionRelation result = child.FindRelationById(resultId);
+                if (result != null)
+                    return result;
             }
             return null;
         }

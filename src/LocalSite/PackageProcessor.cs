@@ -73,6 +73,25 @@ namespace DistDBMS.LocalSite
                         else
                             conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, "BUSY");
                     }
+                    else if (package.Type == ExecutionPackage.PackageType.PlanData)//执行计划
+                    {
+                        ExecutionPlan plan = package.Object as ExecutionPlan;
+                        int tables = packet.ReadInt();
+                        for (int i = 0; i < tables; ++i)
+                        { 
+                            int size = packet.ReadInt();
+                            for (int j = 0; j < size; ++j)
+                                plan.Steps[i].Table.Tuples.Add(Tuple.FromLineString(packet.ReadString()));
+                        }
+                        if (currentPlan == null)
+                        {
+                            currentPlan = plan;
+                            //能执行多少执行多少
+                            ExecutePlan(conn);
+                        }
+                        else
+                            conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, "BUSY");
+                    }
                 }
             }
         }

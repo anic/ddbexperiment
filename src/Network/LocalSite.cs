@@ -527,7 +527,7 @@ namespace DistDBMS.Network
             SendPacket(packet);
         }
 
-        public void SendStepTextObjectPacket(Guid sessionId, int stepFrom, int step, string text, object obj)
+        public LocalSiteServerTextObjectPacket EncapsulateStepTextObjectPacket(Guid sessionId, int stepFrom, int step, string text, object obj)
         {
             LocalSiteServerTextObjectPacket packet = new LocalSiteServerTextObjectPacket();
             packet.SessionId = sessionId;
@@ -536,6 +536,12 @@ namespace DistDBMS.Network
             packet.Text = text;
             packet.Object = obj;
             packet.Encapsulate();
+            return packet;
+        }
+
+        public void SendStepTextObjectPacket(Guid sessionId, int stepFrom, int step, string text, object obj)
+        {
+            NetworkPacket packet = EncapsulateStepTextObjectPacket(sessionId, stepFrom, step, text, obj);
             SendPacket(packet);
         }
 
