@@ -50,15 +50,17 @@ namespace DistDBMS.Network
 
             if (needWait)
             {
-                dataEvent.WaitOne(timeout, false);
-                if (packets.Count == 0)
-                    System.Diagnostics.Debugger.Break();
+                if (!dataEvent.WaitOne(timeout, false))
+                    return null;
             }
             NetworkPacket packet = null;
             lock (packets)
             {
-                packet = packets.Dequeue();
-                dataEvent.Reset();
+                if (packets.Count != 0)
+                {
+                    packet = packets.Dequeue();
+                    dataEvent.Reset();
+                }
             }
 
             return packet;
