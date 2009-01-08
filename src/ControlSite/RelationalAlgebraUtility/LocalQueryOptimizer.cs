@@ -173,6 +173,11 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                     AddPrimaryKey(relation, primaryKey);          
                 }
             }
+
+            foreach (Relation r in relation.Children)
+            {
+                FixVerticalFragment(r);
+            }
         }
 
         private void ReduceEmptySelection(Relation relation)
@@ -708,13 +713,29 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                     case RelationalType.Union:
                         if (fragmentTree.Children.Count - toBeDeleted.Count == 1) // Union剩下一个孩子结点，孩子结点上移并更新孩子结点名称为Union的Resultname
                         {
+                            
                             string resultName = fragmentTree.ResultName;
 
                             foreach (Relation r in toBeDeleted)
                                 fragmentTree.Children.Remove(r);
 
-                            fragmentTree.Copy(fragmentTree.Children[0]);
-                            fragmentTree.DirectTableSchema.ReplaceTableName(resultName);
+
+                            if (fragmentTree.Children[0].Children.Count == 1 && fragmentTree.Children[0].Type == RelationalType.Selection &&
+                                fragmentTree.Children[0].Predication.IsEmpty)
+                            {
+                                fragmentTree.Copy(fragmentTree.Children[0].Children[0]);
+                                fragmentTree.ResultName = resultName;
+                            }
+                            else
+                            {
+                                fragmentTree.Copy(fragmentTree.Children[0]);
+                            }
+
+                            if (fragmentTree.Type == RelationalType.Selection)
+                                fragmentTree.DirectTableSchema.ReplaceTableName(resultName);
+                            
+                            
+                            
                         }
                         else
                         {
@@ -745,14 +766,14 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             // 本fragmentTree结点对应的分片对象
             Fragment fragment = gdd.Fragments.GetFragmentByName(fragmentTree.DirectTableSchema.TableName);
 
-            // 分片的必要属性（感觉有问题！！ 没有必要属性是否应该删除？）
+            // 分片的必要属性
             FieldList fragmentNecessaryAttributes = new FieldList();
             foreach (Field f in fragment.Schema.Fields)
             {
                 if ((joinAttributes.FindLogic(f) != null || selectAttributes.FindLogic(f) != null || projectAttributes.FindLogic(f) != null) && fragmentNecessaryAttributes.FindLogic(f) == null)
                     fragmentNecessaryAttributes.Add(f);
             }
-            if (fragmentNecessaryAttributes.Count == 0) // 有待考虑
+            if (fragmentNecessaryAttributes.Count == 0) 
                 return false;
 
             // 收集分片的所有分片条件
