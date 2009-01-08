@@ -26,6 +26,38 @@ namespace DistDBMS.ControlSite
             //ModifyUnion(r);
             //ModifyJoin(r);
             ModifyProjection(r);
+            //ModifyForTest(r);
+        }
+
+        private void ModifyForTest(Relation r)
+        {
+            if (r.Type == RelationalType.Projection
+                && r.RelativeAttributes.Fields.Count == 1)
+                //&& r.RelativeAttributes.Fields[0].TableName == "Product"
+                //&& r.RelativeAttributes.Fields[1].TableName == "Product.2")
+            {
+//                r.RelativeAttributes.Fields[0].TableName = "Product.1";
+                Field newField = new Field();
+                newField.TableName = "Product.1";
+                newField.AttributeName = "id";
+                TableSchema old = r.RelativeAttributes;
+                r.RelativeAttributes = new TableSchema();
+                r.RelativeAttributes.Fields.Add(newField);
+                r.RelativeAttributes.Fields.Add(old.Fields[0]);
+
+                int a = 0;
+            }
+
+            if (r.Children.Count == 2 && r.Children[1].Type == RelationalType.Selection
+                && r.Children[1].IsDirectTableSchema && r.Children[1].DirectTableSchema.TableName == "Product.2")
+            {
+                Relation old = r.Children[1];
+                r.Children[1] = old.Children[0];
+                old.Children[0].ResultName = "Product.2";
+            }
+
+            foreach (Relation child in r.Children)
+                ModifyForTest(child);
         }
 
         public void CheckLastSchema(ExecutionRelation exR,TableSchema schema)

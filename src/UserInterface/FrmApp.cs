@@ -143,6 +143,10 @@ namespace DistDBMS.UserInterface
                 uscExecuteQuery.SetGlobalDirectory(frmInit.GDD);
                 switcher.SetGlobalDirectory(frmInit.GDD);
             }
+
+            //uscExecuteQuery.SQLText = "select Product.name,Product.stocks,Producer.name from Product,Producer where Product.producer_id=Producer.id and Producer.location='BJ' and Product.stocks > 4000";
+            uscExecuteQuery.SQLText = "select Customer.id,Customer.name,Product.name,Purchase.number from Customer,Product,Purchase where Customer.id=Purchase.customer_id and Product.id=Purchase.product_id and Customer.rank = 1 and Product.stocks > 2000";
+
             uscExecuteQuery.EnableTip = true;
 
         }
