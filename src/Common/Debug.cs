@@ -16,5 +16,14 @@ namespace DistDBMS.Common
             
             Console.WriteLine(DateTime.Now.ToString("hh:mm:ss.fff") + " " + method.DeclaringType.Name + "." + method.Name + ":" + s);
         }
+
+        public static void Assert(bool condition, string msg)
+        {
+            if(!condition)
+            {
+                WriteLine("[ASSERT] " + msg);
+                System.Diagnostics.Debugger.Break();
+            }
+        }
     }
 }

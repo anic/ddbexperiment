@@ -41,8 +41,8 @@ namespace DistDBMS.ControlSite
 
 
 
-            a.TestGDD();
-            a.TestSQLSyntax();
+            //a.TestGDD();
+            //a.TestSQLSyntax();
             //a.TestRelationAlgebra();
             //a.TestExecutionPlan();
 
