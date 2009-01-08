@@ -471,6 +471,9 @@ namespace DistDBMS.LocalSite.Processor
                     }
                 case RelationalType.Join:
                     {
+                        if (step.WaitingId.Contains(r.ResultID)) //测试，这个Join的条件已经完成了
+                            break;
+
                         //TODO:找名字
                         //这里只是两个表的join
                         Condition newCondition = new Condition();

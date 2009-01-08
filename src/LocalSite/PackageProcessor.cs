@@ -156,7 +156,11 @@ namespace DistDBMS.LocalSite
                             //TODO:做异常处理
                             try
                             {
-                                 table = processor.Handle(step, name, buffer);
+                                if (step.Operation.ResultID == 100)
+                                {
+                                    int a = 0;
+                                }
+                                table = processor.Handle(step, name, buffer);
                             }
                             catch{
                                 table = new Table();

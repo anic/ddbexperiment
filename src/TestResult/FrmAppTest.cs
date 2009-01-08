@@ -144,6 +144,8 @@ namespace DistDBMS.TestResult
             Assert.AreEqual(expected.Tuples.Count, actual.Data.Tuples.Count, "fail in " + sql);
             if (expected.Tuples.Count > 0)
                 Assert.AreEqual(expected.Tuples[0].Data.Count, actual.Data.Tuples[0].Data.Count, "Field diff;");
+
+            //Assert.IsTrue(IsSame(expected, actual.Data), "Tuples diff");
         
         }
 
@@ -153,40 +155,48 @@ namespace DistDBMS.TestResult
             if (r1.Tuples.Count != r2.Tuples.Count)
                 return false;
 
-            foreach (Tuple t1 in r1.Tuples)
+            for (int i = 0; i < r1.Tuples.Count; ++i)
             {
-                bool found = false;
-                
-                foreach (Tuple t2 in r2.Tuples)
-                {
-                    if (t1.Data.Count > 0 && t2.Data.Count > 0
-                        && t1.Data[0] == t2.Data[0])
-                    { 
-                        //比较
-                        bool same = true;
-                        for (int i = 0; i < t1.Data.Count; ++i)
-                        {
-                            if (t1.Data[i] != t2.Data[i])
-                            {
-                                same = false;
-                                break;
-                            }
-                        }
-                        if (same)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    
-                }
-
-                if (!found) //没有相同的
-                    return false;
-
+                for (int j = 0; j < r1.Tuples[i].Data.Count; ++j)
+                    if (r1.Tuples[i].Data[j] != r2.Tuples[i].Data[j])
+                        return false;
             }
-
             return true;
+
+            //foreach (Tuple t1 in r1.Tuples)
+            //{
+            //    bool found = false;
+
+            //    foreach (Tuple t2 in r2.Tuples)
+            //    {
+            //        if (t1.Data.Count > 0 && t2.Data.Count > 0
+            //            && t1.Data[0] == t2.Data[0])
+            //        {
+            //            //比较
+            //            bool same = true;
+            //            for (int i = 0; i < t1.Data.Count; ++i)
+            //            {
+            //                if (t1.Data[i] != t2.Data[i])
+            //                {
+            //                    same = false;
+            //                    break;
+            //                }
+            //            }
+            //            if (same)
+            //            {
+            //                found = true;
+            //                break;
+            //            }
+            //        }
+
+            //    }
+
+            //    if (!found) //没有相同的
+            //        return false;
+
+            //}
+
+            //    return true;
         }
         
     }

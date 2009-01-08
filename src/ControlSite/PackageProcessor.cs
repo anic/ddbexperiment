@@ -448,7 +448,7 @@ namespace DistDBMS.ControlSite
                         result.Description = "Site " + (e as LocalSiteFailException).site + " wait timeout.\r\n";
                 }
                 else
-                    result.Description = e.Message;
+                    result.Description = e.Message + "\r\n";
                 conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
                 Common.Debug.WriteLine(result.Description);
             }
