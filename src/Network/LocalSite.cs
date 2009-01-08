@@ -283,19 +283,29 @@ namespace DistDBMS.Network
 
         public void SendP2PStepTextObjectPacket(string dest, int step, string text, object obj)
         {
+            P2PTextObjectPacket packet = EncapsulateP2PStepTextObjectPacket(step, text, obj);
+            SendP2PStepTextObjectPacket(dest, packet);
+
+        }
+
+        public P2PTextObjectPacket EncapsulateP2PStepTextObjectPacket(int step, string text, object obj)
+        {
             P2PTextObjectPacket packet = new P2PTextObjectPacket();
             packet.SessionId = SessionId;
             packet.StepIndex = step;
             packet.Text = text;
             packet.Object = obj;
             packet.Encapsulate();
+            return packet;
+        }
+        public void SendP2PStepTextObjectPacket(string dest, P2PTextObjectPacket packet)
+        {
             PeerConnection peerConn = Server.P2PNetwork.GetConnection(dest);
             if (peerConn != null)
                 peerConn.SendPacket(packet);
             else
                 System.Diagnostics.Debugger.Break();
         }
-
 
         List<SessionStepPacket> stepWaitingPackets = new List<SessionStepPacket>();
         List<SessionStepPacket> stepDonePackets = new List<SessionStepPacket>();

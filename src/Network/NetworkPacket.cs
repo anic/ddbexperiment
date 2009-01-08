@@ -26,7 +26,16 @@ namespace DistDBMS.Network
 
         public int Size  { get {return size;} }
 
+        public int Pos { get { return pos; } }
+
         //virtual public bool IsFragmented { get { return false; } }
+
+        public void CopyFrom(NetworkPacket packet, int offset, int count)
+        {
+            Array.Copy(packet.data, offset, this.data, pos, count);
+            pos += count;
+            size += count;
+        }
 
         public byte Tag;
         virtual public bool Encapsulate()
@@ -220,7 +229,7 @@ namespace DistDBMS.Network
 
 
 
-        bool EnsureSize(int newSize)
+        public bool EnsureSize(int newSize)
         {
             if(newSize > MaxSize)
                 throw new OverflowException();

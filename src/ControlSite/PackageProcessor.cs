@@ -37,8 +37,6 @@ namespace DistDBMS.ControlSite
             }
         }
 
-
-
         public PackageProcessor(string name)
         {
             this.name = name;
@@ -187,10 +185,16 @@ namespace DistDBMS.ControlSite
                                 SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
                                 converter.SetQueryCalculus(s3);
                                 Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd, true);
+                                
+
+                                //原始的查询树
+                                SQL2RelationalAlgebraInterface converter2 = new NaiveSQL2RelationalAlgebraConverter();
+                                converter2.SetQueryCalculus(s3);
+                                result.RawQueryTree = converter.SQL2RelationalAlgebra(gdd, false);
 
                                 //TODO 这里作为测试，临时修改，填写ResultName
-                                //TempModifier tempModifier = new TempModifier(gdd);
-                                //tempModifier.Modify(relationalgebra);
+                                TempModifier tempModifier = new TempModifier(gdd);
+                                tempModifier.Modify(relationalgebra);
 
                                 Debug.WriteLine("-------------E");
 
@@ -200,9 +204,15 @@ namespace DistDBMS.ControlSite
 
                                 QueryPlanCreator creator = new QueryPlanCreator(gdd);
                                 ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, 0);
-
+                                
+                                
+                                ExecutionRelation exR = creator.LastResult;
+                                output = (new RelationDebugger()).GetDebugString(exR);
+                                DistDBMS.Common.Debug.WriteLine(output);
+                                result.OptimizedQueryTree = exR;
 
                                 Debug.WriteLine("-------------F");
+
 
                                 List<ExecutionPlan> plans = creator.SplitPlan(gPlan);
                                 foreach (ExecutionPlan p in plans)
@@ -220,6 +230,8 @@ namespace DistDBMS.ControlSite
 
                                 Debug.WriteLine("-------------G");
 
+                                NetworkPacket lastPackage = null; //表示数据的那个
+                                 
                                 foreach (ExecutionPlan p in plans)
                                 {
                                     NetworkPacket returnPackage = GetLocalSiteClient(conn, p.ExecutionSite.Name).Packets.WaitAndRead(DEFALUT_TIMEOUT_MINISEC);
@@ -232,24 +244,42 @@ namespace DistDBMS.ControlSite
                                     {
                                         if ((returnPackage as ServerClientTextObjectPacket).Object is ExecutionPackage)
                                         {
-                                            ExecutionPackage resultPackage = (returnPackage as ServerClientTextObjectPacket).Object
-                                                as ExecutionPackage;
+                                            lastPackage = returnPackage;
 
-                                            //读取结果
-                                            if (resultPackage.Type == ExecutionPackage.PackageType.Data)
-                                            {
-                                                result.Data = resultPackage.Object as Table;
-                                                result.Description = "Command executed successfully.";
-                                                result.Description += "\r\n" + result.Data.Tuples.Count + " tuples selected";
-                                                result.RawQueryTree = relationalgebra;
+                                        //    ExecutionPackage resultPackage = (returnPackage as ServerClientTextObjectPacket).Object
+                                        //        as ExecutionPackage;
 
-                                                result.Description += "\r\n";
-                                            }
+                                        //    //读取结果
+                                        //    if (resultPackage.Type == ExecutionPackage.PackageType.Data)
+                                        //    {
+                                        //        //result.Data = resultPackage.Object as Table;
+                                        //        //result.Description = "Command executed successfully.";
+                                        //        //result.Description += "\r\n" + result.Data.Tuples.Count + " tuples selected";
+                                        //        //result.RawQueryTree = relationalgebra;
+                                        //        //result.Description += "\r\n";
+                                        //    }
                                         }
                                     }
                                 }
+
+                                ServerClientPacket okPacket;
                                 DistDBMS.Common.Debug.WriteLine("ALL plans done!");
-                                conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
+                                if (lastPackage != null)
+                                {
+                                    int size = lastPackage.ReadInt();
+                                    result.Description = "Command executed successfully.\r\n";
+                                    result.Description += size + " tuples selected\r\n";
+                                    result.Type = ExecutionResult.ResultType.Data;
+                                    okPacket = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result,10*1024*1024);
+                                    okPacket.WriteInt(size);
+                                    okPacket.CopyFrom(lastPackage, lastPackage.Pos, lastPackage.Size - lastPackage.Pos);
+                                }
+                                else
+                                    okPacket = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
+
+                                conn.SendPacket(okPacket);
+                                
+                                //conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
                             }
                             #endregion
                             #region 插入

@@ -215,7 +215,10 @@ namespace DistDBMS.LocalSite.Processor
                         if (localfound && localSources.Count == 1)  //如果本地的表有，且只有一个本地表
                             field.TableName = localSources[0].TableName;
                         else
-                            throw new Exception();
+                        {
+                            //throw new Exception();
+                            //Common.Debug.Assert(false, "ReplaceField 没有找到对应的表");
+                        }
                     }          
                     
                 }

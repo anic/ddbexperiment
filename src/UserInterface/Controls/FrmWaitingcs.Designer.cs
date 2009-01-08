@@ -30,6 +30,7 @@
         {
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.label1 = new System.Windows.Forms.Label();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // progressBar1
@@ -37,7 +38,7 @@
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Left;
             this.progressBar1.Location = new System.Drawing.Point(10, 10);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(511, 26);
+            this.progressBar1.Size = new System.Drawing.Size(517, 26);
             this.progressBar1.TabIndex = 0;
             // 
             // label1
@@ -48,11 +49,23 @@
             this.label1.Size = new System.Drawing.Size(0, 12);
             this.label1.TabIndex = 1;
             // 
+            // btnCancel
+            // 
+            this.btnCancel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnCancel.Location = new System.Drawing.Point(534, 10);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(75, 26);
+            this.btnCancel.TabIndex = 2;
+            this.btnCancel.Text = "取消";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // FrmWaitingcs
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(619, 46);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.progressBar1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -72,5 +85,6 @@
 
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnCancel;
     }
 }

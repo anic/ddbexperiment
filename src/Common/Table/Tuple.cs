@@ -11,11 +11,16 @@ namespace DistDBMS.Common.Table
         /// 数据均适用元组形式存储
         /// </summary>
         public List<string> Data { get { return data; } }
-        List<string> data;
+        protected List<string> data;
 
         public Tuple()
         {
             data = new List<string>();
+        }
+
+        public Tuple(int size)
+        {
+            data = new List<string>(size);
         }
 
         public string this[int index]
@@ -37,6 +42,28 @@ namespace DistDBMS.Common.Table
             }
             result += ")";
 
+            return result;
+        }
+
+        [NonSerialized]
+        static StringBuilder sb = new StringBuilder(10 * 1024);
+        public string GenerateLineString()
+        {
+            sb.Length = 0;
+            foreach (string str in data)
+            {
+                sb.Append(str);
+                sb.Append("\t");
+            }
+            return sb.ToString();
+        }
+
+        public static Tuple FromLineString(string line)
+        {
+            string[] items = line.Split('\t');
+            Tuple result = new Tuple();
+            foreach (string item in items)
+                result.data.Add(item);
             return result;
         }
     }

@@ -13,9 +13,15 @@ namespace DistDBMS.ControlSite.Plan
     class QueryPlanCreator
     {
         GlobalDirectory gdd;
+        ExecutionRelation exR;
+
         public QueryPlanCreator(GlobalDirectory gdd)
         {
             this.gdd = gdd;
+        }
+
+        public ExecutionRelation LastResult {
+            get { return exR; }
         }
 
         /// <summary>
@@ -26,11 +32,9 @@ namespace DistDBMS.ControlSite.Plan
         /// <returns></returns>
         public ExecutionPlan CreateGlobalPlan(Relation root,int id)
         {
-            ExecutionRelation exR = new ExecutionRelation(root, ref id, -1);
+            exR = new ExecutionRelation(root, ref id, -1);
 
-            string output = (new RelationDebugger()).GetDebugString(exR);
-            System.Diagnostics.Debug.WriteLine(output);
-            DistDBMS.Common.Debug.WriteLine(output);
+
             
             ////////////////生成执行计划//////////////////////////
             ExecutionPlan plan = new ExecutionPlan();

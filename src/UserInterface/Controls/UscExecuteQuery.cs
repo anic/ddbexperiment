@@ -10,6 +10,7 @@ using DistDBMS.Common.Dictionary;
 using DistDBMS.UserInterface.Controls.SqlInput;
 using DistDBMS.Common.Table;
 using DistDBMS.Common.RelationalAlgebra.Entity;
+using DistDBMS.Common.Execution;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -107,9 +108,14 @@ namespace DistDBMS.UserInterface.Controls
             uscTableViewer1.Table = table;
         }
 
-        public void SetQueryTree(Relation queryTree)
+        public void SetRawQueryTree(Relation queryTree)
         {
             rawQTreeViewer.ShowRelation(queryTree);
+        }
+
+        public void SetOptQueryTree(ExecutionRelation optQueryTree)
+        {
+            optQTreeViewer.ShowRelation(optQueryTree);
         }
 
 

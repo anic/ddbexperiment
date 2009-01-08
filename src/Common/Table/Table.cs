@@ -39,6 +39,11 @@ namespace DistDBMS.Common.Table
             tuples = new List<Tuple>();
         }
 
+        public Table(int size) {
+            Schema = new TableSchema();
+            tuples = new List<Tuple>(size);
+        }
+
         /// <summary>
         /// 返回Tuple的字符串，会根据类型进行处理，如(1,'aaa')
         /// </summary>

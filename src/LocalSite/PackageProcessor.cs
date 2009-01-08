@@ -84,9 +84,20 @@ namespace DistDBMS.LocalSite
             { 
                 if ((packet as P2PTextObjectPacket).Object is ExecutionPackage)
                 {
+                    ExecutionPackage exPackage = (packet as P2PTextObjectPacket).Object as ExecutionPackage;
+                    //恢复数据包
+                    if (exPackage.Type == ExecutionPackage.PackageType.Data)
+                    {
+                        int size = packet.ReadInt();
+                        exPackage.Object = new Table(size);
+                        Table t = exPackage.Object as Table;
+                        for (int i = 0; i < size; ++i)
+                            t.Tuples.Add(Tuple.FromLineString(packet.ReadString()));
+                    }
+
                     DistDBMS.Common.Debug.WriteLine(name + " package ID:" + ((packet as P2PTextObjectPacket).Object as ExecutionPackage).ID);
                     lock (buffer)
-                        buffer.Add((packet as P2PTextObjectPacket).Object as ExecutionPackage);
+                        buffer.Add(exPackage);
 
                     ExecutePlan(conn);
                 }
@@ -120,10 +131,15 @@ namespace DistDBMS.LocalSite
                         {
                             step.Status = new Status();
                             step.Status.StartTime = DateTime.Now;
-
-                            Table table = processor.Handle(step, name, buffer);
+                            Table table;
                             //TODO:做异常处理
-                            //if(table==null)
+                            try
+                            {
+                                table = processor.Handle(step, name, buffer);
+                            }
+                            catch{
+                                table = new Table();
+                            }
 
                             step.Status.EndTime = DateTime.Now;
                             step.Status.Done = true;
@@ -134,21 +150,44 @@ namespace DistDBMS.LocalSite
                             ExecutionPackage newPackage = new ExecutionPackage();
                             newPackage.ID = step.Operation.ResultID;
                             newPackage.Type = ExecutionPackage.PackageType.Data;
-                            newPackage.Object = table;
+                            newPackage.Object = null;
+                            //table
 
+                            //TODO:应该检查是否在本站点
                             buffer.Add(newPackage);//相当于异步发送
                             if (step.TransferSite != null && step.TransferSite.Name != this.name)
                             {
-                                conn.SendP2PStepTextObjectPacket(step.TransferSite.Name,
-                                    newPackage.ID,
+                                P2PTextObjectPacket packet = conn.EncapsulateP2PStepTextObjectPacket(newPackage.ID,
                                     Common.NetworkCommand.EXESQL,
-                                    newPackage);                                
+                                    newPackage);
+
+                                packet.EnsureSize(10*1024*1024);
+                                packet.WriteInt(table.Tuples.Count); //先写数据大小
+                                foreach (Tuple t in table.Tuples)
+                                    packet.WriteString(t.GenerateLineString());
+
+                                conn.SendP2PStepTextObjectPacket(step.TransferSite.Name, packet);
+
+
+                                //conn.SendP2PStepTextObjectPacket(step.TransferSite.Name,
+                                //    newPackage.ID,
+                                //    Common.NetworkCommand.EXESQL,
+                                //    newPackage);                                
                             }
                             else if (step.Index == 0) //返回ControlSite
                             {
                                 System.Diagnostics.Debug.WriteLine(name + " finish the plan");
                                 DistDBMS.Common.Debug.WriteLine(name + " finish the plan");
-                                conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, newPackage);
+                                //newPackage.Object = table;
+                                //conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, newPackage);
+                                ServerClientPacket packet = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, newPackage);
+                                
+                                packet.EnsureSize(10 * 1024 * 1024);
+                                packet.WriteInt(table.Tuples.Count); //先写数据大小
+                                foreach (Tuple t in table.Tuples)
+                                    packet.WriteString(t.GenerateLineString());
+
+                                conn.SendPacket(packet);
                             }
                             else
                                 buffer.Add(newPackage);
