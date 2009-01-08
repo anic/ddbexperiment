@@ -6,6 +6,8 @@ using DistDBMS.Common.Dictionary;
 using DistDBMS.Common.Execution;
 using DistDBMS.ControlSite.SQLSyntax.Operation;
 using DistDBMS.Common.Syntax;
+using DistDBMS.Common.RelationalAlgebra.Entity;
+using DistDBMS.ControlSite.RelationalAlgebraUtility;
 
 namespace DistDBMS.ControlSite.Plan
 {
@@ -45,9 +47,91 @@ namespace DistDBMS.ControlSite.Plan
 
         }
 
+        /// <summary>
+        /// 获取分片的所有约束条件谓词
+        /// </summary>
+        /// <param name="fragment"></param>
+        /// <returns></returns>
+        private List<AtomCondition> GetFragmentConditions(Fragment fragment)
+        {
+            List<AtomCondition> results = new List<AtomCondition>();
+
+            if (fragment == null || fragment.Condition == null || fragment.Condition.IsEmpty)
+                return results;
+
+            ConditionConverter conditionConverter = new ConditionConverter();
+            conditionConverter.Convert(fragment.Condition, NormalFormType.Conjunction);
+            ConjunctiveNormalForm normalForm = conditionConverter.ConjunctionNormalForm;
+            results.AddRange(normalForm.PredicationItems);
+
+            results.AddRange(GetFragmentConditions(fragment.Parent));
+
+            return results;
+        }
+
+        /// <summary>
+        /// 在GDD中查找所有与tuple不冲突的Fragment
+        /// </summary>
+        /// <param name="fragment"></param>
+        /// <param name="tupleAttributeConditions"></param>
+        /// <param name="result"></param>
+        private void GetUnconflictFragments(Fragment fragment, List<AtomCondition> tupleAttributeConditions, ref List<Fragment> result)
+        {
+            // 叶子结点
+            if (fragment.Children.Count == 0)
+            {
+                List<AtomCondition> fragmentConditions = GetFragmentConditions(fragment);
+                foreach (AtomCondition fragmentAtom in fragmentConditions)
+                {
+                    foreach (AtomCondition tupleAtom in tupleAttributeConditions)
+                    {
+                        if (fragmentAtom.ConflictWith(tupleAtom))
+                            return;
+                    }
+                }
+
+                result.Add(fragment);
+            }
+            else // 中间分片结点
+            {
+                foreach (Fragment f in fragment.Children)
+                    GetUnconflictFragments(f, tupleAttributeConditions, ref result);
+            }
+            
+        }
+
         public List<Fragment> GetFragments(TableSchema schema, Condition condition)
         {
             List<Fragment> result = new List<Fragment>();
+
+            List<AtomCondition> predications = new List<AtomCondition>();
+
+            ConditionConverter conditionConverter = new ConditionConverter();
+            conditionConverter.Convert(condition, NormalFormType.Conjunction);
+            ConjunctiveNormalForm normalForm = conditionConverter.ConjunctionNormalForm;
+
+            if (normalForm != null)
+                predications.AddRange(normalForm.PredicationItems);
+
+            foreach (AtomCondition atom in predications)
+            {
+                atom.Normalize();
+                atom.LeftOperand.Field.TableName = schema.TableName;
+            }
+
+            foreach (Fragment fragment in gdd.Fragments)
+            {
+                if (fragment.Name.Equals(schema.TableName))
+                {
+                    GetUnconflictFragments(fragment, predications, ref result);
+                    break;
+                }
+            }
+
+            return result;
+
+            /*
+
             if (schema.TableName == "Producer")
             {
                 result.Add(gdd.Fragments.GetFragmentByName("Producer.2"));
@@ -61,6 +145,7 @@ namespace DistDBMS.ControlSite.Plan
             }
 
             return result;
+             * */
         }
 
         private ExecutionPlan GetPlanBySite(Site site)
