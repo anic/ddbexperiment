@@ -278,7 +278,7 @@ namespace DistDBMS.Network
             if (peerConn != null)
                 peerConn.SendPacket(packet);
             else
-                System.Diagnostics.Debugger.Break();
+                throw new System.Net.Sockets.SocketException();
         }
 
         public void SendP2PStepTextObjectPacket(string dest, int step, string text, object obj)
@@ -304,7 +304,7 @@ namespace DistDBMS.Network
             if (peerConn != null)
                 peerConn.SendPacket(packet);
             else
-                System.Diagnostics.Debugger.Break();
+                throw new System.Net.Sockets.SocketException();
         }
 
         List<SessionStepPacket> stepWaitingPackets = new List<SessionStepPacket>();
