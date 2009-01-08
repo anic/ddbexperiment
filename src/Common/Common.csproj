@@ -53,6 +53,7 @@
     <Compile Include="RelationalAlgebra\Entity\RelationList.cs" />
     <Compile Include="RelationalAlgebra\RelationDebugger.cs" />
     <Compile Include="Table\Field.cs" />
+    <Compile Include="Table\FieldList.cs" />
     <Compile Include="Table\Table.cs" />
     <Compile Include="Table\Tuple.cs" />
     <Compile Include="Execution\ExecutionPlan.cs" />

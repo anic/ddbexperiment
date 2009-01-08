@@ -66,6 +66,28 @@ namespace DistDBMS.Common.Dictionary
         public FragmentType Type { get; set; }
 
         /// <summary>
+        /// 该分片是否被垂直划分过
+        /// 即，该分片是否是垂直划分或属于一个垂直划分的子划分
+        /// </summary>
+        public bool HasVerticalDivided 
+        { 
+            get 
+            {
+                Fragment f = this;
+                do
+                {
+                    if (f.Type == FragmentType.Vertical)
+                        return true;
+
+                    f = f.Parent;
+                }
+                while (f != null);
+
+                return false;
+            } 
+        }
+
+        /// <summary>
         /// 分片后最终的样式表,tablename将会换成Name
         /// </summary>
         public TableSchema Schema {

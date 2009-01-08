@@ -23,7 +23,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
         public GlobalDirectory dictionary;
 
-        public DistDBMS.ControlSite.SQLSyntax.Operation.Selection selectionCalculus = null;
+        private DistDBMS.ControlSite.SQLSyntax.Operation.Selection selectionCalculus = null;
 
         private DistDBMS.ControlSite.SQLSyntax.Operation.Deletion deleteCalculus = null;
 
@@ -32,6 +32,19 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         private RelationAlgebraConvertError error;
         
         public Relation relationAlgebra;
+
+        public Relation OptimizeRelationAlgebra()
+        {
+            // Local Optimization
+            // 为什么当关系超过2个时，Sources[0].Tag会自动为0？？
+            foreach (TableSchema ts in selectionCalculus.Sources)
+                ts.Tag = -1;
+
+            Relation result = null;
+            LocalQueryOptimizer optimizer = new LocalQueryOptimizer(ref result, selectionCalculus, dictionary);
+
+            return result;
+        }
 
 
         void SQL2RelationalAlgebraInterface.SetQueryCalculus(DistDBMS.ControlSite.SQLSyntax.Operation.Selection queryCalculus)
@@ -52,19 +65,27 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             insertionCaculus = queryCalculus;
         }
 
-        Relation SQL2RelationalAlgebraInterface.SQL2RelationalAlgebra(GlobalDirectory gdd)
+        Relation SQL2RelationalAlgebraInterface.SQL2RelationalAlgebra(GlobalDirectory gdd, bool isOptimize)
         {
             dictionary = gdd;
-
-            Relation decomposedQuery = QueryDecomposition();
-
-            QueryLocalization(decomposedQuery, dictionary);
+            Relation decomposedQuery;
+            if (!isOptimize)
+            {
+                decomposedQuery = QueryDecomposition();
+                QueryLocalization(decomposedQuery, dictionary);
+            }
+            else
+            {
+                decomposedQuery = OptimizeRelationAlgebra();
+            }
+            
 
             return decomposedQuery;
         }
 
         RelationAlgebraConvertError SQL2RelationalAlgebraInterface.GetLastError()
         {
+            error = new RelationAlgebraConvertError();
             return error;
         }
 
@@ -167,7 +188,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 selection.Type = RelationalType.Selection;
                 selection.Children.Add(activeRelation);
 
-                Condition predication = new Condition();                
+                Condition predication = new Condition();
                 predication.AtomCondition = atomPredication;
 
                 
@@ -192,7 +213,6 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             projection.Type = RelationalType.Projection;
             
             projection.Children.Add(root);
-
             projection.RelativeAttributes = schema;
 
             return projection;
@@ -208,6 +228,9 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             if (decompositedQuery.Children.Count == 0 && decompositedQuery.IsDirectTableSchema)
             {
                 LocalizeTable(ref decompositedQuery, gdd);
+
+                // 删除原Selection结点
+                decompositedQuery.Copy(decompositedQuery.Children[0]);
             }
             else // 中间节点
             {
@@ -243,6 +266,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
             // 根据分片构造关系代数树
             ReconstructFragment(fragments, ref selection);
+
             return 0;
         }
 
@@ -254,15 +278,9 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         private void ReconstructFragment(Fragment f, ref Relation parent)
         {
             if (f.Children.Count == 0)
-            {
-                //parent.IsDirectTableSchema = true; 
-                //TO 刘璋：判断一个关系是否是DirectTableSchema，IsDirectTableSchema = (DirectTableSchema !=null);
                 return;
-            }
 
-            //TO 刘璋：同上
-            //parent.IsDirectTableSchema = false;
-            parent.DirectTableSchema = null;
+            //parent.DirectTableSchema = null;
 
             // 水平划分，Union连接
             if (f.Children[0].Type == FragmentType.Horizontal)
@@ -275,11 +293,9 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 {
                     Relation selection = new Relation();
                     selection.Type = RelationalType.Selection;
-                    selection.DirectTableSchema = new TableSchema();
-                    selection.DirectTableSchema.TableName = subf.Name;
+                    selection.DirectTableSchema = subf.Schema.Clone() as TableSchema;
+                    selection.DirectTableSchema.ReplaceTableName(subf.Name);
                     selection.DirectTableSchema.IsAllFields = true;
-                    selection.Predication = subf.Condition;
-                    selection.RelativeAttributes = subf.Schema;
 
                     union.Children.Add(selection);
 
@@ -293,11 +309,8 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 {
                     Relation selection = new Relation();
                     selection.Type = RelationalType.Selection;
-                    //selection.DirectTableSchema = new TableSchema();
-                    //selection.DirectTableSchema.TableName = subf.Name;
-                    selection.DirectTableSchema = subf.Schema;
-                    selection.DirectTableSchema.TableName = subf.Name;
-                    //selection.DirectTableSchema.IsAllFields = subf.Schema.IsAllFields; //??是否这样使用IsAllField?
+                    selection.DirectTableSchema = subf.Schema.Clone() as TableSchema;
+                    selection.DirectTableSchema.ReplaceTableName(subf.Name);
                     selection.RelativeAttributes = subf.Schema;
 
                     if (activeRelation == null)
@@ -345,6 +358,13 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
             // Select ...From ... Where ...
             result = ConvertField(result, selectionCalculus.Fields);
+
+            // Local Optimization
+            // 为什么当关系超过2个时，Sources[0].Tag会自动为0？？
+            foreach (TableSchema ts in selectionCalculus.Sources)
+                ts.Tag = -1;
+
+            //LocalQueryOptimizer optimizer = new LocalQueryOptimizer(result, selectionCalculus, dictionary);
 
             return result;
         }

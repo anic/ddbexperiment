@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.Common.Table
 {
@@ -34,6 +35,21 @@ namespace DistDBMS.Common.Table
         /// 如果是系统表，则是否全属性段
         /// </summary>
         public bool IsAllFields { get; set; }
+
+        /// <summary>
+        /// 标签，优化时使用
+        /// </summary>
+        public int Tag { get; set; }
+
+        /// <summary>
+        /// 与Table相关的一元谓词，优化时使用
+        /// </summary>
+        public List<AtomCondition> RelativeUnaryPredication { get; set; }
+
+        /// <summary>
+        /// 与Table相关的二元谓词，优化时使用
+        /// </summary>
+        public List<AtomCondition> RelativeBinaryPredication { get; set; }
 
         /// <summary>
         /// 返回是主键的属性域
@@ -83,6 +99,9 @@ namespace DistDBMS.Common.Table
             IsDbTable = false;
             Fields = new List<Field>();
             IsAllFields = false;
+            Tag = -1;
+            RelativeUnaryPredication = new List<AtomCondition>();
+            RelativeBinaryPredication = new List<AtomCondition>();
         }
 
         public new string ToString()
@@ -127,9 +146,17 @@ namespace DistDBMS.Common.Table
             result.TableName = TableName;
             result.NickName = NickName;
             result.IsDbTable = IsDbTable;
+            result.Tag = Tag;
             foreach (Field f in Fields)
                 result.Fields.Add(f.Clone() as Field);
             result.IsAllFields = IsAllFields;
+
+            foreach (AtomCondition atom in RelativeUnaryPredication)
+                result.RelativeUnaryPredication.Add(atom.Clone() as AtomCondition);
+
+            foreach (AtomCondition atom in RelativeBinaryPredication)
+                result.RelativeBinaryPredication.Add(atom.Clone() as AtomCondition);
+
             return result;
         }
 

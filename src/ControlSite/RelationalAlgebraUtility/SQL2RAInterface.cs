@@ -31,7 +31,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         /// Convert SQL syntax tree to Relational algebra
         /// </summary>
         /// <returns>Relational Algebra</returns>
-        Relation SQL2RelationalAlgebra(GlobalDirectory gdd);
+        Relation SQL2RelationalAlgebra(GlobalDirectory gdd, bool isOptimize);
 
         /// <summary>
         /// 

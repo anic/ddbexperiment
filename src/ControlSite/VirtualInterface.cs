@@ -57,7 +57,7 @@ namespace DistDBMS.ControlSite
 
             SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
             converter.SetQueryCalculus(s3);
-            Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
+            Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd, true);
 
             //TODO 这里作为测试，临时修改，填写ResultName
             TempModifier tempModifier = new TempModifier(gdd);
