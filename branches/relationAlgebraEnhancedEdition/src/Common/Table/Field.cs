@@ -26,7 +26,11 @@ namespace DistDBMS.Common.Table
         {
             get
             {
-                return TableName.Substring(0, TableName.IndexOf('.'));
+                int pos = TableName.IndexOf('.');
+                if (pos == -1)
+                    return TableName;
+
+                return TableName.Substring(0, pos);
             }
         }
 
@@ -37,7 +41,14 @@ namespace DistDBMS.Common.Table
         {
             get
             {
-                return TableName.Substring(TableName.LastIndexOf('.'));
+                return AttributeName;
+
+                //int pos = TableName.LastIndexOf('.');
+
+                //if (pos == -1)
+                //    return TableName;
+
+                //return TableName.Substring(pos + 1, TableName.Length - pos - 1);
             }
         }
 

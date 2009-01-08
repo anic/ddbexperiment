@@ -21,7 +21,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         private TableSchemaList tables;
         private FieldList projectAttributes;
 
-        public LocalQueryOptimizer(Relation tree, Selection select, GlobalDirectory gdd)
+        public LocalQueryOptimizer(ref Relation tree, Selection select, GlobalDirectory gdd)
         {
             queryTree = tree;
             this.gdd = gdd;
@@ -99,7 +99,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
                 foreach (Relation r in singleTrees)
                 {
-                    //System.Console.Write(r.toString());
+                    System.Console.Write(r.toString());
                 }
             }
 
@@ -110,13 +110,21 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             if (connectRelations.Count > 0)
             {
                 TranslateConnectedRelationCollection(connectRelations, ref connectedTrees);
+
+                foreach (Relation r in connectedTrees)
+                {
+                    System.Console.Write(r.toString());
+                }
             }
 
-            // 对每个有用表，在一元谓词中查找所属谓词并挂在Selection上
 
-            // 根据GDD排序，然后Join
+            // 最上层Cart，可忽略
+            // TODO:
 
-            // 最上层Cart
+            if (singleTrees.Count == 0)
+                tree = connectedTrees[0];
+            else
+                tree = singleTrees[0];
 
         }
 
@@ -149,13 +157,13 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         /// <param name="tree"></param>
         private void GenConnectRelationTree(TableSchemaList connectedTables, ref Relation tree)
         {
-            List<Relation> joinElements = new List<Relation>();
+            List<Relation> fragmentTree = new List<Relation>();
 
             foreach (TableSchema ts in connectedTables)
             {
                 Relation r = new Relation();
                 GenSingleRelationTree(ts, true, ref r);
-                joinElements.Add(r);
+                fragmentTree.Add(r);
 
                 //System.Console.Write(r.toString());
             }
@@ -163,19 +171,232 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             // TODO: 将joinElements中的各个元素join起来
             // 在做完Localization之后再评估各分支，然后join
             //
+            JoinRelations(connectedTables, fragmentTree, ref tree);
 
         }
 
         /// <summary>
         /// join一个联通集内的每个Relation子树
         /// </summary>
-        /// <param name="joinElements">经过Selection和Projection的Relation的集合</param>
+        /// <param name="connectedTables">联通集中所有Table</param>
+        /// <param name="fragmentTrees">经过Selection和Projection的Relation的集合</param>
         /// <param name="joinResult">join后的根结点</param>
-        private void JoinRelations(List<Relation> joinElements, ref Relation joinResult)
+        private void JoinRelations(TableSchemaList connectedTables, List<Relation> fragmentTrees, ref Relation joinResult)
         {
-            
+            // 生成join条件链
+            List<AtomCondition> orderedJoinCondition = new List<AtomCondition>();
+            OrderJoinCondition(connectedTables, ref orderedJoinCondition);
+
+            // 搜索所有可能join顺序
+            List<Relation> joinPatterns = new List<Relation>();
+            SearchAllPossibleJoinOrder(orderedJoinCondition, ref joinPatterns);
+
+            // 根据join顺序和GenSingleRelationTree结果评分，选出最优join顺序
+            // TODO: liuzhang
+            Relation bestJoinPattern = new Relation();
+            EvaluateJoinPattern(joinPatterns, fragmentTrees, ref bestJoinPattern);
+
+            // 按最优join顺序生成关系代数树
+            // 
+            MergeJoinPatternAndFragmentTree(connectedTables, bestJoinPattern, fragmentTrees);
+
+            joinResult = bestJoinPattern;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joinPattern"></param>
+        /// <param name="fragmentTrees"></param>
+        /// <param name="result"></param>
+        private void MergeJoinPatternAndFragmentTree(TableSchemaList connectedTables, Relation joinNode, List<Relation> fragmentTrees)
+        {
+            if (joinNode == null)
+                return;
+
+            // 左结点
+            if (joinNode.LeftRelation == null)
+            {
+                string name = joinNode.RelativeAttributes.Fields[0].LogicTableName;
+                int pos;
+                for (pos = 0; pos < connectedTables.Count; pos++)
+                {
+                    if (connectedTables[pos].TableName.Equals(name))
+                    {
+                        joinNode.LeftRelation = fragmentTrees[pos];
+                    }
+                }
+            }
+            else
+            {
+                MergeJoinPatternAndFragmentTree(connectedTables, joinNode.LeftRelation, fragmentTrees);
+            }
+
+            // 右结点
+            if (joinNode.RightRelation == null)
+            {
+                int pos;
+                string name = joinNode.RelativeAttributes.Fields[1].LogicTableName;
+                for (pos = 0; pos < connectedTables.Count; pos++)
+                {
+                    if (connectedTables[pos].TableName.Equals(name))
+                    {
+                        joinNode.RightRelation = fragmentTrees[pos];
+                    }
+                }
+            }
+            else
+            { 
+                MergeJoinPatternAndFragmentTree(connectedTables, joinNode.RightRelation, fragmentTrees);
+            }
+        }
+
+        /// <summary>
+        /// 根据join顺序和GenSingleRelationTree结果评分，选出最优join树
+        /// 
+        /// (未完成)
+        /// </summary>
+        /// <param name="joinPatterns"></param>
+        /// <param name="fragmentTrees"></param>
+        /// <param name="bestJoinPattern"></param>
+        private void EvaluateJoinPattern(List<Relation> joinPatterns, List<Relation> fragmentTrees, ref Relation bestJoinPattern)
+        {
+            Debug.Assert(joinPatterns!=null && joinPatterns.Count > 0, "Error: Evaluation!");
+            bestJoinPattern = joinPatterns[0].Clone() as Relation;
+        }
+
+        /// <summary>
+        /// 搜索所有可能join顺序,获得join树
+        /// </summary>
+        /// <param name="orderedJoinCondition">join条件链，由OrderJoinCondition生成</param>
+        /// <param name="joinPatterns">所有合法的join树结构</param>
+        private void SearchAllPossibleJoinOrder(List<AtomCondition> orderedJoinCondition, ref List<Relation> joinPatterns)
+        {
+            // 每个join结点依次作为join树的根结点
+            int nJoin = orderedJoinCondition.Count;
+            for (int rootPos = 0; rootPos < nJoin; rootPos++)
+            {
+                int createPos = rootPos;
+                
+                // 创建Join Relation结点
+                Relation root = new Relation();
+                root.Type = RelationalType.Join;
+                root.RelativeAttributes = new TableSchema();
+                root.RelativeAttributes.Fields.Add(orderedJoinCondition[rootPos].LeftOperand.Field.Clone() as Field);
+                root.RelativeAttributes.Fields.Add(orderedJoinCondition[rootPos].RightOperand.Field.Clone() as Field);
+                
+                Relation growPoint= null;
+
+                // 左结点
+                growPoint = root;
+                createPos = rootPos - 1;
+                while (createPos > 0) 
+                {
+                    Relation join = new Relation();
+                    join.Type = RelationalType.Join;
+                    join.RelativeAttributes = new TableSchema();
+                    join.RelativeAttributes.Fields.Add(orderedJoinCondition[createPos].LeftOperand.Field.Clone() as Field);
+                    join.RelativeAttributes.Fields.Add(orderedJoinCondition[createPos].RightOperand.Field.Clone() as Field);
+
+                    growPoint.LeftRelation = join;
+                    growPoint = join;
+                    createPos--;
+                }
+
+                // 右结点
+                growPoint = root;
+                createPos = rootPos + 1;
+                while(createPos < nJoin)
+                {
+                    Relation join = new Relation();
+                    join.Type = RelationalType.Join;
+                    join.RelativeAttributes = new TableSchema();
+                    join.RelativeAttributes.Fields.Add(orderedJoinCondition[createPos].LeftOperand.Field.Clone() as Field);
+                    join.RelativeAttributes.Fields.Add(orderedJoinCondition[createPos].RightOperand.Field.Clone() as Field);
+
+                    growPoint.RightRelation = join;
+                    growPoint = join;
+                    createPos++;
+                }
+
+                joinPatterns.Add(root.Clone() as Relation);
+            }
+        }
+
+
+        /// <summary>
+        /// 生成join条件链，以便枚举所有可能的join顺序
+        /// </summary>
+        /// <param name="joinElements"></param>
+        /// <param name="orderedJoinCondition"></param>
+        /// <returns>若jion条件形成环无法排序，则返回false，否则返回true</returns>
+        private bool OrderJoinCondition(TableSchemaList connectedTable, ref List<AtomCondition> orderedJoinCondition)
+        {
+
+            foreach (TableSchema ts in connectedTable)
+            {
+                foreach (AtomCondition atom in binaryPredictions)
+                {
+                    if (atom.RightOperand.Field.LogicTableName.Equals(ts.TableName))
+                    {
+                        atom.Reverse();
+                        ts.RelativeBinaryPredication.Add(atom.Clone() as AtomCondition);
+                    }
+                    else if (atom.LeftOperand.Field.LogicTableName.Equals(ts.TableName))
+                    {
+                        ts.RelativeBinaryPredication.Add(atom.Clone() as AtomCondition);
+                    }
+                }
+
+                int i = 0;
+            }
+            
+
+            // 查找链端点，即相关二元谓词数量为1的table
+
+            TableSchema headertable = null;
+            foreach (TableSchema ts in connectedTable)
+            {
+                if (ts.RelativeBinaryPredication.Count == 1)
+                {
+                    headertable = ts.Clone() as TableSchema;
+                    orderedJoinCondition.Add(ts.RelativeBinaryPredication[0].Clone() as AtomCondition);
+                    break;
+                }
+            }
+
+            TableSchema priorTable = headertable;
+            TableSchema curTable = connectedTable[headertable.RelativeBinaryPredication[0].RightOperand.Field.LogicTableName];
+            while (curTable.RelativeBinaryPredication.Count != 1)
+            {
+                Debug.Assert(curTable.RelativeBinaryPredication.Count == 2, "Error RelativeBinaryPredication Number");
+
+                // 判断第一个与curTable相关联的二元谓词是否与priorTable所拥有的谓词相同,若相同则将另外一个加入orderJoinCondition表，谓词本身注意顺序
+                // 使得前后属性所属的Table相连
+                AtomCondition atom;
+
+                int pos;
+                if (curTable.RelativeBinaryPredication[0].RightOperand.Field.LogicTableName.Equals(priorTable.TableName))
+                {
+                    atom = curTable.RelativeBinaryPredication[1].Clone() as AtomCondition;
+                    pos = 1;
+                }
+                else
+                {
+                    atom = curTable.RelativeBinaryPredication[0].Clone() as AtomCondition;
+                    pos = 0;
+                }
+                
+                // atom.Reverse();
+                orderedJoinCondition.Add(atom);
+
+                priorTable = curTable;
+                curTable = connectedTable[curTable.RelativeBinaryPredication[pos].RightOperand.Field.TableName];
+            }
+
+
+            return true;
+        }
 
 
         /// <summary>
@@ -234,18 +455,24 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         }
 
         /// <summary>
+        /// 生成对应一个逻辑表的查询树
+        /// 
+        /// 该查询树考虑了分片条件和查询语句中的投影、Where子句的互斥影响
+        /// 删除了不必要分片
+        /// 
         /// 对于非联通的Table，有效属性为：投影属性、相关一元谓词属性
         /// 若投影属性与一元谓词属性均为空，则投影主键
         /// 
         /// 对于联通的Table，有效属性为：join条件、投影属性、一元谓词
         /// 
-        /// 
         /// 计算全局有效属性，确定单独Relation是否有用
         /// - Selection，Projection，最后和join后的结果Cart
         /// </summary>
         /// <param name="table"></param>
+        /// <param name="isConnected"></param>
         /// <param name="tree"></param>
-        private void GenSingleRelationTree(TableSchema table, bool isConnected, ref Relation tree)
+        /// <returns></returns>
+        private bool GenSingleRelationTree(TableSchema table, bool isConnected, ref Relation tree)
         {
             // 没有分片构建的关系代数树，以Project为根结点，后跟若干Selection，最后一个Selection的isDirectTableSchema为table
             Relation projectNode = new Relation();
@@ -330,28 +557,30 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             if (selectField.Count == 0)
             {
                 projectNode.DirectTableSchema = table.Clone() as TableSchema;
-                return;
             }
-
-            /**
-             * 存在select谓词，构建Select节点
-             */
-            Relation active = projectNode;
-
-            // Selection
-            foreach (AtomCondition atom in predictions)
+            else
             {
-                Relation r = new Relation();
-                r.Type = RelationalType.Selection;
-                r.Predication = new Condition();
-                r.Predication.AtomCondition = atom.Clone() as AtomCondition;
-                r.ResultName = table.TableName.Clone() as string;
 
-                active.Children.Add(r);
-                active = r;
+                /**
+                 * 存在select谓词，构建Select节点
+                 */
+                Relation active = projectNode;
+
+                // Selection
+                foreach (AtomCondition atom in predictions)
+                {
+                    Relation r = new Relation();
+                    r.Type = RelationalType.Selection;
+                    r.Predication = new Condition();
+                    r.Predication.AtomCondition = atom.Clone() as AtomCondition;
+                    r.ResultName = table.TableName.Clone() as string;
+
+                    active.Children.Add(r);
+                    active = r;
+                }
+
+                active.DirectTableSchema = table.Clone() as TableSchema;
             }
-
-            active.DirectTableSchema = table.Clone() as TableSchema;
 
             System.Console.Write(projectNode.toString());
 
@@ -359,11 +588,15 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             // active下开始做Localization，做完后修改active.DirectTableSchema = null;
             Relation fragmentTree = new Relation();
             LocalizeTable(table.TableName, gdd, ref fragmentTree);
-            //System.Console.Write(fragmentTree.toString());
+            System.Console.Write("=================================================\n");
+            System.Console.Write(fragmentTree.toString());
 
-            AttachConditionToFragments(fragmentTree, projectNode, joinField, selectField);
             // 遍历FragmentTree，遇到分片节点就检查tree上的Project和Select与Fragment的相容性，并将可用节点复制到FragmentTree中
+            if (!AttachConditionToFragments(fragmentTree, projectNode, joinField, selectField, projectFields))
+                return false;
 
+            tree = fragmentTree;
+            return true;
         }
 
         /// <summary>
@@ -373,7 +606,8 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         /// <param name="centralConditionTree">不考虑分片形成的关系代数树</param>
         /// <param name="joinAttributes">与fragment的逻辑表相关二元谓词的属性</param>
         /// <param name="selectAttributes">与fragment的逻辑表相关的一元谓词的属性</param>
-        private bool AttachConditionToFragments(Relation fragmentTree, Relation centralConditionTreeRoot, FieldList joinAttributes, FieldList selectAttributes)
+        /// <param name="projectAttributes">与fragment的逻辑表相关的投影属性</param>
+        private bool AttachConditionToFragments(Relation fragmentTree, Relation centralConditionTreeRoot, FieldList joinAttributes, FieldList selectAttributes, FieldList projectAttributes)
         {
             ///////////////////////////////////////////////////
             //
@@ -384,7 +618,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 List<Relation> toBeDeleted = new List<Relation>();
                 foreach (Relation r in fragmentTree.Children)
                 {
-                    if (!AttachConditionToFragments(r, centralConditionTreeRoot, joinAttributes, selectAttributes))
+                    if (!AttachConditionToFragments(r, centralConditionTreeRoot, joinAttributes, selectAttributes, projectAttributes))
                         toBeDeleted.Add(r);
                 }
 
@@ -429,15 +663,15 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             // 本fragmentTree结点对应的分片对象
             Fragment fragment = gdd.Fragments.GetFragmentByName(fragmentTree.DirectTableSchema.TableName);
 
-            // 分片的必要属性（不知是否有用）
+            // 分片的必要属性（感觉有问题！！ 没有必要属性是否应该删除？）
             FieldList fragmentNecessaryAttributes = new FieldList();
             foreach (Field f in fragment.Schema.Fields)
             {
-                if ((joinAttributes[f] != null || selectAttributes[f] != null ) && fragmentNecessaryAttributes[f] == null)
+                if ((joinAttributes.FindLogic(f) != null || selectAttributes.FindLogic(f) != null || projectAttributes.FindLogic(f) != null) && fragmentNecessaryAttributes.FindLogic(f) == null)
                     fragmentNecessaryAttributes.Add(f);
             }
-
-            Debug.Assert(fragmentNecessaryAttributes.Count > 0);
+            if (fragmentNecessaryAttributes.Count == 0) // 有待考虑
+                return false;
 
             // 收集分片的所有分片条件
             Fragment traveller = fragment;
@@ -496,6 +730,11 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 }
 
                 growPoint = growPoint.LeftRelation;
+
+                if (centralTreeNode.Children.Count > 0)
+                    centralTreeNode = centralTreeNode.Children[0];
+                else
+                    break;
                 
             }
 
@@ -714,6 +953,14 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             // 根据分片构造关系代数树
             ReconstructFragment(fragments, ref root);
 
+
+            Debug.Assert(root.Children.Count == 1 || root.Children.Count == 0, "Error Root");
+            // 修建一下空的根结点
+            if (root.Children.Count == 1)
+                root = root.Children[0];
+
+            
+
             return 0;
         }
 
@@ -725,13 +972,16 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         private void ReconstructFragment(Fragment f, ref Relation root)
         {
             if (f.Children.Count == 0)
+            {
                 return;
-
+            }
             //parent.DirectTableSchema = null;
+
 
             // 水平划分，Union连接
             if (f.Children[0].Type == FragmentType.Horizontal)
             {
+                
                 Relation union = new Relation();
                 union.Type = RelationalType.Union;
                 root.LeftRelation = union;

@@ -19,5 +19,15 @@ namespace DistDBMS.Common.Table
 
             }            
         }
+
+        public Field FindLogic(Field key)
+        {
+            foreach (Field f in this)
+            {
+                if (key.LogicAttributeName.Equals(f.LogicAttributeName) && key.LogicTableName.Equals(f.LogicTableName))
+                    return f;
+            }
+            return null;
+        }
     }
 }

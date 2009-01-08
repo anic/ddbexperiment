@@ -338,6 +338,7 @@ namespace DistDBMS.ControlSite
         {
             //测试
             string[] tests = new string[]{
+                /*
             "select Course.name from Course, Teacher, Student where Course.teacher_id=Teacher.id and Student.id=0 and Course.credit_hour<20 and Course.teacher_id > 12 and Teacher.id>24",
             "select * from Student",
             "select Course.name from Course",
@@ -345,6 +346,7 @@ namespace DistDBMS.ControlSite
             "select course_id, mark from Exam",
             "select Course.name, Course.credit_hour, Teacher.name from Course, Teacher where Course.teacher_id=Teacher.id and Course.credit_hour>2 and Teacher.title=3",
             "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id",
+                 */
             "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'"
             };
 
@@ -362,7 +364,9 @@ namespace DistDBMS.ControlSite
 
                 SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
                 converter.SetQueryCalculus(s3);
-                Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
+                Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd, true);
+
+                System.Console.Write(relationalgebra.toString());
                 //QueryOptimizer optimizer = new QueryOptimizer(relationalgebra, gdd);
                 
                 

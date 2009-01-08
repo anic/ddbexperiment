@@ -137,14 +137,28 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
         {
             Relation r = new Relation();
             r.Type = this.Type;
-            r.DirectTableSchema = this.DirectTableSchema.Clone() as TableSchema;
-            r.LeftRelation = this.LeftRelation.Clone() as Relation;
-            r.RightRelation = this.RightRelation.Clone() as Relation;
-            r.ResultName = this.ResultName.Clone() as String;
-            r.RelativeAttributes = this.RelativeAttributes.Clone() as TableSchema;
-            r.Predication = this.Predication.Clone() as Condition;
+            
+            if (this.DirectTableSchema != null)
+                r.DirectTableSchema = this.DirectTableSchema.Clone() as TableSchema;
+            
+            /*
+            if (this.LeftRelation != null)
+                r.LeftRelation = this.LeftRelation.Clone() as Relation;
+            
+            if (this.RightRelation != null)
+                r.RightRelation = this.RightRelation.Clone() as Relation;
+            */
 
-            foreach (Relation child in r.Children)
+            if (this.ResultName != null)
+                r.ResultName = this.ResultName.Clone() as String;
+            
+            if (this.RelativeAttributes != null)
+                r.RelativeAttributes = this.RelativeAttributes.Clone() as TableSchema;
+            
+            if (this.Predication != null)
+                r.Predication = this.Predication.Clone() as Condition;
+
+            foreach (Relation child in Children)
                 r.Children.Add(child.Clone() as Relation);
 
             return r;            
@@ -160,6 +174,7 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
             this.RelativeAttributes = r.RelativeAttributes;
             this.Predication = r.Predication;
 
+            this.children = new List<Relation>();
             foreach (Relation child in r.Children)
                 this.Children.Add(child);            
         }
@@ -211,13 +226,19 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
                     str += "]\n";
                     break;
                 case RelationalType.Selection:
-                    str = str + TypeName + "[" + this.Predication.ToString() + "]" + "\n";
+                    str = str + Type + "[" + this.Predication.ToString() + "]" + "\n";
+                    break;
+                case RelationalType.Union:
+                    str = str + Type + "\n";
+                    break;
+                case RelationalType.Join:
+                    str = str + Type + "\n";
                     break;
             }
             
 
-            if (IsDirectTableSchema)
-                return str;
+            //if (IsDirectTableSchema)
+            //    return str;
 
             foreach (Relation child in Children)
             {
