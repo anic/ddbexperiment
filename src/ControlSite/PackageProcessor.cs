@@ -12,12 +12,13 @@ using DistDBMS.ControlSite.RelationalAlgebraUtility;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.RelationalAlgebra;
 using DistDBMS.Common.Table;
+using DistDBMS.Common;
 
 namespace DistDBMS.ControlSite
 {
     class PackageProcessor
     {
-        int DEFALUT_TIMEOUT_MINISEC = 30000;
+        int DEFALUT_TIMEOUT_MINISEC = 600000;
 
         GlobalDirectory gdd;
         string name;
@@ -177,16 +178,16 @@ namespace DistDBMS.ControlSite
 
                                 SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
                                 converter.SetQueryCalculus(s3);
-                                Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd);
+                                Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd, true);
 
                                 //TODO 这里作为测试，临时修改，填写ResultName
-                                TempModifier tempModifier = new TempModifier(gdd);
-                                tempModifier.Modify(relationalgebra);
+                                //TempModifier tempModifier = new TempModifier(gdd);
+                                //tempModifier.Modify(relationalgebra);
 
 
                                 //测试代码
                                 string output = (new RelationDebugger()).GetDebugString(relationalgebra);
-                                System.Diagnostics.Debug.WriteLine(output);
+                                Common.Debug.WriteLine(output);
 
                                 QueryPlanCreator creator = new QueryPlanCreator(gdd);
                                 ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, 0);

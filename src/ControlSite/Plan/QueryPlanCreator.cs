@@ -116,7 +116,15 @@ namespace DistDBMS.ControlSite.Plan
                         //记录Id与Plan的对应关系
                         id2PlanTable[gPlan.Steps[i].Operation.ResultID] = currentPlan;
 
+                        
                         leftBottom.InLocalSite = true;
+                        //将所有的父亲标记为InLocalSite
+                        ExecutionRelation parent = leftBottom.Parent;
+                        while (parent != null)
+                        {
+                            parent.InLocalSite = true;
+                            parent = parent.Parent;
+                        }
 
                     }
                 }

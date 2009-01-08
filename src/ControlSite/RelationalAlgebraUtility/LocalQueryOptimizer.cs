@@ -69,7 +69,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
             AnalyseRelationJoin(ref connectRelations, ref singleRelations); 
 
-            
+            /*
             System.Console.WriteLine("");
             System.Console.WriteLine("************************************");
             System.Console.WriteLine("-------Connected Relation----");
@@ -88,7 +88,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             {
                 System.Console.Write(ts.Tag + "_" + ts.TableName + " ");
             }
-            
+            */
 
             // 对于非联通的Table，有效属性为：投影属性、一元谓词属性
             List<Relation> singleTrees = new List<Relation>();
@@ -99,7 +99,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
                 foreach (Relation r in singleTrees)
                 {
-                    System.Console.Write(r.toString());
+                    // System.Console.Write(r.toString());
                 }
             }
 
@@ -113,7 +113,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
                 foreach (Relation r in connectedTrees)
                 {
-                    System.Console.Write(r.toString());
+                    // System.Console.Write(r.toString());
                 }
             }
 
@@ -126,6 +126,21 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             else
                 tree = singleTrees[0];
 
+            ReduceEmptySelection(tree);
+
+        }
+
+        private void ReduceEmptySelection(Relation relation)
+        {
+            if (relation.Children.Count == 1 && relation.Type == RelationalType.Selection && relation.Predication.IsEmpty)
+            {
+                Debug.Assert(relation.Children.Count == 1, "Error structure in Selection");
+
+                relation.Copy(relation.Children[0]);
+            }
+
+            foreach (Relation r in relation.Children)
+                ReduceEmptySelection(r);
         }
 
         /// <summary>
@@ -582,14 +597,14 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 active.DirectTableSchema = table.Clone() as TableSchema;
             }
 
-            System.Console.Write(projectNode.toString());
+            // System.Console.Write(projectNode.toString());
 
             ////////////////////////////////////////////////////////////////////////////////
             // active下开始做Localization，做完后修改active.DirectTableSchema = null;
             Relation fragmentTree = new Relation();
             LocalizeTable(table.TableName, gdd, ref fragmentTree);
             System.Console.Write("=================================================\n");
-            System.Console.Write(fragmentTree.toString());
+            // System.Console.Write(fragmentTree.toString());
 
             // 遍历FragmentTree，遇到分片节点就检查tree上的Project和Select与Fragment的相容性，并将可用节点复制到FragmentTree中
             if (!AttachConditionToFragments(fragmentTree, projectNode, joinField, selectField, projectFields))
