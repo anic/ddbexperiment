@@ -160,8 +160,12 @@ namespace DistDBMS.Common.RelationalAlgebra.Entity
                 r.Predication = this.Predication.Clone() as Condition;
 
             foreach (Relation child in Children)
-                r.Children.Add(child.Clone() as Relation);
-
+            {
+                if (child == null)
+                    r.Children.Add(null);
+                else
+                    r.Children.Add(child.Clone() as Relation);
+            }
             return r;            
         }
 
