@@ -476,7 +476,7 @@ namespace DistDBMS.Common.Syntax
                                     return false;
                                 }
 
-                                return false;
+                                return true;
                         }
                         break;
                     case LogicOperator.LessOrEqual:
@@ -620,7 +620,7 @@ namespace DistDBMS.Common.Syntax
                                     return true;
                             case LogicOperator.NotEqual:
                                 if (value1 == value2)
-                                    return false;
+                                    return true;
 
                                 result.Add(Clone() as AtomCondition);
                                 return false;
