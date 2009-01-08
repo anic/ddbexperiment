@@ -56,7 +56,7 @@ namespace DistDBMS.ControlSite
 
         public void PackageProcess(ControlSiteServerConnection conn, ServerClientPacket packet)
         {
-            //try
+            try
             {
                 Debug.WriteLine("-------------0");
 
@@ -238,6 +238,8 @@ namespace DistDBMS.ControlSite
                                 TempModifier tempModifier = new TempModifier(gdd);
                                 tempModifier.Modify(relationalgebra);
 
+                                
+
                                 Debug.WriteLine("-------------E");
 
                                 //测试代码
@@ -245,22 +247,27 @@ namespace DistDBMS.ControlSite
                                 Common.Debug.WriteLine(output);
 
                                 QueryPlanCreator creator = new QueryPlanCreator(gdd);
-                                ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, 0);
 
+                                int id = 0;
+                                ExecutionRelation exR = new ExecutionRelation(relationalgebra, ref id, -1);
+                                tempModifier.CheckLastSchema(exR, s3.Fields);
+                                
+                                ExecutionRelation root = (exR.Parent == null) ? exR : exR.Parent;
+                                ExecutionPlan gPlan = creator.CreateGlobalPlan(root, 0);
 
-                                ExecutionRelation exR = creator.LastResult;
-                                output = (new RelationDebugger()).GetDebugString(exR);
+                                output = (new RelationDebugger()).GetDebugString(root);
                                 DistDBMS.Common.Debug.WriteLine(output);
-
-                                result.OptimizedQueryTree = exR;
+                                result.OptimizedQueryTree = root;
 
                                 Debug.WriteLine("-------------F");
 
                                 List<ExecutionPlan> plans = creator.SplitPlan(gPlan);
-                                creator.FillSite(exR, plans);
+                                creator.FillSite(root, plans);
 
                                 foreach (ExecutionPlan p in plans)
                                 {
+                                    Common.Debug.WriteLine(p.ToString());
+
                                     ExecutionPackage package = new ExecutionPackage();
                                     package.ID = 0;
                                     package.Object = p;
@@ -431,20 +438,20 @@ namespace DistDBMS.ControlSite
                     }
                 }
             }
-            //catch(Exception e){
-            //    ExecutionResult result = new ExecutionResult();
-            //    if (e is LocalSiteFailException)
-            //    {
-            //        if ((e as LocalSiteFailException).type == LocalSiteFailException.ExceptionType.ConnectionFail)
-            //            result.Description = "Site " + (e as LocalSiteFailException).site + " failed.";
-            //        else
-            //            result.Description = "Site " + (e as LocalSiteFailException).site + " wait timeout.\r\n";
-            //    }
-            //    else
-            //        result.Description = e.Message;
-            //    conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
-            //    Common.Debug.WriteLine(result.Description);
-            //}
+            catch(Exception e){
+                ExecutionResult result = new ExecutionResult();
+                if (e is LocalSiteFailException)
+                {
+                    if ((e as LocalSiteFailException).type == LocalSiteFailException.ExceptionType.ConnectionFail)
+                        result.Description = "Site " + (e as LocalSiteFailException).site + " failed.";
+                    else
+                        result.Description = "Site " + (e as LocalSiteFailException).site + " wait timeout.\r\n";
+                }
+                else
+                    result.Description = e.Message;
+                conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
+                Common.Debug.WriteLine(result.Description);
+            }
 
 
         }

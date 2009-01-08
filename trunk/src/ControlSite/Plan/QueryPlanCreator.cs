@@ -20,20 +20,16 @@ namespace DistDBMS.ControlSite.Plan
             this.gdd = gdd;
         }
 
-        public ExecutionRelation LastResult {
-            get { return exR; }
-        }
-
         /// <summary>
         /// 生成全局的Plan
         /// </summary>
         /// <param name="root"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ExecutionPlan CreateGlobalPlan(Relation root,int id)
+        public ExecutionPlan CreateGlobalPlan(ExecutionRelation exR,int id)
         {
-            exR = new ExecutionRelation(root, ref id, -1);
-
+            
+            
 
             
             ////////////////生成执行计划//////////////////////////

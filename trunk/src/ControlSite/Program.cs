@@ -259,7 +259,9 @@ namespace DistDBMS.ControlSite
             }
 
             QueryPlanCreator creator = new QueryPlanCreator(gdd);
-            ExecutionPlan plan = creator.CreateGlobalPlan(r, 0);
+            int id = 0;
+            ExecutionRelation root = new ExecutionRelation(r,ref id,-1);
+            ExecutionPlan plan = creator.CreateGlobalPlan(root, 0);
             DistDBMS.Common.Debug.WriteLine("\n\n\n*****\n" + plan.ToString() + "\n*****\n");
             plans = creator.SplitPlan(plan);
 

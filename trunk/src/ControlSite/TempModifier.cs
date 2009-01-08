@@ -4,6 +4,7 @@ using System.Text;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Table;
 using DistDBMS.Common.Dictionary;
+using DistDBMS.Common.Execution;
 
 namespace DistDBMS.ControlSite
 {
@@ -25,6 +26,20 @@ namespace DistDBMS.ControlSite
             //ModifyUnion(r);
             //ModifyJoin(r);
             ModifyProjection(r);
+        }
+
+        public void CheckLastSchema(ExecutionRelation exR,TableSchema schema)
+        {
+            if (exR.ResultSchema.Fields.Count > schema.Fields.Count)
+            {
+                ExecutionRelation project = new ExecutionRelation(exR);
+                project.Type = RelationalType.Projection;
+                project.RelativeAttributes = schema.Clone() as TableSchema;
+                //先定义一个很大的数
+                project.ResultID = 100;
+                
+                
+            }
         }
 
         private void ModifyProjection(Relation r)
