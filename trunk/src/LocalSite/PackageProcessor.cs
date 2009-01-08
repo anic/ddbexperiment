@@ -94,7 +94,7 @@ namespace DistDBMS.LocalSite
                         exPackage.Object = t;
                         for (int i = 0; i < size; ++i)
                             t.Tuples.Add(Tuple.FromLineString(packet.ReadString()));
-
+                        Common.Debug.WriteLine("---------------Received tuple:" + size);
                     }
 
                     DistDBMS.Common.Debug.WriteLine(name + " package ID:" + ((packet as P2PTextObjectPacket).Object as ExecutionPackage).ID);
@@ -156,7 +156,7 @@ namespace DistDBMS.LocalSite
                             (newPackage.Object as Table).Schema = table.Schema;
                             
                             //TODO:应该检查是否在本站点
-                            buffer.Add(newPackage);//相当于异步发送
+                            
                             if (step.TransferSite != null && step.TransferSite.Name != this.name)
                             {
                                 P2PTextObjectPacket packet = conn.EncapsulateP2PStepTextObjectPacket(newPackage.ID,
@@ -164,10 +164,12 @@ namespace DistDBMS.LocalSite
                                     newPackage);
 
                                 packet.EnsureSize(10*1024*1024);
+                                StringBuilder sb = new StringBuilder(10 * 1024);
                                 packet.WriteInt(table.Tuples.Count); //先写数据大小
                                 foreach (Tuple t in table.Tuples)
-                                    packet.WriteString(t.GenerateLineString());
-
+                                    packet.WriteString(t.GenerateLineString(sb));
+                                
+                                Common.Debug.WriteLine("---------------Write tuple:" + table.Tuples.Count);
                                 conn.SendP2PStepTextObjectPacket(step.TransferSite.Name, packet);
 ;                                
                             }
@@ -175,19 +177,22 @@ namespace DistDBMS.LocalSite
                             {
                                 System.Diagnostics.Debug.WriteLine(name + " finish the plan");
                                 DistDBMS.Common.Debug.WriteLine(name + " finish the plan");
-                                //newPackage.Object = table;
-                                //conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, newPackage);
+
                                 ServerClientPacket packet = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, newPackage);
-                                
+                                Common.Debug.WriteLine("---------------Write tuple:" + table.Tuples.Count);
                                 packet.EnsureSize(10 * 1024 * 1024);
+                                StringBuilder sb = new StringBuilder(10 * 1024);
                                 packet.WriteInt(table.Tuples.Count); //先写数据大小
                                 foreach (Tuple t in table.Tuples)
-                                    packet.WriteString(t.GenerateLineString());
+                                    packet.WriteString(t.GenerateLineString(sb));
 
                                 conn.SendPacket(packet);
                             }
                             else
+                            {
+                                newPackage.Object = table;
                                 buffer.Add(newPackage);
+                            }
 
                         }
                         else

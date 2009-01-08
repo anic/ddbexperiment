@@ -57,18 +57,31 @@ namespace DistDBMS.LocalSite.Processor
             using (DataAccess.DataAccessor accessor = new DistDBMS.LocalSite.DataAccess.DataAccessor(dbname))
             {
 
-                string sql = GenerateQueryString(true);
-                System.Diagnostics.Debug.WriteLine(sql);
+                
+                
+                Table result = null;
+                if (localSources.Count > 0)
+                {
+                    string sql = GenerateQueryString(true);
+                    System.Diagnostics.Debug.WriteLine(sql);
+                    target.ReplaceTableName(localSources[0].TableName);
+                    result = accessor.Query(sql, target);
+                    if (result == null)
+                        throw new Exception("sql:" + sql + " error.Info" + accessor.LastException.Message);
+                }
+                else
+                { 
+                    //也可能对
+                    result = new Table();
+                    result.Schema = target;
+                }
+                
+                
 
-                target.ReplaceTableName(localSources[0].TableName);
-                Table result = accessor.Query(sql, target);
-                if (result == null)
-                    throw new Exception("sql:" + sql + " error.Info" + accessor.LastException.Message);
-
-                string union = "Union " + localSources[0].TableName;
-                foreach (TableSchema schema in tempSources)
-                    union += " ," + schema.TableName;
-                System.Diagnostics.Debug.WriteLine(union);
+                //string union = "Union " + localSources[0].TableName;
+                //foreach (TableSchema schema in tempSources)
+                //    union += " ," + schema.TableName;
+                //System.Diagnostics.Debug.WriteLine(union);
 
                 //然后将外部的表和这个表在内存中合起来
 
@@ -93,13 +106,18 @@ namespace DistDBMS.LocalSite.Processor
                 foreach (TableSchema t in tempSources)
                 {
                     System.Diagnostics.Debug.WriteLine("create table " + t.ToString());
-                    bool r = accessor.CreateTable(t, false, false);
+                    bool r = accessor.CreateTable(t, true, false);
                     if (r)
                     {
                         //填入临时数据
                         Table tmpTable = buffer.GetPackageById((int)source2Id[t.TableName]).Object as Table;
                         tmpTable.Schema = t;
                         int nResult = accessor.InsertValues(tmpTable);
+                    }
+                    else
+                    {
+                        accessor.DropTable(t.TableName);
+                        throw new Exception("Table Exist, Try again!");
                     }
                 }
 
@@ -108,9 +126,7 @@ namespace DistDBMS.LocalSite.Processor
                 string sql = GenerateQueryString(false);
                 System.Diagnostics.Debug.WriteLine(sql);
                 Table result = accessor.Query(sql, target);
-                if (result == null)
-                    throw new Exception("sql:" + sql + " execute error. Info: " + accessor.LastException.Message);
-       
+                
                 //删除临时表格
                 foreach (TableSchema t in tempSources)
                 {
@@ -118,6 +134,10 @@ namespace DistDBMS.LocalSite.Processor
                     System.Diagnostics.Debug.WriteLine("drop table " + t.ToString());
                 }
 
+                //删除了临时表后才抛出异常
+                if (result == null)
+                    throw new Exception("sql:" + sql + " execute error. Info: " + accessor.LastException.Message);
+       
                 return result;
             }
         }
@@ -217,6 +237,8 @@ namespace DistDBMS.LocalSite.Processor
                         else
                         {
                             //throw new Exception();
+                            if (found > 0) //随便填写一个，可能相同
+                                field.TableName = tablename;
                             //Common.Debug.Assert(false, "ReplaceField 没有找到对应的表");
                         }
                     }          

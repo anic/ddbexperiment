@@ -18,7 +18,7 @@ namespace DistDBMS.ControlSite
 {
     class PackageProcessor
     {
-        int DEFALUT_TIMEOUT_MINISEC = 10000;
+        int DEFALUT_TIMEOUT_MINISEC = 20000;
 
         GlobalDirectory gdd;
         string name;
@@ -55,7 +55,7 @@ namespace DistDBMS.ControlSite
 
         public void PackageProcess(ControlSiteServerConnection conn, ServerClientPacket packet)
         {
-            try
+            //try
             {
                 Debug.WriteLine("-------------0");
 
@@ -245,19 +245,6 @@ namespace DistDBMS.ControlSite
                                         if ((returnPackage as ServerClientTextObjectPacket).Object is ExecutionPackage)
                                         {
                                             lastPackage = returnPackage;
-
-                                        //    ExecutionPackage resultPackage = (returnPackage as ServerClientTextObjectPacket).Object
-                                        //        as ExecutionPackage;
-
-                                        //    //读取结果
-                                        //    if (resultPackage.Type == ExecutionPackage.PackageType.Data)
-                                        //    {
-                                        //        //result.Data = resultPackage.Object as Table;
-                                        //        //result.Description = "Command executed successfully.";
-                                        //        //result.Description += "\r\n" + result.Data.Tuples.Count + " tuples selected";
-                                        //        //result.RawQueryTree = relationalgebra;
-                                        //        //result.Description += "\r\n";
-                                        //    }
                                         }
                                     }
                                 }
@@ -391,20 +378,20 @@ namespace DistDBMS.ControlSite
                     }
                 }
             }
-            catch(Exception e){
-                ExecutionResult result = new ExecutionResult();
-                if (e is LocalSiteFailException)
-                {
-                    if ((e as LocalSiteFailException).type == LocalSiteFailException.ExceptionType.ConnectionFail)
-                        result.Description = "Site " + (e as LocalSiteFailException).site + " failed.";
-                    else
-                        result.Description = "Site " + (e as LocalSiteFailException).site + " wait timeout.\r\n";
-                }
-                else
-                    result.Description = e.Message;
-                conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
-                Common.Debug.WriteLine(result.Description);
-            }
+            //catch(Exception e){
+            //    ExecutionResult result = new ExecutionResult();
+            //    if (e is LocalSiteFailException)
+            //    {
+            //        if ((e as LocalSiteFailException).type == LocalSiteFailException.ExceptionType.ConnectionFail)
+            //            result.Description = "Site " + (e as LocalSiteFailException).site + " failed.";
+            //        else
+            //            result.Description = "Site " + (e as LocalSiteFailException).site + " wait timeout.\r\n";
+            //    }
+            //    else
+            //        result.Description = e.Message;
+            //    conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
+            //    Common.Debug.WriteLine(result.Description);
+            //}
 
             
         }

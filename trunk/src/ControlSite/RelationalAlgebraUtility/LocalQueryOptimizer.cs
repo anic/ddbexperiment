@@ -130,6 +130,16 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="relation"></param>
+        private void SynchronizeName(Relation relation)
+        {
+
+        }
+
+
         private void ReduceEmptySelection(Relation relation)
         {
             if (relation.Children.Count == 1 && relation.Type == RelationalType.Selection && relation.Predication.IsEmpty)
@@ -651,10 +661,23 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 // 至少剩余一个子节点
                 switch (fragmentTree.Type)
                 {
-                    case RelationalType.Union:                      
-                        //还剩至少一个分片结点,当前结点不用删除
-                        foreach (Relation r in toBeDeleted)    
-                            fragmentTree.Children.Remove(r);
+                    case RelationalType.Union:
+                        if (fragmentTree.Children.Count - toBeDeleted.Count == 1) // Union剩下一个孩子结点，孩子结点上移并更新孩子结点名称为Union的Resultname
+                        {
+                            string resultName = fragmentTree.ResultName;
+
+                            foreach (Relation r in toBeDeleted)
+                                fragmentTree.Children.Remove(r);
+
+                            fragmentTree.Copy(fragmentTree.Children[0]);
+                            fragmentTree.DirectTableSchema.ReplaceTableName(resultName);
+                        }
+                        else
+                        {
+                            // 还剩至少2个分片结点,当前结点不用删除
+                            foreach (Relation r in toBeDeleted)
+                                fragmentTree.Children.Remove(r);
+                        }                        
                         break;
                     case RelationalType.Join:
                         //join的一个子结点将被删除，则剩余结点代替join结点
@@ -839,7 +862,10 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                     connectRelationCollections[leftTable.Tag].AddRange(connectRelationCollections[rightTag]);
 
                     foreach (TableSchema t in connectRelationCollections[rightTag])
+                    {
                         t.Tag = leftTable.Tag;
+                        tables[t.TableName].Tag = leftTable.Tag;
+                    }
 
                     connectRelationCollections[rightTag].Clear();
                 }
@@ -999,6 +1025,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 
                 Relation union = new Relation();
                 union.Type = RelationalType.Union;
+                union.ResultName = f.Name;
                 root.LeftRelation = union;
 
                 foreach (Fragment subf in f.Children)
@@ -1033,6 +1060,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                     {
                         Relation join = new Relation();
                         join.Type = RelationalType.Join;
+                        join.ResultName = f.Name;
                         join.LeftRelation = activeRelation;
                         join.RightRelation = selection;
 

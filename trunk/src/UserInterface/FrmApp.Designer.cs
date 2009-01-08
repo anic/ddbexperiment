@@ -60,8 +60,8 @@ namespace DistDBMS.UserInterface
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.tsExesqlProgress = new System.Windows.Forms.ToolStripProgressBar();
             this.tsCancelButton = new System.Windows.Forms.ToolStripSplitButton();
+            this.tsExesqlProgress = new System.Windows.Forms.ToolStripProgressBar();
             this.tsInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.uscExecuteQuery = new DistDBMS.UserInterface.Controls.UscExecuteQuery();
             this.uscSiteViewer = new DistDBMS.UserInterface.Controls.UscSiteViewer();
@@ -94,7 +94,7 @@ namespace DistDBMS.UserInterface
             treeNode1,
             treeNode5});
             this.tvwMenu.SelectedImageIndex = 0;
-            this.tvwMenu.Size = new System.Drawing.Size(183, 392);
+            this.tvwMenu.Size = new System.Drawing.Size(183, 415);
             this.tvwMenu.TabIndex = 2;
             // 
             // imageList
@@ -107,7 +107,7 @@ namespace DistDBMS.UserInterface
             // 
             this.splitter1.Location = new System.Drawing.Point(203, 25);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 412);
+            this.splitter1.Size = new System.Drawing.Size(3, 435);
             this.splitter1.TabIndex = 4;
             this.splitter1.TabStop = false;
             // 
@@ -118,7 +118,7 @@ namespace DistDBMS.UserInterface
             this.pnlControl.Location = new System.Drawing.Point(0, 25);
             this.pnlControl.Name = "pnlControl";
             this.pnlControl.Padding = new System.Windows.Forms.Padding(10);
-            this.pnlControl.Size = new System.Drawing.Size(203, 412);
+            this.pnlControl.Size = new System.Drawing.Size(203, 435);
             this.pnlControl.TabIndex = 5;
             // 
             // mainMenu
@@ -245,16 +245,11 @@ namespace DistDBMS.UserInterface
             this.tsExesqlProgress,
             this.tsInfo});
             this.statusStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
-            this.statusStrip1.Location = new System.Drawing.Point(0, 437);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 460);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.statusStrip1.Size = new System.Drawing.Size(697, 23);
+            this.statusStrip1.Size = new System.Drawing.Size(697, 0);
             this.statusStrip1.TabIndex = 11;
-            // 
-            // tsExesqlProgress
-            // 
-            this.tsExesqlProgress.Name = "tsExesqlProgress";
-            this.tsExesqlProgress.Size = new System.Drawing.Size(200, 17);
             // 
             // tsCancelButton
             // 
@@ -265,13 +260,21 @@ namespace DistDBMS.UserInterface
             this.tsCancelButton.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.tsCancelButton.Size = new System.Drawing.Size(48, 21);
             this.tsCancelButton.Text = "取消";
+            this.tsCancelButton.Visible = false;
             this.tsCancelButton.ButtonClick += new System.EventHandler(this.tsCancelButton_ButtonClick);
+            // 
+            // tsExesqlProgress
+            // 
+            this.tsExesqlProgress.Name = "tsExesqlProgress";
+            this.tsExesqlProgress.Size = new System.Drawing.Size(200, 17);
+            this.tsExesqlProgress.Visible = false;
             // 
             // tsInfo
             // 
             this.tsInfo.Name = "tsInfo";
-            this.tsInfo.Size = new System.Drawing.Size(103, 18);
+            this.tsInfo.Size = new System.Drawing.Size(103, 17);
             this.tsInfo.Text = "正在执行SQL语句";
+            this.tsInfo.Visible = false;
             // 
             // uscExecuteQuery
             // 
@@ -282,7 +285,7 @@ namespace DistDBMS.UserInterface
             this.uscExecuteQuery.Name = "uscExecuteQuery";
             this.uscExecuteQuery.Padding = new System.Windows.Forms.Padding(10);
             this.uscExecuteQuery.ShowTip = true;
-            this.uscExecuteQuery.Size = new System.Drawing.Size(491, 157);
+            this.uscExecuteQuery.Size = new System.Drawing.Size(491, 180);
             this.uscExecuteQuery.SQLText = "";
             this.uscExecuteQuery.SqlTextReadOnly = false;
             this.uscExecuteQuery.Tab = DistDBMS.UserInterface.Controls.UscExecuteQuery.ResultTab.Console;

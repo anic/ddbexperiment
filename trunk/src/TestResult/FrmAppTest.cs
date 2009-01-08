@@ -134,13 +134,14 @@ namespace DistDBMS.TestResult
         {
             string sql = testsqls[i];
             Table expected;
+            ExecutionResult actual;
             using (DataAccessor da = new DataAccessor(TestDbCreator.FILE_DB_TESTER))
             {
                 expected = da.Query(sql);
             }
-            ExecutionResult actual;
+            
             actual = target.ExecuteSQL(sql);
-            Assert.AreEqual(actual.Data.Tuples.Count, expected.Tuples.Count, "fail in " + sql);
+            Assert.AreEqual(expected.Tuples.Count, actual.Data.Tuples.Count, "fail in " + sql);
         
         }
 
