@@ -15,6 +15,7 @@ using DistDBMS.UserInterface.Handler;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Network;
 using DistDBMS.Common.Execution;
+using System.Threading;
 
 namespace DistDBMS.UserInterface
 {
@@ -64,15 +65,27 @@ namespace DistDBMS.UserInterface
             controlSiteClient.SendServerClientTextObjectPacket(Common.NetworkCommand.EXESQL, sql);
 
             NetworkPacket resultPacket = controlSiteClient.Packets.WaitAndRead();
-            if (resultPacket is ServerClientTextObjectPacket
+            if (resultPacket!=null && resultPacket is ServerClientTextObjectPacket
                 && (resultPacket as ServerClientTextObjectPacket).Object is ExecutionResult)
             {
-                return (resultPacket as ServerClientTextObjectPacket).Object as ExecutionResult;
+                ExecutionResult result = (resultPacket as ServerClientTextObjectPacket).Object as ExecutionResult;
+                if ((resultPacket as ServerClientTextObjectPacket).Text == Common.NetworkCommand.RESULT_OK
+                    && result.Type == ExecutionResult.ResultType.Data)
+                { 
+                    //恢复数据
+                    int size = resultPacket.ReadInt();
+                    result.Data = new Table(size);
+                    for (int i = 0; i < size; ++i)
+                        result.Data.Tuples.Add(Tuple.FromLineString(resultPacket.ReadString()));
+
+                    result.Data.Schema = result.OptimizedQueryTree.ResultSchema.Clone() as TableSchema;
+                }
+                return result;
             }
             return null;
         }
 
-        void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
+        void ExecuteSQLWithOutput()
         {
             try
             {
@@ -84,7 +97,8 @@ namespace DistDBMS.UserInterface
 
                 uscExecuteQuery.AddCommandResult(exResult.Description);
                 uscExecuteQuery.SetResultTable(exResult.Data);
-                uscExecuteQuery.SetQueryTree(exResult.RawQueryTree);
+                uscExecuteQuery.SetOptQueryTree(exResult.OptimizedQueryTree);
+                uscExecuteQuery.SetRawQueryTree(exResult.RawQueryTree);
             }
             catch (Exception ex)
             {
@@ -93,6 +107,13 @@ namespace DistDBMS.UserInterface
                 writer.WriteLog(uscExecuteQuery.SQLText + "\r\n" + ex.StackTrace);
                 MessageBox.Show("执行出现异常，并已经记录到error.log中", "出错", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            FinishProgress();
+        }
+
+        void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
+        {
+            ExecuteSQLWithOutput();
+            //StartThread();
         }
 
         public void RunDefaultWizzard()
@@ -122,37 +143,6 @@ namespace DistDBMS.UserInterface
                 uscExecuteQuery.SetGlobalDirectory(frmInit.GDD);
                 switcher.SetGlobalDirectory(frmInit.GDD);
             }
-
-
-            //测试执行sql
-
-            //uscExecuteQuery.SQLText = "select * from Student";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-            //uscExecuteQuery.SQLText = "select Course.name from Course";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-            //uscExecuteQuery.SQLText = "select * from Course where credit_hour>2 and location='CB‐6'";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-            //uscExecuteQuery.SQLText = "select course_id, mark from Exam";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-            //uscExecuteQuery.SQLText = "select Course.name, Course.credit_hour, Teacher.name from Course, Teacher where Course.teacher_id=Teacher.id and Course.credit_hour>2 and Teacher.title=3";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-
-            //uscExecuteQuery.SQLText = "select Student.name, Exam.mark from Student, Exam where Student.id=Exam.student_id";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-
-            //uscExecuteQuery.SQLText = "select Student.id, Student.name, Exam.mark, Course.name from Student, Exam, Course where Student.id=Exam.student_id and Exam.course_id=Course.id and Student.age>26 and Course.location<>'CB‐6'";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-            //uscExecuteQuery.SQLText = "select Student.name, Teacher.name from Student, Teacher,Course where Student.id = Teacher.id and Course.teacher_id = Teacher.id";
-            //uscExecuteQuery_OnExecuteSQL(this, EventArgs.Empty);
-
-
             uscExecuteQuery.EnableTip = true;
 
         }
@@ -192,6 +182,59 @@ namespace DistDBMS.UserInterface
         private void tsExit_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            if (tExecute != null && tExecute.IsAlive)
+            {
+                this.tsExesqlProgress.Value = (this.tsExesqlProgress.Value + this.tsExesqlProgress.Maximum / 10) % this.tsExesqlProgress.Maximum;
+            }
+            else
+                timer.Stop();
+        }
+
+        private void MultiThreadsRunSQL()
+        {
+            ExecutionResult exResult = ExecuteSQL(uscExecuteQuery.SQLText);
+        }
+
+        Thread tExecute;
+        private void StartThread()
+        {
+            tExecute = new Thread(new ThreadStart(ExecuteSQLWithOutput));
+            tExecute.Start();
+            ShowProgress();
+        }
+
+        private void FinishProgress()
+        {
+            timer.Stop();
+            this.tsCancelButton.Visible = false;
+            this.tsExesqlProgress.Visible = false;
+            this.tsExesqlProgress.Value = 0;
+            this.tsInfo.Visible = false;
+        }
+
+        private void ShowProgress()
+        {
+            this.tsCancelButton.Visible = true;
+            this.tsExesqlProgress.Visible = true;
+            this.tsInfo.Visible = true;
+            timer.Start();
+        }
+
+        private void tsCancelButton_ButtonClick(object sender, EventArgs e)
+        {
+            if (tExecute != null && tExecute.IsAlive)
+            {
+                try
+                {
+                    tExecute.Abort();
+                }
+                catch { }
+            }
+            FinishProgress();
         }
 
 

@@ -190,12 +190,28 @@ namespace DistDBMS.Network
             SendPacket(packet);
         }
 
-        public void SendServerClientTextObjectPacket(string text, object obj)
+        public ServerClientTextObjectPacket EncapsulateServerClientTextObjectPacket(string text, object obj)
         {
             ServerClientTextObjectPacket packet = new ServerClientTextObjectPacket();
             packet.Text = text;
             packet.Object = obj;
             packet.Encapsulate();
+            return packet;
+        }
+
+        public ServerClientTextObjectPacket EncapsulateServerClientTextObjectPacket(string text, object obj,int size)
+        {
+            ServerClientTextObjectPacket packet = new ServerClientTextObjectPacket();
+            packet.EnsureSize(size);
+            packet.Text = text;
+            packet.Object = obj;
+            packet.Encapsulate();
+            return packet;
+        }
+
+        public void SendServerClientTextObjectPacket(string text, object obj)
+        {
+            ServerClientTextObjectPacket packet = EncapsulateServerClientTextObjectPacket(text, obj);
             SendPacket(packet);
         }
 
