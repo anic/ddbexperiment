@@ -148,6 +148,17 @@ namespace DistDBMS.Common.Execution
         {
             ResultID = 0;
             InLocalSite = false;
+            ExecutionSite = null;
+        }
+
+        public ExecutionRelation(ExecutionRelation child)
+        {
+            child.parent = this;
+            this.Children.Add(child);
+
+            ResultID = 0;
+            InLocalSite = false;
+            ExecutionSite = null;
         }
 
         public ExecutionRelation(Relation r,ref int initID,int createLevel)
@@ -231,6 +242,8 @@ namespace DistDBMS.Common.Execution
         {
             return base.ToString();
         }
+
+        
 
 
         internal class RelationPair
