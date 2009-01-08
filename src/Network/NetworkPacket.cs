@@ -35,6 +35,7 @@ namespace DistDBMS.Network
             size = HeaderSize;
             if (!WriteByte(Tag))
                 return false;
+
             return true;
         }
 
@@ -195,14 +196,26 @@ namespace DistDBMS.Network
 
         public object ReadObject()
         {
+            long timeStart = DateTime.Now.Ticks;
+
             int len = ReadInt();
             if (pos + len > size)
                 throw new EndOfStreamException();
 
+            //if (len > 1024 * 1024)
+            //    System.Diagnostics.Debugger.Break();
+
             MemoryStream ms = new MemoryStream(data, pos, (int)len);
             BinaryFormatter bs = new BinaryFormatter();
             pos += len;
-            return bs.Deserialize(ms);
+
+
+            object obj = bs.Deserialize(ms);
+
+            timeDelay += DateTime.Now.Ticks - timeStart;
+            DistDBMS.Common.Debug.WriteLine(" time : " + ((DateTime.Now.Ticks - timeStart) / 10000).ToString() + "ms, total : " + (timeDelay / 10000).ToString() + "ms");
+
+            return obj;
         }
 
 
@@ -296,20 +309,35 @@ namespace DistDBMS.Network
             return true;
         }
 
+        static long timeDelay = 0;
         public bool WriteObject(object obj)
         {
+
+            long timeStart = DateTime.Now.Ticks;
+
             MemoryStream ms = new MemoryStream();
             BinaryFormatter bs = new BinaryFormatter();
+            
+
             bs.Serialize(ms, obj);
+
+            long timeStart1 = DateTime.Now.Ticks;
+
             ms.Position = 0;
             if (!WriteInt((int)ms.Length))
                 return false;
+
+
             if(!WriteBytes(ms.ToArray()))
             {
                 pos -= sizeof(int);
                 size = pos;
                 return false;
             }
+
+            timeDelay += DateTime.Now.Ticks - timeStart;
+            DistDBMS.Common.Debug.WriteLine(" time : " + ((DateTime.Now.Ticks - timeStart) / 10000).ToString() + "ms, total: : " +  ((timeDelay) / 10000).ToString() + "ms");
+            
             return true;
         }
 

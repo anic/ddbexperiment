@@ -49,7 +49,9 @@ namespace DistDBMS.Network
 
         public void SendPacket(NetworkPacket packet)
         {
+            long timeStart = DateTime.Now.Ticks;
             PeerSocket.Send(packet.Data, 0, packet.Size, SocketFlags.None);
+            DistDBMS.Common.Debug.WriteLine(" size = " + packet.Size.ToString() + ", time = " + ((DateTime.Now.Ticks - timeStart) / 10000).ToString() + "ms");
         }
 
 
@@ -182,17 +184,20 @@ namespace DistDBMS.Network
                         }
                     }
 
-
+                    /*
+                     * //shrink
                     if (peerConn.Buffer.Length >= 1024 * 1024 && peerConn.DataSizeInBuffer < peerConn.Buffer.Length / 2)
                     {
                         byte[] old = peerConn.Buffer;
                         peerConn.Buffer = new byte[peerConn.Buffer.Length / 2];
                         Array.Copy(old, 0, peerConn.Buffer, 0, peerConn.DataSizeInBuffer);
                     }
+                     */
                     if (peerConn.Buffer.Length - peerConn.DataSizeInBuffer <= 8 * 1024)
                     {
                         byte[] old = peerConn.Buffer;
-                        peerConn.Buffer = new byte[peerConn.DataSizeInBuffer + 8 * 1024];
+                        int newSize = peerConn.DataSizeInBuffer > 8 * 1024 ? peerConn.DataSizeInBuffer * 2 : peerConn.DataSizeInBuffer + 8 * 1024;
+                        peerConn.Buffer = new byte[newSize];
                         old.CopyTo(peerConn.Buffer, 0);
                     }
 
