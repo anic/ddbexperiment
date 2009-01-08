@@ -128,17 +128,52 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
             ReduceEmptySelection(tree);
 
+            FixVerticalFragment(tree);
+
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="relation"></param>
-        private void SynchronizeName(Relation relation)
+        private void AddPrimaryKey(Relation relation, Field primaryKey)
         {
+            bool hasPrimaryKey = false;
+            if (relation.Type == RelationalType.Projection)
+            {
+                foreach (Field f in relation.RelativeAttributes.Fields)
+                {
+                    if (f.IsPrimaryKey)
+                    {
+                        hasPrimaryKey = true;
+                    }
+                }
 
+                if (!hasPrimaryKey)
+                {
+                    Field key = primaryKey.Clone() as Field;
+                    key.TableName = relation.RelativeAttributes.Fields[0].TableName;
+                    relation.RelativeAttributes.Fields.Insert(0, key);
+                }
+            }
+            else 
+            {
+                foreach (Relation r in relation.Children)
+                {
+                    AddPrimaryKey(r, primaryKey);
+                }
+            }
         }
 
+        private void FixVerticalFragment(Relation relation)
+        {
+            
+            if (relation.Type == RelationalType.Join)
+            {
+                if (relation.RelativeAttributes.Fields[0].LogicTableName.Equals(relation.RelativeAttributes.Fields[1].LogicTableName))
+                {
+                    Field primaryKey = tables[relation.RelativeAttributes.Fields[0].LogicTableName].PrimaryKeyField;
+
+                    AddPrimaryKey(relation, primaryKey);          
+                }
+            }
+        }
 
         private void ReduceEmptySelection(Relation relation)
         {
@@ -598,7 +633,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                     r.Type = RelationalType.Selection;
                     r.Predication = new Condition();
                     r.Predication.AtomCondition = atom.Clone() as AtomCondition;
-                    r.ResultName = table.TableName.Clone() as string;
+                    //r.ResultName = table.TableName.Clone() as string;
 
                     active.Children.Add(r);
                     active = r;
@@ -1083,7 +1118,6 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 root.LeftRelation = activeRelation;
             }
         }
-
 
     }
 }
