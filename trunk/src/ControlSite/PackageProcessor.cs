@@ -59,6 +59,8 @@ namespace DistDBMS.ControlSite
         {
             try
             {
+                Debug.WriteLine("-------------0");
+
                 Guid newSessionId = Guid.NewGuid();
                 //packet
                 if (packet is ServerClientPacket)
@@ -149,10 +151,14 @@ namespace DistDBMS.ControlSite
                                 return;
                             }
 
+
+
+                            Debug.WriteLine("-------------A");
                             string sql = (packet as ServerClientTextObjectPacket).Object as string;
                             ParserSwitcher ps = new ParserSwitcher();
                             bool bParse = ps.Parse(sql.Trim(), gdd);
 
+                            Debug.WriteLine("-------------B");
                             if (!bParse)
                             {
 
@@ -160,6 +166,7 @@ namespace DistDBMS.ControlSite
                                 conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
                                 return;
                             }
+                            Debug.WriteLine("-------------C");
                             #region 查询
                             if (ps.LastResult is Selection)
                             {
@@ -176,6 +183,7 @@ namespace DistDBMS.ControlSite
                                 }
                                 //TO 刘璋：可以从这里开始测试转换
 
+                                Debug.WriteLine("-------------D");
                                 SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
                                 converter.SetQueryCalculus(s3);
                                 Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd, true);
@@ -184,6 +192,7 @@ namespace DistDBMS.ControlSite
                                 //TempModifier tempModifier = new TempModifier(gdd);
                                 //tempModifier.Modify(relationalgebra);
 
+                                Debug.WriteLine("-------------E");
 
                                 //测试代码
                                 string output = (new RelationDebugger()).GetDebugString(relationalgebra);
@@ -193,6 +202,7 @@ namespace DistDBMS.ControlSite
                                 ExecutionPlan gPlan = creator.CreateGlobalPlan(relationalgebra, 0);
 
 
+                                Debug.WriteLine("-------------F");
 
                                 List<ExecutionPlan> plans = creator.SplitPlan(gPlan);
                                 foreach (ExecutionPlan p in plans)
@@ -207,6 +217,8 @@ namespace DistDBMS.ControlSite
                                             Network.SessionStepPacket.StepIndexNone,
                                             Common.NetworkCommand.PLAN, package);
                                 }
+
+                                Debug.WriteLine("-------------G");
 
                                 foreach (ExecutionPlan p in plans)
                                 {

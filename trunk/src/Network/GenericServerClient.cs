@@ -113,6 +113,7 @@ namespace DistDBMS.Network
                 else
                 {
                     dataSizeInBuffer += bytesRead;
+                    //DistDBMS.Common.Debug.WriteLine(" read " + bytesRead.ToString() + ", total: " + dataSizeInBuffer.ToString());
                     while (true)
                     {
                         if (!NetworkPacket.IsInvalidPacket(buffer, dataSizeInBuffer))
@@ -124,24 +125,33 @@ namespace DistDBMS.Network
                         {
                             NetworkPacket packet = NetworkPacket.FetchFromBuffer(ref buffer, ref dataSizeInBuffer);
                             if (packet != null)
+                            {
+                                //DistDBMS.Common.Debug.WriteLine(" Packet arrived ");
+                                //if (packet.Size > 1024 * 1024 * 4)
+                                //    System.Diagnostics.Debugger.Break();
+
                                 OnPacketArrived(packet);
+                            }
                             else
                                 break;
                         }
                     }
 
 
-
+                    /*
+                     //shrink
                     if (buffer.Length >= 1024 * 1024 && dataSizeInBuffer < buffer.Length / 2)
                     {
                         byte[] old = buffer;
                         buffer = new byte[buffer.Length / 2];
                         Array.Copy(old, 0, buffer, 0, dataSizeInBuffer);
                     }
+                     * */
                     if (buffer.Length - dataSizeInBuffer <= 8 * 1024)
                     {
                         byte[] old = buffer;
-                        buffer = new byte[dataSizeInBuffer + 8 * 1024];
+                        int newSize = dataSizeInBuffer > 8 * 1024 ? dataSizeInBuffer * 2 : dataSizeInBuffer + 8 * 1024;
+                        buffer = new byte[newSize];
                         old.CopyTo(buffer, 0);
                     }
                     networkStream.BeginRead(buffer, dataSizeInBuffer, buffer.Length - dataSizeInBuffer, new AsyncCallback(AsyncReceiveCallback), this);
@@ -167,7 +177,9 @@ namespace DistDBMS.Network
 
         public void SendPacket(NetworkPacket packet)
         {
+            long timeStart = DateTime.Now.Ticks;
             networkStream.Write(packet.Data, 0, packet.Size);
+            DistDBMS.Common.Debug.WriteLine(" size = " + packet.Size.ToString() + ", time = " + ((DateTime.Now.Ticks - timeStart) / 10000).ToString() + "ms");
         }
 
         public void SendServerClientTextPacket(string text)
