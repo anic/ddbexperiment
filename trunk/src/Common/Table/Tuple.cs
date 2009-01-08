@@ -62,8 +62,9 @@ namespace DistDBMS.Common.Table
         {
             string[] items = line.Split('\t');
             Tuple result = new Tuple();
-            foreach (string item in items)
-                result.data.Add(item);
+            //添加的时候会多一个\t所以要少一个
+            for (int i = 0; i < items.Length - 1; ++i)
+                result.data.Add(items[i]);
             return result;
         }
     }

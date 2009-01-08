@@ -105,7 +105,7 @@ namespace DistDBMS.TestResult
         /// <summary>
         ///A test for ExecuteSQL
         ///</summary>
-        [TestMethod()]
+        [TestMethod()] 
         public void Case0() { BasicCaseTest(0); }
 
         [TestMethod()]

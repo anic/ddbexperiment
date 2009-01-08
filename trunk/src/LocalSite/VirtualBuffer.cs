@@ -12,12 +12,24 @@ namespace DistDBMS.LocalSite
     {
         public ExecutionPackage GetPackageById(int id)
         {
-            for (int i = 0; i < this.Count; i++)
+            for (int i = 0; i < this.Count; ++i)
             {
                 ExecutionPackage package = this[i];
                 if (package.ID == id)
                     return package;
             }
+            return null;
+        }
+
+        public ExecutionPlan GetPlan()
+        {
+            for (int i = 0; i < this.Count; ++i)
+            {
+                ExecutionPackage package = this[i];
+                if (package.Object != null && package.Object is ExecutionPlan)
+                    return package.Object as ExecutionPlan;
+            }
+
             return null;
         }
 

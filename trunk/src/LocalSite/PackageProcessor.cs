@@ -89,10 +89,12 @@ namespace DistDBMS.LocalSite
                     if (exPackage.Type == ExecutionPackage.PackageType.Data)
                     {
                         int size = packet.ReadInt();
-                        exPackage.Object = new Table(size);
-                        Table t = exPackage.Object as Table;
+                        Table t = new Table(size);
+                        t.Schema = (exPackage.Object as Table).Schema;
+                        exPackage.Object = t;
                         for (int i = 0; i < size; ++i)
                             t.Tuples.Add(Tuple.FromLineString(packet.ReadString()));
+
                     }
 
                     DistDBMS.Common.Debug.WriteLine(name + " package ID:" + ((packet as P2PTextObjectPacket).Object as ExecutionPackage).ID);
@@ -150,9 +152,9 @@ namespace DistDBMS.LocalSite
                             ExecutionPackage newPackage = new ExecutionPackage();
                             newPackage.ID = step.Operation.ResultID;
                             newPackage.Type = ExecutionPackage.PackageType.Data;
-                            newPackage.Object = null;
-                            //table
-
+                            newPackage.Object = new Table();
+                            (newPackage.Object as Table).Schema = table.Schema;
+                            
                             //TODO:应该检查是否在本站点
                             buffer.Add(newPackage);//相当于异步发送
                             if (step.TransferSite != null && step.TransferSite.Name != this.name)
@@ -167,12 +169,7 @@ namespace DistDBMS.LocalSite
                                     packet.WriteString(t.GenerateLineString());
 
                                 conn.SendP2PStepTextObjectPacket(step.TransferSite.Name, packet);
-
-
-                                //conn.SendP2PStepTextObjectPacket(step.TransferSite.Name,
-                                //    newPackage.ID,
-                                //    Common.NetworkCommand.EXESQL,
-                                //    newPackage);                                
+;                                
                             }
                             else if (step.Index == 0) //返回ControlSite
                             {

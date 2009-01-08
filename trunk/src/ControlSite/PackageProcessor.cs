@@ -18,7 +18,7 @@ namespace DistDBMS.ControlSite
 {
     class PackageProcessor
     {
-        int DEFALUT_TIMEOUT_MINISEC = 600000;
+        int DEFALUT_TIMEOUT_MINISEC = 10000;
 
         GlobalDirectory gdd;
         string name;
@@ -398,7 +398,7 @@ namespace DistDBMS.ControlSite
                     if ((e as LocalSiteFailException).type == LocalSiteFailException.ExceptionType.ConnectionFail)
                         result.Description = "Site " + (e as LocalSiteFailException).site + " failed.";
                     else
-                        result.Description = "Site " + (e as LocalSiteFailException).site + " wait timeout.";
+                        result.Description = "Site " + (e as LocalSiteFailException).site + " wait timeout.\r\n";
                 }
                 else
                     result.Description = e.Message;
