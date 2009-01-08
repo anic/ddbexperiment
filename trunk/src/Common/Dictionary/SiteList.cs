@@ -19,5 +19,14 @@ namespace DistDBMS.Common.Dictionary
             }
         }
 
+        public int GetIndexOf(Site site)
+        {
+            for (int i = 0; i < this.Count; ++i)
+                if (this[i].Name == site.Name)
+                    return i;
+
+            return -1;
+        }
+
     }
 }

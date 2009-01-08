@@ -14,7 +14,8 @@ namespace DistDBMS.Common.Execution
         { 
             Plan = 0,
             Data,
-            Gdd
+            Gdd,
+            PlanData
         }
 
         public PackageType Type { get; set; }

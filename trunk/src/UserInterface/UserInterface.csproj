@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{87680F2D-D9E4-490C-9601-C8BA477B9D41}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -63,12 +63,6 @@
     <Compile Include="Controls\FrmInit.Designer.cs">
       <DependentUpon>FrmInit.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\FrmWaitingcs.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\FrmWaitingcs.Designer.cs">
-      <DependentUpon>FrmWaitingcs.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\UscQTreeViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -125,10 +119,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Controls\FrmInit.resx">
       <DependentUpon>FrmInit.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\FrmWaitingcs.resx">
-      <DependentUpon>FrmWaitingcs.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SqlInput\SqlTextBox.resx">
