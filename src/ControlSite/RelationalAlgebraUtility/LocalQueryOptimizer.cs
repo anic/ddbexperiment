@@ -563,17 +563,22 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             // 提取table相关一元谓词属性
             foreach (AtomCondition atom in unaryPredictions)
             {
-                if (atom.LeftOperand.IsField && tableFields[atom.LeftOperand.Field] != null && selectField[atom.LeftOperand.Field] == null)
+                if (atom.LeftOperand.IsField && tableFields[atom.LeftOperand.Field] != null)
                 {
                     predictions.Add(atom);
-                    selectField.Add(atom.LeftOperand.Field.Clone() as Field);
+
+                    if (selectField[atom.LeftOperand.Field] == null)
+                        selectField.Add(atom.LeftOperand.Field.Clone() as Field);
+                    
                     continue;
                 }
 
-                if (atom.RightOperand.IsField && tableFields[atom.RightOperand.Field] != null && selectField[atom.RightOperand.Field] == null)
+                if (atom.RightOperand.IsField && tableFields[atom.RightOperand.Field] != null)
                 {
                     predictions.Add(atom);
-                    selectField.Add(atom.RightOperand.Field.Clone() as Field);
+
+                    if ( selectField[atom.RightOperand.Field] == null)
+                        selectField.Add(atom.RightOperand.Field.Clone() as Field);
                 }
             }
 
@@ -583,15 +588,19 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             {
                 foreach (AtomCondition atom in binaryPredictions)
                 {
-                    if (tableFields[atom.LeftOperand.Field] != null && joinField[atom.LeftOperand.Field] == null)
+                    if (tableFields[atom.LeftOperand.Field] != null)
                     {
                         joinCondition.Add(atom);
-                        joinField.Add(atom.LeftOperand.Field as Field);
+
+                        if ( joinField[atom.LeftOperand.Field] == null)
+                            joinField.Add(atom.LeftOperand.Field as Field);
                     }
-                    else if (tableFields[atom.RightOperand.Field] != null && joinField[atom.RightOperand.Field] == null)
+                    else if (tableFields[atom.RightOperand.Field] != null)
                     {
                         joinCondition.Add(atom);
-                        joinField.Add(atom.RightOperand.Field as Field);
+
+                        if (joinField[atom.RightOperand.Field] == null)
+                            joinField.Add(atom.RightOperand.Field as Field);
                     }
                 }
             }
@@ -783,6 +792,27 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
                 }
                 else if (centralTreeNode.Type == RelationalType.Selection)  // 检查Select条件
                 {
+                    bool hasField = false;
+                    foreach (Field f in fragment.Schema.Fields)
+                    {
+                        if (centralTreeNode.Predication.AtomCondition.LeftOperand.Field.Equals(f, true))
+                        {
+                            hasField = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasField)
+                    {
+                        if (centralTreeNode.Children.Count > 0)
+                        {
+                            centralTreeNode = centralTreeNode.Children[0];
+                            continue;
+                        }
+                        else
+                            break; 
+                    }
+
                     // 检查Select条件与分片条件是否冲突
                     foreach (AtomCondition atom in fragmentCondition)
                     {
@@ -791,7 +821,10 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
 
                         List<AtomCondition> reducedConditon = null;
                         if (centralTreeNode.Predication.AtomCondition.ConflictWith(atom, ref reducedConditon))  // 冲突，消除分片
+                        {
                             return false;
+                        }
+                        
                     }
                     // 不冲突：继续生长
                     Relation selection = centralTreeNode.Clone() as Relation;
