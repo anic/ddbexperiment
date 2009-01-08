@@ -216,8 +216,7 @@ namespace DistDBMS.LocalSite.Processor
                             field.TableName = localSources[0].TableName;
                         else
                             throw new Exception();
-                    }
-                    
+                    }          
                     
                 }
         }
