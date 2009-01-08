@@ -37,6 +37,11 @@ namespace DistDBMS.Common.Syntax
         public Operand RightOperand { get; set; }
 
         /// <summary>
+        /// 谓词优先级 (优化时使用)
+        /// </summary>
+        public int Priority { get; set; }
+
+        /// <summary>
         /// 谓词类型
         /// 
         /// 类型可以是：一元谓词、二元谓词、恒真式、恒假式
@@ -181,7 +186,7 @@ namespace DistDBMS.Common.Syntax
         /// <returns>若为一元谓词，返回false，否则返回true</returns>
         public bool Reverse()
         {
-            if (LeftOperand.IsField ^ RightOperand.IsField)
+            if (LeftOperand.IsField && RightOperand.IsField)
             {
                 Operand tmp = LeftOperand;
                 LeftOperand = RightOperand;
@@ -273,7 +278,7 @@ namespace DistDBMS.Common.Syntax
                 other.Normalize();
 
                 // 可比的两个一元谓词
-                if (LeftOperand.Field.Equals(other.RightOperand.Field, true))
+                if (LeftOperand.Field.Equals(other.LeftOperand.Field, true))
                 {
                     // 两个相同的一元谓词是否冲突
                     reducedCondition = new List<AtomCondition>();
@@ -643,6 +648,7 @@ namespace DistDBMS.Common.Syntax
             Operator = LogicOperator.Equal;
             LeftOperand = new Operand();
             RightOperand = new Operand();
+            Priority = 0;
         }
 
         public new string ToString()
@@ -685,6 +691,7 @@ namespace DistDBMS.Common.Syntax
             result.LeftOperand = LeftOperand.Clone() as Operand;
             result.RightOperand = RightOperand.Clone() as Operand;
             result.Operator = Operator;
+            result.Priority = Priority;
             return result;
         }
 

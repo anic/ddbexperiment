@@ -46,6 +46,11 @@ namespace DistDBMS.Common.Table
         public List<AtomCondition> RelativeUnaryPredication { get; set; }
 
         /// <summary>
+        /// 与Table相关的二元谓词，优化时使用
+        /// </summary>
+        public List<AtomCondition> RelativeBinaryPredication { get; set; }
+
+        /// <summary>
         /// 返回是主键的属性域
         /// </summary>
         public Field PrimaryKeyField
@@ -95,6 +100,7 @@ namespace DistDBMS.Common.Table
             IsAllFields = false;
             Tag = -1;
             RelativeUnaryPredication = new List<AtomCondition>();
+            RelativeBinaryPredication = new List<AtomCondition>();
         }
 
         public new string ToString()
@@ -146,6 +152,9 @@ namespace DistDBMS.Common.Table
 
             foreach (AtomCondition atom in RelativeUnaryPredication)
                 result.RelativeUnaryPredication.Add(atom.Clone() as AtomCondition);
+
+            foreach (AtomCondition atom in RelativeBinaryPredication)
+                result.RelativeBinaryPredication.Add(atom.Clone() as AtomCondition);
 
             return result;
         }

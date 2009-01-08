@@ -33,6 +33,19 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
         
         public Relation relationAlgebra;
 
+        public Relation OptimizeRelationAlgebra()
+        {
+            // Local Optimization
+            // 为什么当关系超过2个时，Sources[0].Tag会自动为0？？
+            foreach (TableSchema ts in selectionCalculus.Sources)
+                ts.Tag = -1;
+
+            Relation result = null;
+            LocalQueryOptimizer optimizer = new LocalQueryOptimizer(ref result, selectionCalculus, dictionary);
+
+            return result;
+        }
+
 
         void SQL2RelationalAlgebraInterface.SetQueryCalculus(DistDBMS.ControlSite.SQLSyntax.Operation.Selection queryCalculus)
         {
@@ -52,13 +65,20 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             insertionCaculus = queryCalculus;
         }
 
-        Relation SQL2RelationalAlgebraInterface.SQL2RelationalAlgebra(GlobalDirectory gdd)
+        Relation SQL2RelationalAlgebraInterface.SQL2RelationalAlgebra(GlobalDirectory gdd, bool isOptimize)
         {
             dictionary = gdd;
-
-            Relation decomposedQuery = QueryDecomposition();
-
-            QueryLocalization(decomposedQuery, dictionary);
+            Relation decomposedQuery;
+            if (!isOptimize)
+            {
+                decomposedQuery = QueryDecomposition();
+                QueryLocalization(decomposedQuery, dictionary);
+            }
+            else
+            {
+                decomposedQuery = OptimizeRelationAlgebra();
+            }
+            
 
             return decomposedQuery;
         }
@@ -344,7 +364,7 @@ namespace DistDBMS.ControlSite.RelationalAlgebraUtility
             foreach (TableSchema ts in selectionCalculus.Sources)
                 ts.Tag = -1;
 
-            LocalQueryOptimizer optimizer = new LocalQueryOptimizer(result, selectionCalculus, dictionary);
+            //LocalQueryOptimizer optimizer = new LocalQueryOptimizer(result, selectionCalculus, dictionary);
 
             return result;
         }
