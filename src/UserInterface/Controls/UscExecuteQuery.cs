@@ -115,7 +115,7 @@ namespace DistDBMS.UserInterface.Controls
 
         public void SetOptQueryTree(ExecutionRelation optQueryTree)
         {
-            optQTreeViewer.ShowRelation(optQueryTree);
+            optQTreeViewer.ShowExecutionRelation(optQueryTree);
         }
 
 

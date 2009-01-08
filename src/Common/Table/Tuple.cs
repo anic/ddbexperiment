@@ -45,9 +45,9 @@ namespace DistDBMS.Common.Table
             return result;
         }
 
-        [NonSerialized]
-        static StringBuilder sb = new StringBuilder(10 * 1024);
-        public string GenerateLineString()
+        
+        
+        public string GenerateLineString(StringBuilder sb)
         {
             sb.Length = 0;
             foreach (string str in data)

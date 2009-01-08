@@ -64,9 +64,22 @@ namespace DistDBMS.ControlSite.Plan
                         if (
                             (splitRelation.Children.Count == 1)                 //只有一个分枝
                             || (i > 0)      //非第一个分枝
-                            || (i ==0 && !splitRelation.Children[i].IsDirectTableSchema) //第一个分枝且不是直接关系数据库表
+                            || (i == 0 && !splitRelation.Children[i].IsDirectTableSchema) //第一个分枝且不是直接关系数据库表
                             )
                             queue.Enqueue(splitRelation.Children[i] as ExecutionRelation);
+                        //bool result = !IsSingleTableSelectionAndProjection(splitRelation.Children[i] as ExecutionRelation);
+                        //bool result2 = !splitRelation.Children[i].IsDirectTableSchema;
+                        //if (result != result2 && i == 0)
+                        //{
+                        //    int a = 0;
+                        //}
+
+                        //if (
+                        //    (splitRelation.Children.Count == 1)                 //只有一个分枝
+                        //    || (i > 0)      //非第一个分枝
+                        //    || (i == 0 && !IsSingleTableSelectionAndProjection(splitRelation.Children[i] as ExecutionRelation)) //第一个分枝且不是直接关系数据库表
+                        //    )
+                        //    queue.Enqueue(splitRelation.Children[i] as ExecutionRelation);
                     }
                 }
                 else //如果没有分裂点，表明从这个开始到底层都是一个step
@@ -76,6 +89,28 @@ namespace DistDBMS.ControlSite.Plan
                 plan.Steps.Add(step);
             }
             return plan;
+        }
+
+        /// <summary>
+        /// 是否是单个表的投影和选择
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        private bool IsSingleTableSelectionAndProjection(ExecutionRelation r)
+        {
+            if (r.Children.Count == 0 && r.IsDirectTableSchema)
+                return true;
+
+            if (r.Children.Count >= 2)
+                return false;
+
+            //有一个孩子
+            if (r.Type == RelationalType.Selection || r.Type == RelationalType.Projection)
+            {
+                return IsSingleTableSelectionAndProjection(r.Children[0] as ExecutionRelation);
+            }
+            else
+                return false;
         }
 
 

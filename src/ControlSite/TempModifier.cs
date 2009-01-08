@@ -20,10 +20,36 @@ namespace DistDBMS.ControlSite
 
         public void Modify(Relation r)
         {
-            ModifyRelativeAttribute(r);
-            ModifySelection(r);
-            ModifyUnion(r);
-            ModifyJoin(r);
+            //ModifyRelativeAttribute(r);
+            //ModifySelection(r);
+            //ModifyUnion(r);
+            //ModifyJoin(r);
+            ModifyProjection(r);
+        }
+
+        private void ModifyProjection(Relation r)
+        {
+            if (r.Type == RelationalType.Projection)
+            {
+                if (r.Children.Count == 0)
+                {
+                    if (r.DirectTableSchema.Fields.Count == r.RelativeAttributes.Fields.Count)
+                    {
+                        r.Type = RelationalType.Selection;
+                    }
+                    else
+                    {
+                        Relation selection = new Relation();
+                        selection.Type = RelationalType.Selection;
+                        selection.DirectTableSchema = r.DirectTableSchema.Clone() as TableSchema;
+                        r.DirectTableSchema = null;
+                        r.Children.Add(selection);
+                    }
+                }
+            }
+
+            foreach (Relation child in r.Children)
+                ModifyProjection(child);
         }
 
         private void ModifyRelativeAttribute(Relation r)
