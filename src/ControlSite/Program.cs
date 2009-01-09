@@ -71,7 +71,7 @@ namespace DistDBMS.ControlSite
             {
                 ControlSiteServer controlSiteServer = new ControlSiteServer(clusterConfig, site);
 
-                PackageProcessor processor = new PackageProcessor(site);
+                PackageProcessor processor = new PackageProcessor(site, clusterConfig, initiator);
                 controlSiteServer.PacketProcessor = new ControlSiteServer.PacketProcessorDelegate(processor.PackageProcess);
                 controlSiteServer.Start();
 
