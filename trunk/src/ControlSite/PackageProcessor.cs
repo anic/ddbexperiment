@@ -13,6 +13,8 @@ using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.RelationalAlgebra;
 using DistDBMS.Common.Table;
 using DistDBMS.Common;
+using System.Net.Sockets;
+using System.Collections;
 
 namespace DistDBMS.ControlSite
 {
@@ -22,6 +24,9 @@ namespace DistDBMS.ControlSite
 
         GlobalDirectory gdd;
         string name;
+        ClusterConfiguration config;
+        NetworkInitiator initiator;
+
         internal class LocalSiteFailException : Exception
         {
             public enum ExceptionType
@@ -38,9 +43,11 @@ namespace DistDBMS.ControlSite
             }
         }
 
-        public PackageProcessor(string name)
+        public PackageProcessor(string name,ClusterConfiguration config,NetworkInitiator initiator)
         {
             this.name = name;
+            this.config = config;
+            this.initiator = initiator;
         }
 
         public bool IsReady { get { return gdd != null; } }
@@ -446,6 +453,24 @@ namespace DistDBMS.ControlSite
                         result.Description = "Site " + (e as LocalSiteFailException).site + " failed.";
                     else
                         result.Description = "Site " + (e as LocalSiteFailException).site + " wait timeout.\r\n";
+                }
+                else if (e is System.Net.Sockets.SocketException)
+                {
+                    
+                    SocketException ex = (e as System.Net.Sockets.SocketException);
+                
+                    foreach (string localSite in initiator.LocalSiteNames)
+                    {
+
+                        string host = config.Hosts[localSite]["Host"] as string;
+                        int port = (int)config.Hosts[localSite]["Port"];
+                        string addr = host + ":" + port.ToString();
+                        if (ex.Message.IndexOf(addr) != -1)
+                        {
+                            result.Description = "Site " + localSite + " fail\r\n";
+                            break;
+                        }
+                    }
                 }
                 else
                     result.Description = e.Message + "\r\n";
