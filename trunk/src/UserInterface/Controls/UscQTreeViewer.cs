@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using DistDBMS.Common.RelationalAlgebra.Entity;
 using DistDBMS.Common.Execution;
 using DistDBMS.Common.Dictionary;
+using DistDBMS.UserInterface.Handler;
 
 namespace DistDBMS.UserInterface.Controls
 {
@@ -17,17 +18,28 @@ namespace DistDBMS.UserInterface.Controls
         public UscQTreeViewer()
         {
             InitializeComponent();
+
+            for (int i = 0; i < colors.Length; ++i)
+                imgList.Images.Add(CalendarIconUtil.Instance.DrawCalendarImage(colors[i]));
         }
 
         Color[] colors = new Color[] { Color.Red, Color.Blue, Color.Green, Color.Orange };
         SiteList sites = new SiteList();
 
-        private TreeNode CreateNode(string text,Color color)
+        private TreeNode CreateNode(string text,int index)
         {
             TreeNode node = new TreeNode();
             node.Text = text;
             node.ToolTipText = text;
-            node.BackColor = color;
+            if (index != -1)
+            {
+                //node.BackColor = colors[index];
+                //node.ImageIndex = index;
+                //node.SelectedImageIndex = index;
+            }
+            node.ImageIndex = index;
+            node.SelectedImageIndex = index;
+            
             return node;
         }
 
@@ -47,12 +59,12 @@ namespace DistDBMS.UserInterface.Controls
                 if (sites[relation.ExecutionSite.Name] == null)
                     sites.Add(relation.ExecutionSite);
 
-                n = CreateNode(relation.ToSimpleString() + " " + strSite, colors[sites.GetIndexOf(relation.ExecutionSite) % colors.Length]);
+                n = CreateNode(relation.ToSimpleString() + " " + strSite, sites.GetIndexOf(relation.ExecutionSite) % colors.Length);
                 
             }
             else
-            { 
-                n = CreateNode(relation.ToSimpleString(),Color.Empty);
+            {
+                n = CreateNode(relation.ToSimpleString(), -1);
             }
             tvwRelation.Nodes.Add(n);
             foreach (ExecutionRelation child in relation.Children)
@@ -68,11 +80,11 @@ namespace DistDBMS.UserInterface.Controls
                 if (sites[relation.ExecutionSite.Name] == null)
                     sites.Add(relation.ExecutionSite);
 
-                n = CreateNode(relation.ToSimpleString() + " " + strSite, colors[sites.GetIndexOf(relation.ExecutionSite) % colors.Length]);
+                n = CreateNode(relation.ToSimpleString() + " " + strSite, sites.GetIndexOf(relation.ExecutionSite) % colors.Length);
             }
             else
             {
-                n = CreateNode(relation.ToSimpleString(), Color.Empty);
+                n = CreateNode(relation.ToSimpleString(), -1);
             } 
             node.Nodes.Add(n);
 
@@ -87,7 +99,7 @@ namespace DistDBMS.UserInterface.Controls
             if (relation == null)
                 return;
 
-            TreeNode node = CreateNode(relation.ToString(), Color.Empty);
+            TreeNode node = CreateNode(relation.ToString(),-1);
             tvwRelation.Nodes.Add(node);
 
             foreach (Relation child in relation.Children)
@@ -96,7 +108,7 @@ namespace DistDBMS.UserInterface.Controls
 
         private void Visit(TreeNode node, Relation relation)
         {
-            TreeNode n = CreateNode(relation.ToString(), Color.Empty);
+            TreeNode n = CreateNode(relation.ToString(), -1);
             node.Nodes.Add(n);
 
             foreach (Relation child in relation.Children)

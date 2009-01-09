@@ -112,6 +112,7 @@
     <Compile Include="FrmApp.Designer.cs">
       <DependentUpon>FrmApp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Handler\CalendarIconUtil.cs" />
     <Compile Include="Handler\FileUploader.cs" />
     <Compile Include="Handler\MenuTreeSwitcher.cs" />
     <Compile Include="LogWriter.cs" />

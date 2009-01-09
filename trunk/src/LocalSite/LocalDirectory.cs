@@ -5,6 +5,7 @@ using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.LocalSite
 {
+    [Serializable]
     class LocalDirectory
     {
         public FragmentList Fragments { get{return fragments;} }
@@ -20,5 +21,6 @@ namespace DistDBMS.LocalSite
 
             fragments.AddRange(gdd.Fragments.GetFragmentsBySiteName(name));
         }
+        
     }
 }

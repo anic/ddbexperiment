@@ -12,7 +12,8 @@ namespace DistDBMS.Common
         Boolean,
         Double,
         String,
-        DateTime
+        DateTime,
+        BLOB
     }
 
     public enum RelationOperator
