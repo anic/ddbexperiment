@@ -7,6 +7,7 @@ using DistDBMS.Common.Table;
 using DistDBMS.Common.Execution;
 using DistDBMS.LocalSite.Processor;
 using System.Threading;
+using System.IO;
 
 namespace DistDBMS.LocalSite
 {
@@ -25,6 +26,35 @@ namespace DistDBMS.LocalSite
             //等待数据来才初始化
             this.currentPlan = null;
             this.ldd = null;
+        }
+
+        public void Init()
+        {
+            //if (File.Exists(this.name))
+            //{
+            //    using (DataAccess.DataAccessor da = new DistDBMS.LocalSite.DataAccess.DataAccessor(name))
+            //    {
+            //        //从数据库中获取ldd
+            //        TableSchema lddTable = CreateLddTable();
+            //        this.ldd = da.QueryLdd(lddTable) as LocalDirectory;
+            //    }
+            //}
+        }
+
+        private TableSchema CreateLddTable()
+        {
+            TableSchema lddTable = new TableSchema();
+            Field fId = new Field();
+            fId.AttributeName = "id";
+            fId.AttributeType = DistDBMS.Common.AttributeType.Int;
+            Field fContent = new Field();
+            fContent.AttributeName = "content";
+            fContent.AttributeType = DistDBMS.Common.AttributeType.BLOB;
+            lddTable.Fields.Add(fId);
+            lddTable.Fields.Add(fContent);
+            lddTable.ReplaceTableName("LddTable");
+
+            return lddTable;
         }
 
 
@@ -51,6 +81,11 @@ namespace DistDBMS.LocalSite
                                 localTable.TableName = f.LogicSchema.TableName;
                                 result &= da.CreateTable(localTable);
                             }
+
+                            //TableSchema lddTable = CreateLddTable();
+                            //da.DropTable(lddTable.TableName);
+                            //da.CreateTable(lddTable);
+                            //da.InsertLdd(lddTable, ldd);
 
                             if (!result)
                                 error = da.LastException.Message;

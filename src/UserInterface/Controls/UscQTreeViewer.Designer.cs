@@ -28,16 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tvwRelation = new System.Windows.Forms.TreeView();
+            this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
             // tvwRelation
             // 
             this.tvwRelation.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tvwRelation.ImageIndex = 0;
+            this.tvwRelation.ImageList = this.imgList;
             this.tvwRelation.Location = new System.Drawing.Point(0, 0);
             this.tvwRelation.Name = "tvwRelation";
+            this.tvwRelation.SelectedImageIndex = 0;
             this.tvwRelation.Size = new System.Drawing.Size(232, 253);
             this.tvwRelation.TabIndex = 0;
+            // 
+            // imgList
+            // 
+            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imgList.ImageSize = new System.Drawing.Size(16, 16);
+            this.imgList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // UscQTreeViewer
             // 
@@ -53,5 +64,6 @@
         #endregion
 
         private System.Windows.Forms.TreeView tvwRelation;
+        private System.Windows.Forms.ImageList imgList;
     }
 }
