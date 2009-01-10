@@ -10,6 +10,9 @@ using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.UserInterface.Handler
 {
+    /// <summary>
+    /// 控制菜单转换的类
+    /// </summary>
     class MenuTreeSwitcher
     {
         TreeView tree;

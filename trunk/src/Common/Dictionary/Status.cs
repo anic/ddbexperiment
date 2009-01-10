@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DistDBMS.Common.Dictionary
 {
+    /// <summary>
+    /// 状态信息
+    /// </summary>
     [Serializable]
     public class Status
     {

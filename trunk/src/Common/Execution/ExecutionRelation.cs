@@ -8,13 +8,25 @@ using DistDBMS.Common.Syntax;
 
 namespace DistDBMS.Common.Execution
 {
+    /// <summary>
+    /// 可以执行的关系代数
+    /// </summary>
     [Serializable]
     public class ExecutionRelation:Relation
     {
+        /// <summary>
+        /// 唯一标识
+        /// </summary>
         public int ResultID { get; set; }
 
+        /// <summary>
+        /// 是否是本地LocalSite中的数据
+        /// </summary>
         public bool InLocalSite { get; set; }
 
+        /// <summary>
+        /// 父亲节点
+        /// </summary>
         public ExecutionRelation Parent { get { return parent; } }
         ExecutionRelation parent = null;
 
@@ -187,10 +199,6 @@ namespace DistDBMS.Common.Execution
         {
             if (r.DirectTableSchema != null)
                 this.DirectTableSchema = r.DirectTableSchema.Clone() as TableSchema;
-
-            //if (DirectTableSchema != null)
-            //    for (int i = 0; i < DirectTableSchema.Fields.Count; i++)
-            //        DirectTableSchema.Fields[i] = DirectTableSchema.Fields[i].Clone() as Field;
 
             if (r.Predication != null)
                 this.Predication = r.Predication.Clone() as Condition;

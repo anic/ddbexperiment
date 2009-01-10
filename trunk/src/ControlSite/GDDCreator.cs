@@ -10,6 +10,9 @@ using DistDBMS.Common.Execution;
 
 namespace DistDBMS.ControlSite
 {
+    /// <summary>
+    /// 生成GDD的类
+    /// </summary>
     public class GDDCreator
     {
         List<SiteDefinition> siteDefList = new List<SiteDefinition>();

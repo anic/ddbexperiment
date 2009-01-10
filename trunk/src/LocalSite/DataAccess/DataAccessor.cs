@@ -228,51 +228,6 @@ namespace DistDBMS.LocalSite.DataAccess
             }
         }
 
-        public bool InsertLdd(TableSchema lddSchema,object ldd)
-        {
-            SQLiteCommand sqlCmd = new SQLiteCommand(conn);
-
-            try
-            {
-                sqlCmd.CommandText = "insert into " + lddSchema.TableName + " values(1,$ldd)";
-                sqlCmd.Parameters.Add("$ldd", System.Data.DbType.Object).Value = ldd;
-                int result = sqlCmd.ExecuteNonQuery();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                lastEx = ex;
-                return false;
-            }
-        }
-
-        public object QueryLdd(TableSchema lddSchema)
-        {
-            SQLiteCommand sqlCmd = new SQLiteCommand(conn);
-            try
-            {
-                sqlCmd.CommandText = "select * from " + lddSchema.TableName + " where id = 1";
-
-                SQLiteDataReader reader = sqlCmd.ExecuteReader();
-                {
-                    //填充数据
-
-                    while (reader.Read())
-                    {
-                        if (reader.FieldCount == 2)
-                            return reader[1];
-                    }
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                lastEx = ex;
-                return null;
-            }
-        }
-
-
         #region IDisposable Members
 
         public void Dispose()

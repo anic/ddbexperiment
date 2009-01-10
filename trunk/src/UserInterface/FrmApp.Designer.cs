@@ -46,8 +46,6 @@ namespace DistDBMS.UserInterface
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsWizzard = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsImportScript = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsImportData = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,17 +56,11 @@ namespace DistDBMS.UserInterface
             this.menuItemOption = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.timer = new System.Windows.Forms.Timer(this.components);
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.tsCancelButton = new System.Windows.Forms.ToolStripSplitButton();
-            this.tsExesqlProgress = new System.Windows.Forms.ToolStripProgressBar();
-            this.tsInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.uscExecuteQuery = new DistDBMS.UserInterface.Controls.UscExecuteQuery();
             this.uscSiteViewer = new DistDBMS.UserInterface.Controls.UscSiteViewer();
             this.uscFragmentViewer = new DistDBMS.UserInterface.Controls.UscFragmentViewer();
             this.pnlControl.SuspendLayout();
             this.mainMenu.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tvwMenu
@@ -135,8 +127,6 @@ namespace DistDBMS.UserInterface
             // 
             this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsWizzard,
-            this.tsImportScript,
-            this.tsImportData,
             this.toolStripSeparator1,
             this.tsExit});
             this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
@@ -146,33 +136,19 @@ namespace DistDBMS.UserInterface
             // tsWizzard
             // 
             this.tsWizzard.Name = "tsWizzard";
-            this.tsWizzard.Size = new System.Drawing.Size(160, 22);
+            this.tsWizzard.Size = new System.Drawing.Size(152, 22);
             this.tsWizzard.Text = "运行向导";
             this.tsWizzard.Click += new System.EventHandler(this.tsWizzard_Click);
-            // 
-            // tsImportScript
-            // 
-            this.tsImportScript.Name = "tsImportScript";
-            this.tsImportScript.Size = new System.Drawing.Size(160, 22);
-            this.tsImportScript.Text = "导入初始化脚本";
-            this.tsImportScript.Click += new System.EventHandler(this.tsImportScript_Click);
-            // 
-            // tsImportData
-            // 
-            this.tsImportData.Name = "tsImportData";
-            this.tsImportData.Size = new System.Drawing.Size(160, 22);
-            this.tsImportData.Text = "导入数据";
-            this.tsImportData.Click += new System.EventHandler(this.tsImportData_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(157, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // tsExit
             // 
             this.tsExit.Name = "tsExit";
-            this.tsExit.Size = new System.Drawing.Size(160, 22);
+            this.tsExit.Size = new System.Drawing.Size(152, 22);
             this.tsExit.Text = "退出";
             this.tsExit.Click += new System.EventHandler(this.tsExit_Click);
             // 
@@ -232,50 +208,6 @@ namespace DistDBMS.UserInterface
             this.menuItemAbout.Size = new System.Drawing.Size(100, 22);
             this.menuItemAbout.Text = "关于";
             // 
-            // timer
-            // 
-            this.timer.Interval = 300;
-            this.timer.Tick += new System.EventHandler(this.timer_Tick);
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.BackColor = System.Drawing.SystemColors.Control;
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsCancelButton,
-            this.tsExesqlProgress,
-            this.tsInfo});
-            this.statusStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
-            this.statusStrip1.Location = new System.Drawing.Point(0, 460);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.statusStrip1.Size = new System.Drawing.Size(697, 0);
-            this.statusStrip1.TabIndex = 11;
-            // 
-            // tsCancelButton
-            // 
-            this.tsCancelButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.tsCancelButton.Image = ((System.Drawing.Image)(resources.GetObject("tsCancelButton.Image")));
-            this.tsCancelButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsCancelButton.Name = "tsCancelButton";
-            this.tsCancelButton.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.tsCancelButton.Size = new System.Drawing.Size(48, 21);
-            this.tsCancelButton.Text = "取消";
-            this.tsCancelButton.Visible = false;
-            this.tsCancelButton.ButtonClick += new System.EventHandler(this.tsCancelButton_ButtonClick);
-            // 
-            // tsExesqlProgress
-            // 
-            this.tsExesqlProgress.Name = "tsExesqlProgress";
-            this.tsExesqlProgress.Size = new System.Drawing.Size(200, 17);
-            this.tsExesqlProgress.Visible = false;
-            // 
-            // tsInfo
-            // 
-            this.tsInfo.Name = "tsInfo";
-            this.tsInfo.Size = new System.Drawing.Size(103, 17);
-            this.tsInfo.Text = "正在执行SQL语句";
-            this.tsInfo.Visible = false;
-            // 
             // uscExecuteQuery
             // 
             this.uscExecuteQuery.CommandResultText = "";
@@ -320,7 +252,6 @@ namespace DistDBMS.UserInterface
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.pnlControl);
             this.Controls.Add(this.mainMenu);
-            this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.mainMenu;
             this.Name = "FrmApp";
@@ -331,8 +262,6 @@ namespace DistDBMS.UserInterface
             this.pnlControl.ResumeLayout(false);
             this.mainMenu.ResumeLayout(false);
             this.mainMenu.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -356,17 +285,10 @@ namespace DistDBMS.UserInterface
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem tsExit;
-        private System.Windows.Forms.Timer timer;
         private DistDBMS.UserInterface.Controls.UscSiteViewer uscSiteViewer;
         private DistDBMS.UserInterface.Controls.UscFragmentViewer uscFragmentViewer;
         private System.Windows.Forms.ToolStripMenuItem tsWizzard;
-        private System.Windows.Forms.ToolStripMenuItem tsImportScript;
-        private System.Windows.Forms.ToolStripMenuItem tsImportData;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel tsInfo;
-        private System.Windows.Forms.ToolStripProgressBar tsExesqlProgress;
-        private System.Windows.Forms.ToolStripSplitButton tsCancelButton;
         
     }
 }

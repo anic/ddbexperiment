@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DistDBMS.Common
 {
+    /// <summary>
+    /// 属性类型
+    /// </summary>
     public enum AttributeType
     {
         Unknown,
@@ -16,12 +19,18 @@ namespace DistDBMS.Common
         BLOB
     }
 
+    /// <summary>
+    /// 关系符
+    /// </summary>
     public enum RelationOperator
     {
         And,
         Or
     }
 
+    /// <summary>
+    /// 逻辑运算符
+    /// </summary>
     public enum LogicOperator
     {
         Greater,

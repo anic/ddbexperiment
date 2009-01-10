@@ -8,6 +8,11 @@ namespace DistDBMS.UserInterface.Handler
 {
     class FileUploader
     {
+        /// <summary>
+        /// 将文本文件读成string数组
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public static string[] ReadFileToString(string fileName)
         {
             List<string> result = new List<string>();

@@ -5,11 +5,17 @@ using System.Text;
 
 namespace DistDBMS.Common.Execution
 {
+    /// <summary>
+    /// 执行包
+    /// </summary>
     [Serializable]
     public class ExecutionPackage 
     {
         public int ID { get; set; }
 
+        /// <summary>
+        /// 包的类型定义
+        /// </summary>
         public enum PackageType
         { 
             Plan = 0,
@@ -18,6 +24,9 @@ namespace DistDBMS.Common.Execution
             PlanData
         }
 
+        /// <summary>
+        /// 类型
+        /// </summary>
         public PackageType Type { get; set; }
 
         public ExecutionPackage()

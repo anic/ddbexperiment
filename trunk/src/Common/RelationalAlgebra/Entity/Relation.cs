@@ -8,6 +8,9 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.Common.RelationalAlgebra.Entity
 {
+    /// <summary>
+    /// 关系代数的节点
+    /// </summary>
     [Serializable]
     public class Relation:ICloneable
     {

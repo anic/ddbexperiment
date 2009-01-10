@@ -20,11 +20,29 @@ namespace DistDBMS.ControlSite
 {
     class PackageProcessor
     {
+        /// <summary>
+        /// 默认超时时间
+        /// </summary>
         int DEFALUT_TIMEOUT_MINISEC = 60000;
 
+        /// <summary>
+        /// 数据字典
+        /// </summary>
         GlobalDirectory gdd;
+
+        /// <summary>
+        /// 站点的名称
+        /// </summary>
         string name;
+
+        /// <summary>
+        /// 网络配置参数
+        /// </summary>
         ClusterConfiguration config;
+
+        /// <summary>
+        /// 网络配置参数2
+        /// </summary>
         NetworkInitiator initiator;
 
         internal class LocalSiteFailException : Exception
@@ -65,7 +83,7 @@ namespace DistDBMS.ControlSite
         {
             try
             {
-                Debug.WriteLine("-------------0");
+                Debug.WriteLine("收到数据");
 
                 Guid newSessionId = Guid.NewGuid();
                 //packet
@@ -75,7 +93,7 @@ namespace DistDBMS.ControlSite
                     {
                         if ((packet as ServerClientTextObjectPacket).Text == Common.NetworkCommand.GDDSCRIPT)
                         {
-                            //string[] gddScript = (packet as ServerClientTextObjectPacket).Object as string[];
+                            
                             int size = packet.ReadInt();
                             string[] gddScript = new string[size];
                             for (int i = 0; i < size; ++i)
@@ -116,13 +134,13 @@ namespace DistDBMS.ControlSite
                         else if ((packet as ServerClientTextObjectPacket).Text == Common.NetworkCommand.DATASCRIPT)
                         {
                             //string[] dataScript = (packet as ServerClientTextObjectPacket).Object as string[];
-                            Common.Debug.WriteLine("收到数据: " + DateTime.Now.ToLongTimeString());
+                            Common.Debug.WriteLine("收到数据");
                             int size = packet.ReadInt();
                             string[] dataScript = new string[size];
                             for (int i = 0; i < size; ++i)
                                 dataScript[i] = packet.ReadString();
 
-                            Common.Debug.WriteLine("转成string[]: " + DateTime.Now.ToLongTimeString());
+                            Common.Debug.WriteLine("转换完成");
 
                             DataImporter importer = new DataImporter(gdd);
                             importer.ImportFromText(dataScript);
@@ -130,7 +148,7 @@ namespace DistDBMS.ControlSite
                             ImportPlanCreator importPlanCreator = new ImportPlanCreator(gdd);
                             List<ExecutionPlan> plans = importPlanCreator.CreatePlans(importer);
 
-                            Common.Debug.WriteLine("生成计划: " + DateTime.Now.ToLongTimeString());
+                            Common.Debug.WriteLine("生成计划");
                             List<Table> tables = new List<Table>();
                             foreach (ExecutionPlan p in plans)
                             {
@@ -165,10 +183,6 @@ namespace DistDBMS.ControlSite
                                 }
                                 GetLocalSiteClient(conn, p.ExecutionSite.Name).SendPacket(packet2);
 
-                                //GetLocalSiteClient(conn, p.ExecutionSite.Name).SendStepTextObjectPacket(newSessionId,
-                                //        Network.SessionStepPacket.StepIndexNone,
-                                //        Network.SessionStepPacket.StepIndexNone,
-                                //        Common.NetworkCommand.PLAN, package);
                             }
 
                             
@@ -181,7 +195,7 @@ namespace DistDBMS.ControlSite
                                 //TODO:导入期间出错
 
                             }
-                            Common.Debug.WriteLine("执行完成: " + DateTime.Now.ToLongTimeString());
+                            Common.Debug.WriteLine("执行完成");
                             string result = "Data imported successful";
                             conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
                         }
@@ -198,14 +212,10 @@ namespace DistDBMS.ControlSite
                                 return;
                             }
 
-
-
-                            Debug.WriteLine("-------------A");
                             string sql = (packet as ServerClientTextObjectPacket).Object as string;
                             ParserSwitcher ps = new ParserSwitcher();
                             bool bParse = ps.Parse(sql.Trim(), gdd);
 
-                            Debug.WriteLine("-------------B");
                             if (!bParse)
                             {
 
@@ -213,7 +223,7 @@ namespace DistDBMS.ControlSite
                                 conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
                                 return;
                             }
-                            Debug.WriteLine("-------------C");
+                            
                             #region 查询
                             if (ps.LastResult is Selection)
                             {
@@ -228,9 +238,8 @@ namespace DistDBMS.ControlSite
                                     conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
                                     return;
                                 }
-                                //TO 刘璋：可以从这里开始测试转换
+                                //可以从这里开始测试转换
 
-                                Debug.WriteLine("-------------D");
                                 SQL2RelationalAlgebraInterface converter = new NaiveSQL2RelationalAlgebraConverter();
                                 converter.SetQueryCalculus(s3);
                                 Relation relationalgebra = converter.SQL2RelationalAlgebra(gdd, true);
@@ -244,10 +253,6 @@ namespace DistDBMS.ControlSite
                                 //TODO 这里作为测试，临时修改，填写ResultName
                                 TempModifier tempModifier = new TempModifier(gdd);
                                 tempModifier.Modify(relationalgebra);
-
-                                
-
-                                Debug.WriteLine("-------------E");
 
                                 //测试代码
                                 string output = (new RelationDebugger()).GetDebugString(relationalgebra);
@@ -265,8 +270,6 @@ namespace DistDBMS.ControlSite
                                 output = (new RelationDebugger()).GetDebugString(root);
                                 DistDBMS.Common.Debug.WriteLine(output);
                                 result.OptimizedQueryTree = root;
-
-                                Debug.WriteLine("-------------F");
 
                                 List<ExecutionPlan> plans = creator.SplitPlan(gPlan);
                                 creator.FillSite(root, plans);
@@ -286,9 +289,7 @@ namespace DistDBMS.ControlSite
                                             Common.NetworkCommand.PLAN, package);
                                 }
 
-                                Debug.WriteLine("-------------G");
-
-                                NetworkPacket lastPackage = null; //表示数据的那个
+                                NetworkPacket lastPackage = null; //表示数据的那个packet
 
                                 foreach (ExecutionPlan p in plans)
                                 {
@@ -326,14 +327,12 @@ namespace DistDBMS.ControlSite
                                     result.Type = ExecutionResult.ResultType.Data;
                                     okPacket = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
                                     okPacket.WriteInt(0);
-                                    //okPacket.CopyFrom(lastPackage, lastPackage.Pos, lastPackage.Size - lastPackage.Pos);
                                 }
                                 else
                                     okPacket = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_ERROR, result);
 
                                 conn.SendPacket(okPacket);
 
-                                //conn.SendServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, result);
                             }
                             #endregion
                             #region 插入
@@ -459,6 +458,7 @@ namespace DistDBMS.ControlSite
                     
                     SocketException ex = (e as System.Net.Sockets.SocketException);
                 
+                    //查询哪一个LocalSite站点出错
                     foreach (string localSite in initiator.LocalSiteNames)
                     {
 
@@ -490,7 +490,6 @@ namespace DistDBMS.ControlSite
 
             gdd = gddCreator.CreateGDD();
             return gdd != null;
-
         }
 
 

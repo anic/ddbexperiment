@@ -21,7 +21,6 @@ namespace DistDBMS.UserInterface
 {
     public partial class FrmApp : Form
     {
-        GlobalDirectory gdd;
         MenuTreeSwitcher switcher;
         ClusterConfiguration clusterConfig;
 
@@ -54,8 +53,9 @@ namespace DistDBMS.UserInterface
         /// <summary>
         /// 执行查询
         /// </summary>
-        /// <param name="sql"></param>
+        /// <param name="sql">sql语句</param>
         /// <returns></returns>
+        /// <remarks>对外可以用于测试</remarks>
         public ExecutionResult ExecuteSQL(string sql)
         {
 
@@ -107,13 +107,12 @@ namespace DistDBMS.UserInterface
                 writer.WriteLog(uscExecuteQuery.SQLText + "\r\n" + ex.StackTrace);
                 MessageBox.Show("执行出现异常，并已经记录到error.log中", "出错", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            FinishProgress();
+            
         }
 
         void uscExecuteQuery_OnExecuteSQL(object sender, EventArgs e)
         {
             ExecuteSQLWithOutput();
-            //StartThread();
         }
 
         public void RunDefaultWizzard()
@@ -145,7 +144,7 @@ namespace DistDBMS.UserInterface
             }
 
             //uscExecuteQuery.SQLText = "select Product.name,Product.stocks,Producer.name from Product,Producer where Product.producer_id=Producer.id and Producer.location='BJ' and Product.stocks > 4000";
-            uscExecuteQuery.SQLText = "select Customer.id,Customer.name,Product.name,Purchase.number from Customer,Product,Purchase where Customer.id=Purchase.customer_id and Product.id=Purchase.product_id and Customer.rank = 1 and Product.stocks > 2000";
+            //uscExecuteQuery.SQLText = "select Customer.id,Customer.name,Product.name,Purchase.number from Customer,Product,Purchase where Customer.id=Purchase.customer_id and Product.id=Purchase.product_id and Customer.rank = 1 and Product.stocks > 2000";
 
             uscExecuteQuery.EnableTip = true;
 
@@ -173,75 +172,12 @@ namespace DistDBMS.UserInterface
 
         }
 
-        private void tsImportScript_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void tsImportData_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void tsExit_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void timer_Tick(object sender, EventArgs e)
-        {
-            if (tExecute != null && tExecute.IsAlive)
-            {
-                this.tsExesqlProgress.Value = (this.tsExesqlProgress.Value + this.tsExesqlProgress.Maximum / 10) % this.tsExesqlProgress.Maximum;
-            }
-            else
-                timer.Stop();
-        }
-
-        private void MultiThreadsRunSQL()
-        {
-            ExecutionResult exResult = ExecuteSQL(uscExecuteQuery.SQLText);
-        }
-
-        Thread tExecute;
-        private void StartThread()
-        {
-            tExecute = new Thread(new ThreadStart(ExecuteSQLWithOutput));
-            tExecute.Start();
-            ShowProgress();
-        }
-
-        private void FinishProgress()
-        {
-            timer.Stop();
-            this.tsCancelButton.Visible = false;
-            this.tsExesqlProgress.Visible = false;
-            this.tsExesqlProgress.Value = 0;
-            this.tsInfo.Visible = false;
-        }
-
-        private void ShowProgress()
-        {
-            this.tsCancelButton.Visible = true;
-            this.tsExesqlProgress.Visible = true;
-            this.tsInfo.Visible = true;
-            timer.Start();
-        }
-
-        private void tsCancelButton_ButtonClick(object sender, EventArgs e)
-        {
-            if (tExecute != null && tExecute.IsAlive)
-            {
-                try
-                {
-                    tExecute.Abort();
-                }
-                catch { }
-            }
-            FinishProgress();
-        }
-
-
+       
 
 
     }

@@ -6,6 +6,9 @@ using System.IO;
 
 namespace DistDBMS.UserInterface
 {
+    /// <summary>
+    /// 填写日志，作为测试使用
+    /// </summary>
     class LogWriter
     {
         string filename = "error.log";

@@ -10,8 +10,7 @@ namespace DistDBMS.TestResult
     
     
     /// <summary>
-    ///This is a test class for FrmAppTest and is intended
-    ///to contain all FrmAppTest Unit Tests
+    ///测试工程，进行Sql查询测试
     ///</summary>
     [TestClass()]
     public class FrmAppTest
@@ -141,7 +140,10 @@ namespace DistDBMS.TestResult
             }
             
             actual = target.ExecuteSQL(sql);
+            //比较数目是否相同
             Assert.AreEqual(expected.Tuples.Count, actual.Data.Tuples.Count, "fail in " + sql);
+
+            //比较属性个数是否相同
             if (expected.Tuples.Count > 0)
                 Assert.AreEqual(expected.Tuples[0].Data.Count, actual.Data.Tuples[0].Data.Count, "Field diff;");
 
@@ -162,41 +164,6 @@ namespace DistDBMS.TestResult
                         return false;
             }
             return true;
-
-            //foreach (Tuple t1 in r1.Tuples)
-            //{
-            //    bool found = false;
-
-            //    foreach (Tuple t2 in r2.Tuples)
-            //    {
-            //        if (t1.Data.Count > 0 && t2.Data.Count > 0
-            //            && t1.Data[0] == t2.Data[0])
-            //        {
-            //            //比较
-            //            bool same = true;
-            //            for (int i = 0; i < t1.Data.Count; ++i)
-            //            {
-            //                if (t1.Data[i] != t2.Data[i])
-            //                {
-            //                    same = false;
-            //                    break;
-            //                }
-            //            }
-            //            if (same)
-            //            {
-            //                found = true;
-            //                break;
-            //            }
-            //        }
-
-            //    }
-
-            //    if (!found) //没有相同的
-            //        return false;
-
-            //}
-
-            //    return true;
         }
         
     }
