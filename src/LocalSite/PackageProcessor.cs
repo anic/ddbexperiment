@@ -28,19 +28,6 @@ namespace DistDBMS.LocalSite
             this.ldd = null;
         }
 
-        public void Init()
-        {
-            //if (File.Exists(this.name))
-            //{
-            //    using (DataAccess.DataAccessor da = new DistDBMS.LocalSite.DataAccess.DataAccessor(name))
-            //    {
-            //        //从数据库中获取ldd
-            //        TableSchema lddTable = CreateLddTable();
-            //        this.ldd = da.QueryLdd(lddTable) as LocalDirectory;
-            //    }
-            //}
-        }
-
         private TableSchema CreateLddTable()
         {
             TableSchema lddTable = new TableSchema();
@@ -148,7 +135,7 @@ namespace DistDBMS.LocalSite
                         exPackage.Object = t;
                         for (int i = 0; i < size; ++i)
                             t.Tuples.Add(Tuple.FromLineString(packet.ReadString()));
-                        Common.Debug.WriteLine("---------------Received tuple:" + size);
+                        Common.Debug.WriteLine("收到数据条数:" + size);
                     }
 
                     DistDBMS.Common.Debug.WriteLine(name + " package ID:" + ((packet as P2PTextObjectPacket).Object as ExecutionPackage).ID);
@@ -227,7 +214,7 @@ namespace DistDBMS.LocalSite
                                 foreach (Tuple t in table.Tuples)
                                     packet.WriteString(t.GenerateLineString(sb));
                                 
-                                Common.Debug.WriteLine("---------------Write tuple:" + table.Tuples.Count);
+                                Common.Debug.WriteLine("传输数据条数:" + table.Tuples.Count);
                                 conn.SendP2PStepTextObjectPacket(step.TransferSite.Name, packet);
 ;                                
                             }
@@ -237,7 +224,7 @@ namespace DistDBMS.LocalSite
                                 DistDBMS.Common.Debug.WriteLine(name + " finish the plan");
 
                                 ServerClientPacket packet = conn.EncapsulateServerClientTextObjectPacket(Common.NetworkCommand.RESULT_OK, newPackage);
-                                Common.Debug.WriteLine("---------------Write tuple:" + table.Tuples.Count);
+                                Common.Debug.WriteLine("传输数据条数:" + table.Tuples.Count);
                                 packet.EnsureSize(10 * 1024 * 1024);
                                 StringBuilder sb = new StringBuilder(10 * 1024);
                                 packet.WriteInt(table.Tuples.Count); //先写数据大小

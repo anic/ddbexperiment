@@ -37,7 +37,12 @@ namespace DistDBMS.Common.Dictionary
         }
 
         
-
+        /// <summary>
+        /// 通过站点名称获得分片
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private Fragment FindFragmentByName(Fragment f, string name)
         { 
             if (f.Name == name)
@@ -54,7 +59,7 @@ namespace DistDBMS.Common.Dictionary
             return null;
         }
 
-        private void FindFragmentBySiteName(string sitename,Fragment f,ref List<Fragment> result)
+         private void FindFragmentBySiteName(string sitename,Fragment f,ref List<Fragment> result)
         { 
             if (f.Site != null && f.Site.Name == sitename)
                     result.Add(f);

@@ -5,6 +5,9 @@ using DistDBMS.Common.Dictionary;
 
 namespace DistDBMS.Common.Execution
 {
+    /// <summary>
+    /// 执行计划
+    /// </summary>
     [Serializable]
     public class ExecutionPlan
     {

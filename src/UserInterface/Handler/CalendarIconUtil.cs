@@ -8,15 +8,19 @@ using System.Collections;
 
 namespace DistDBMS.UserInterface.Handler
 {
-    class CalendarIconUtil
+
+    /// <summary>
+    /// 生成Icon的类
+    /// </summary>
+    class IconUtil
     {
-        static CalendarIconUtil instance = null;
-        public static CalendarIconUtil Instance
+        static IconUtil instance = null;
+        public static IconUtil Instance
         {
             get
             {
                 if (instance == null)
-                    instance = new CalendarIconUtil();
+                    instance = new IconUtil();
                 return instance;
 
             }
@@ -24,14 +28,14 @@ namespace DistDBMS.UserInterface.Handler
 
         Pen pen;
         Hashtable imgList;
-        protected CalendarIconUtil()
+        protected IconUtil()
         {
             pen = new Pen(Color.Empty); 
             imgList = new Hashtable();
             
         }
 
-        public Image DrawCalendarImage(Color color)
+        public Image DrawIconImage(Color color)
         {
             object result = imgList[color];
             if (result != null)

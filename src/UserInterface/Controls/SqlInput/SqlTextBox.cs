@@ -10,6 +10,9 @@ using DistDBMS.Common.Table;
 
 namespace DistDBMS.UserInterface.Controls.SqlInput
 {
+    /// <summary>
+    /// SQL的输入框
+    /// </summary>
     class SqlTextBox:RichTextBox
     {
         FrmTip frmTip;

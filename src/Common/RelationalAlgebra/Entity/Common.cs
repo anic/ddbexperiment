@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DistDBMS.Common.RelationalAlgebra.Entity
 {
+    /// <summary>
+    /// 关系代数类型
+    /// </summary>
     public enum RelationalType
     { 
         Projection,

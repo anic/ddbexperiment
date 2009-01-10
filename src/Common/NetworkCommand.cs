@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DistDBMS.Common
 {
+    /// <summary>
+    /// 定义的一些网络命令常量
+    /// </summary>
     public class NetworkCommand
     {
         public static string GDDSCRIPT = "GddScript";

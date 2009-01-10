@@ -20,7 +20,7 @@ namespace DistDBMS.UserInterface.Controls
             InitializeComponent();
 
             for (int i = 0; i < colors.Length; ++i)
-                imgList.Images.Add(CalendarIconUtil.Instance.DrawCalendarImage(colors[i]));
+                imgList.Images.Add(IconUtil.Instance.DrawIconImage(colors[i]));
         }
 
         Color[] colors = new Color[] { Color.Red, Color.Blue, Color.Green, Color.Orange };
